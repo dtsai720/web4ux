@@ -1,0 +1,26 @@
+{
+  "appId": "web4ux:v1.0.0",
+  "productName": "web4ux",
+  "directories": {
+    "output": "dist_electron"
+  },
+  "files": [
+    "dist/**/*",
+    "electron/**/*"
+  ],
+  "mac": {
+    "category": "public.app-category.developer-tools"
+  },
+  "win": {
+    "target": [
+      "nsis"
+    ]
+  },
+  "linux": {
+    "target": [
+      "AppImage",
+      "deb"
+    ],
+    "category": "Development"
+  }
+}
