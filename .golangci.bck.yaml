@@ -1,0 +1,22 @@
+run:
+  concurrency: 2
+  timeout: 10m
+  tests: true
+  go: "1.22"
+
+linters:
+  disable:
+    - gomodguard
+    - gomnd
+    - execinquery
+    - contextcheck
+    - depguard
+    - exhaustruct
+    - gci
+    - varnamelen
+    - wrapcheck
+    - wsl
+    - revive
+    - lll
+    - exportloopref
+  enable-all: true

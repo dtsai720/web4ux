@@ -17,3 +17,15 @@ to this in your browser, and you can call your Go code from devtools.
 ## Building
 
 To build a redistributable, production mode package, use `wails build`.
+
+### run golangci-ci
+
+```sh
+docker run -t --rm -v $(pwd):/app -w /app golangci/golangci-lint:v2.1.6 golangci-lint run
+```
+
+### install golangci-lint
+
+```sh
+go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.1.6
+```
