@@ -1,0 +1,2684 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDGUX</title>
+    <link rel="stylesheet" href="/lib/jquery-ui/jquery-ui.css">
+
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/lib/jquery-ui/jquery-ui.js"></script>
+    <script src="/js/screenfull.min.js"></script>
+    <script src="/js/main.js"></script>
+
+</head>
+
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <a href="/Project">
+                    <span>
+                        EDGUX testing Tool
+                        <i>V1.2.10</i>
+                    </span>
+                </a>
+            </div>
+            <div class="right">
+                <div class="nav">
+                    <div class="user-icon">
+                        <span>S</span>
+                    </div>
+                    <ul class="dropdown">
+                        <li><a class="button-5 icon-setting" href="/Home/MyAccount">My account</a></li>
+                        <li><a class="button-5 icon-logout" href="/Home/LogOut">Log out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+    </partial>
+    <main b-mf9v14mmpt>
+        <div b-mf9v14mmpt class="project-result">
+
+
+            <div class="go-prev"><a href="/Project">Back to project list</a></div>
+            <div class="page-side ">
+                <div class="icon-sideinfo"></div>
+                <div class="side-info">
+                    <div class="title">P24032 BlackHawk chromebook</div>
+                    <div class="user">
+                        Sandy
+                        <span class="department">EMRIC</span>
+                    </div>
+                    <div class="date">4/28/2025 2:41:34 PM &#x2B;08:00</div>
+                </div>
+                <div class="action">
+                    <a href="/Project/Devices/3de7e0b8891e41a48f69e1ce3a5475a1" class="button-9 icon-setting2">Review
+                        setting</a>
+                </div>
+                <div class="data-nav">
+                    <div class="item">
+                        <div class="title">
+                            <span class="icon-winfitts"></span>
+                            Winfitts <span class="index">1st</span>
+                        </div>
+                        <div class="list">
+                            <span class="min-title">Winfitts</span>
+                            <a href="/Project/WinfittsResult/2c9127f5faa4486c8cbe162046454e89"
+                                class="button-5 icon-result active">Result</a>
+                            <a href="/Project/WinfittsRawData/2c9127f5faa4486c8cbe162046454e89"
+                                class="button-5 icon-rawdata ">Raw data</a>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="title">
+                            <span class="icon-draganddrop"></span>
+                            Drag and drop <span class="index">2nd</span>
+                        </div>
+                        <div class="list">
+                            <span class="min-title">Drag and drop</span>
+                            <a href="/Project/DragDropResult/f3107a546f7d4310a8ac14210bbce573"
+                                class="button-5 icon-result ">Result</a>
+                            <a href="/Project/DragRawData/f3107a546f7d4310a8ac14210bbce573"
+                                class="button-5 icon-rawdata ">Raw data</a>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="title">
+                            <span class="icon-typing"></span>
+                            Typing timed task <span class="index">3rd</span>
+                        </div>
+                        <div class="list">
+                            <span class="min-title">Typing</span>
+                            <a href="/Project/TypingResult/8c32b3447e4a4a408afc3ffb576d17b8"
+                                class="button-5 icon-result ">Result</a>
+                            <a href="/Project/TypingRawData/8c32b3447e4a4a408afc3ffb576d17b8"
+                                class="button-5 icon-rawdata ">Raw data</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </partial>
+
+            <div class="page-content">
+                <div class="task-title">
+                    <div><span class="index">1st</span>Winfitts — Result</div>
+                </div>
+
+                <div class="chart-selects">
+                    <div class="selects-1">
+                        <select data-task="add-task-select" id="chartSelector" class="select-folder">
+                            <option data-charttype="line" value="cursormovementtime">coursor movement time</option>
+                            <option data-charttype="bar" value="errorrate">Error rate</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="resultChart">
+                    <canvas id="resultChart"></canvas>
+                </div>
+
+                <!-- Winfitts by model -->
+                <div class="page-block">
+                    <h4>Average result by device ​</h4>
+                    <div class="block-content">
+                        <div class="block-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Device order​</th>
+                                        <th>Device name</th>
+                                        <th>ID</th>
+                                        <th>Target / Distance (mm)</th>
+                                        <th>Cursor movement time (ms)</th>
+                                        <th>Error rate (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>A</td>
+                                        <td>Elan BlackHawk </td>
+                                        <td>1.6</td>
+                                        <td>15/30</td>
+                                        <td>1233.823</td>
+                                        <td>2.08 %</td>
+                                    </tr>
+                                    <tr>
+                                        <td>A</td>
+                                        <td>Elan BlackHawk </td>
+                                        <td>3.5</td>
+                                        <td>3/30</td>
+                                        <td>1675.885</td>
+                                        <td>1.04 %</td>
+                                    </tr>
+                                    <tr>
+                                        <td>A</td>
+                                        <td>Elan BlackHawk </td>
+                                        <td>3.5</td>
+                                        <td>10/105</td>
+                                        <td>1639.521</td>
+                                        <td>3.12 %</td>
+                                    </tr>
+                                    <tr>
+                                        <td>A</td>
+                                        <td>Elan BlackHawk </td>
+                                        <td>5.7</td>
+                                        <td>2/100</td>
+                                        <td>2223.583</td>
+                                        <td>5.21 %</td>
+                                    </tr>
+                                    <tr>
+                                        <td>B</td>
+                                        <td>Elan golden sample</td>
+                                        <td>1.6</td>
+                                        <td>15/30</td>
+                                        <td>1244.802</td>
+                                        <td>0.00 %</td>
+                                    </tr>
+                                    <tr>
+                                        <td>B</td>
+                                        <td>Elan golden sample</td>
+                                        <td>3.5</td>
+                                        <td>3/30</td>
+                                        <td>1854.688</td>
+                                        <td>8.33 %</td>
+                                    </tr>
+                                    <tr>
+                                        <td>B</td>
+                                        <td>Elan golden sample</td>
+                                        <td>3.5</td>
+                                        <td>10/105</td>
+                                        <td>1629.833</td>
+                                        <td>2.08 %</td>
+                                    </tr>
+                                    <tr>
+                                        <td>B</td>
+                                        <td>Elan golden sample</td>
+                                        <td>5.7</td>
+                                        <td>2/100</td>
+                                        <td>2360.125</td>
+                                        <td>8.33 %</td>
+                                    </tr>
+                                    <tr>
+                                        <td>C</td>
+                                        <td>Cirque BlackHawk </td>
+                                        <td>1.6</td>
+                                        <td>15/30</td>
+                                        <td>1199.417</td>
+                                        <td>1.04 %</td>
+                                    </tr>
+                                    <tr>
+                                        <td>C</td>
+                                        <td>Cirque BlackHawk </td>
+                                        <td>3.5</td>
+                                        <td>3/30</td>
+                                        <td>2014.292</td>
+                                        <td>7.29 %</td>
+                                    </tr>
+                                    <tr>
+                                        <td>C</td>
+                                        <td>Cirque BlackHawk </td>
+                                        <td>3.5</td>
+                                        <td>10/105</td>
+                                        <td>1578.615</td>
+                                        <td>3.12 %</td>
+                                    </tr>
+                                    <tr>
+                                        <td>C</td>
+                                        <td>Cirque BlackHawk </td>
+                                        <td>5.7</td>
+                                        <td>2/100</td>
+                                        <td>2507.063</td>
+                                        <td>12.50 %</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page-block">
+                    <h4>Average result per participant ​</h4>
+                    <div class="block-content">
+                        <form id="formRemoveRowData" method="post" enctype="multipart/form-data"
+                            action="/Project/ModifyWinfittsResultRowData">
+                            <div class="blueline-title">A - Elan BlackHawk </div>
+                            <div class="block-table">
+                                <input type="hidden" name="TaskId" value="2c9127f5faa4486c8cbe162046454e89">
+                                <input type="hidden" name="IsResultCalculate" value="false">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>#</th>
+                                            <th>Participants</th>
+                                            <th>ID</th>
+                                            <th>Target / Distance</th>
+                                            <th>Cursor movement time</th>
+                                            <th>Error rate</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[0].RowDataId"
+                                                    value="a0d34782f8c24a01b40113161fba9402">
+                                                <input class="checkbox-input" id="6a45e2d986924449927da5c366d30685"
+                                                    type="checkbox" value="true" name="RowDatas[0].IsModify">
+                                                <label class="checkbox-lable" for="6a45e2d986924449927da5c366d30685">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                1
+                                            </td>
+                                            <td>CD854</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>2048.625</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>2168.000</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>2501.875</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2850.250</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[1].RowDataId"
+                                                    value="dc686ada0a6c4bb38950724af0022790">
+                                                <input class="checkbox-input" id="674f30a1ad004ff88df71fb1ae3f472e"
+                                                    type="checkbox" value="true" name="RowDatas[1].IsModify">
+                                                <label class="checkbox-lable" for="674f30a1ad004ff88df71fb1ae3f472e">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                2
+                                            </td>
+                                            <td>89457</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1610.250</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1771.625</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>2006.125</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2259.125</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[2].RowDataId"
+                                                    value="7a3a7c58715641699c9e1d9a8eeb9575">
+                                                <input class="checkbox-input" id="8664e83f5cb84a14a0f1a48e4ada825d"
+                                                    type="checkbox" value="true" name="RowDatas[2].IsModify">
+                                                <label class="checkbox-lable" for="8664e83f5cb84a14a0f1a48e4ada825d">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                3
+                                            </td>
+                                            <td>82E99</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>841.875</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1347.250</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1107.250</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>1673.500</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[3].RowDataId"
+                                                    value="810ddb6e1a044847add20c5d5ba192c5">
+                                                <input class="checkbox-input" id="9c1c6731bfcb4638bfee3c14df5ce307"
+                                                    type="checkbox" value="true" name="RowDatas[3].IsModify">
+                                                <label class="checkbox-lable" for="9c1c6731bfcb4638bfee3c14df5ce307">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                4
+                                            </td>
+                                            <td>BEEEA</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1333.625</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>2175.625</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1594.750</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2824.875</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[4].RowDataId"
+                                                    value="3773369769de435d88cc3d83e40351f5">
+                                                <input class="checkbox-input" id="54816b394f46442ab665b38bfe7d4b3f"
+                                                    type="checkbox" value="true" name="RowDatas[4].IsModify">
+                                                <label class="checkbox-lable" for="54816b394f46442ab665b38bfe7d4b3f">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                5
+                                            </td>
+                                            <td>6BF64</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>895.625</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1309.125</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1251.750</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>1785.375</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[5].RowDataId"
+                                                    value="ef8569410cd44527aa2bc0ba0805524b">
+                                                <input class="checkbox-input" id="30fbb4f1b51d409d9b296e15f27aad04"
+                                                    type="checkbox" value="true" name="RowDatas[5].IsModify">
+                                                <label class="checkbox-lable" for="30fbb4f1b51d409d9b296e15f27aad04">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                6
+                                            </td>
+                                            <td>4E47B</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1067.250</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1562.125</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1535.250</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2188.250</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[6].RowDataId"
+                                                    value="36abe57ac944457a8efc801ebc25ee4e">
+                                                <input class="checkbox-input" id="2d2d85d2a12e485590359e2093b21488"
+                                                    type="checkbox" value="true" name="RowDatas[6].IsModify">
+                                                <label class="checkbox-lable" for="2d2d85d2a12e485590359e2093b21488">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                7
+                                            </td>
+                                            <td>EEF23</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1116.125</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1850.500</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1843.750</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2212.500</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[7].RowDataId"
+                                                    value="dcea5cb78d2e492782da12b8063966b5">
+                                                <input class="checkbox-input" id="89ae87fdae764713bfeec4830d578bf4"
+                                                    type="checkbox" value="true" name="RowDatas[7].IsModify">
+                                                <label class="checkbox-lable" for="89ae87fdae764713bfeec4830d578bf4">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                9
+                                            </td>
+                                            <td>DAA8F</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1132.250</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1585.625</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1702.750</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2180.000</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[8].RowDataId"
+                                                    value="21b80ff8d66f44aea07ea0ff8f29ebb3">
+                                                <input class="checkbox-input" id="e1318176350b4a1b8d8224e51c4c50e2"
+                                                    type="checkbox" value="true" name="RowDatas[8].IsModify">
+                                                <label class="checkbox-lable" for="e1318176350b4a1b8d8224e51c4c50e2">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                10
+                                            </td>
+                                            <td>44268</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1356.625</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1690.250</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1656.125</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2295.625</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[9].RowDataId"
+                                                    value="e2be4efd468b43a18ccd3551915deaa5">
+                                                <input class="checkbox-input" id="dcaaa2be4a594fb7897f9c12e16d4370"
+                                                    type="checkbox" value="true" name="RowDatas[9].IsModify">
+                                                <label class="checkbox-lable" for="dcaaa2be4a594fb7897f9c12e16d4370">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                11
+                                            </td>
+                                            <td>B3E8B</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1413.375</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1660.625</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1632.375</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2788.750</td>
+                                            <td>25.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[10].RowDataId"
+                                                    value="9e20341e57a24782ad7307acfe5dbcbf">
+                                                <input class="checkbox-input" id="ae743511587844c1926127c51583708c"
+                                                    type="checkbox" value="true" name="RowDatas[10].IsModify">
+                                                <label class="checkbox-lable" for="ae743511587844c1926127c51583708c">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                12
+                                            </td>
+                                            <td>D6BFE</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>960.875</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1338.500</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1376.500</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>1690.625</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[11].RowDataId"
+                                                    value="cad8431b75284af097d3d59897b82309">
+                                                <input class="checkbox-input" id="24bc94ce58004ced89899ceece466218"
+                                                    type="checkbox" value="true" name="RowDatas[11].IsModify">
+                                                <label class="checkbox-lable" for="24bc94ce58004ced89899ceece466218">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                13
+                                            </td>
+                                            <td>43A37</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1029.375</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1651.375</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1465.750</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>1934.125</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+                            </div>
+                            <div class="blueline-title">B - Elan golden sample</div>
+                            <div class="block-table">
+                                <input type="hidden" name="TaskId" value="2c9127f5faa4486c8cbe162046454e89">
+                                <input type="hidden" name="IsResultCalculate" value="false">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>#</th>
+                                            <th>Participants</th>
+                                            <th>ID</th>
+                                            <th>Target / Distance</th>
+                                            <th>Cursor movement time</th>
+                                            <th>Error rate</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[12].RowDataId"
+                                                    value="a79fb52bba744f5cbe5f4c4ff02be27b">
+                                                <input class="checkbox-input" id="32daad4c73ea4118b69c65cf2afc80f3"
+                                                    type="checkbox" value="true" name="RowDatas[12].IsModify">
+                                                <label class="checkbox-lable" for="32daad4c73ea4118b69c65cf2afc80f3">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                1
+                                            </td>
+                                            <td>CD854</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1234.125</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1776.750</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>2017.125</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2537.125</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[13].RowDataId"
+                                                    value="a9a1a771b1584b299256939e72060ab7">
+                                                <input class="checkbox-input" id="703cea1059ec4602a162cbc423190e7b"
+                                                    type="checkbox" value="true" name="RowDatas[13].IsModify">
+                                                <label class="checkbox-lable" for="703cea1059ec4602a162cbc423190e7b">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                2
+                                            </td>
+                                            <td>89457</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1351.250</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>2056.500</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1954.875</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>3280.125</td>
+                                            <td>50.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[14].RowDataId"
+                                                    value="1ca43dafa2d241e4b7766638d3318459">
+                                                <input class="checkbox-input" id="3f8af58d31b84dcaad5262ab5d453141"
+                                                    type="checkbox" value="true" name="RowDatas[14].IsModify">
+                                                <label class="checkbox-lable" for="3f8af58d31b84dcaad5262ab5d453141">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                3
+                                            </td>
+                                            <td>82E99</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>922.250</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1586.250</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1346.000</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2076.625</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[15].RowDataId"
+                                                    value="b3a44801f48344db8ea2c62bb308805d">
+                                                <input class="checkbox-input" id="afcfb629f08c45b3b243340e0260803f"
+                                                    type="checkbox" value="true" name="RowDatas[15].IsModify">
+                                                <label class="checkbox-lable" for="afcfb629f08c45b3b243340e0260803f">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                4
+                                            </td>
+                                            <td>BEEEA</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1235.250</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1741.500</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1477.375</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2458.250</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[16].RowDataId"
+                                                    value="0f06641b4f134f06844dae0c0924a375">
+                                                <input class="checkbox-input" id="c491697b02ef4409804862012b47158d"
+                                                    type="checkbox" value="true" name="RowDatas[16].IsModify">
+                                                <label class="checkbox-lable" for="c491697b02ef4409804862012b47158d">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                5
+                                            </td>
+                                            <td>6BF64</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>953.375</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1410.000</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1236.250</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>1655.500</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[17].RowDataId"
+                                                    value="fc038f90fb444b4c92bdeb8bbbe0c9d3">
+                                                <input class="checkbox-input" id="cfde703b408e4705be640bac23a3863e"
+                                                    type="checkbox" value="true" name="RowDatas[17].IsModify">
+                                                <label class="checkbox-lable" for="cfde703b408e4705be640bac23a3863e">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                6
+                                            </td>
+                                            <td>4E47B</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1281.500</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1567.625</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1647.750</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2501.750</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[18].RowDataId"
+                                                    value="4e6e193f34b54245b56fe435744b632c">
+                                                <input class="checkbox-input" id="1c8c370f8ef54ae982f6ff6e68f19d0a"
+                                                    type="checkbox" value="true" name="RowDatas[18].IsModify">
+                                                <label class="checkbox-lable" for="1c8c370f8ef54ae982f6ff6e68f19d0a">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                7
+                                            </td>
+                                            <td>EEF23</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1480.500</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1917.375</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1629.875</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2138.250</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[19].RowDataId"
+                                                    value="0a74cfd35c3643bfa0919f9eea968497">
+                                                <input class="checkbox-input" id="609bb4087e20435f8a3587d7e06ec9b2"
+                                                    type="checkbox" value="true" name="RowDatas[19].IsModify">
+                                                <label class="checkbox-lable" for="609bb4087e20435f8a3587d7e06ec9b2">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                9
+                                            </td>
+                                            <td>DAA8F</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1256.500</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>2454.875</td>
+                                            <td>37.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1636.625</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2283.375</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[20].RowDataId"
+                                                    value="c68122686efe43a195dc0ff22b4f061d">
+                                                <input class="checkbox-input" id="c23dc1259ca34b01930b90be89f41981"
+                                                    type="checkbox" value="true" name="RowDatas[20].IsModify">
+                                                <label class="checkbox-lable" for="c23dc1259ca34b01930b90be89f41981">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                10
+                                            </td>
+                                            <td>44268</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1624.875</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>2337.625</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>2090.375</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2891.625</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[21].RowDataId"
+                                                    value="c0bf8219b6ef4f68a3c9829b4ee301d4">
+                                                <input class="checkbox-input" id="cbe5bd44b7dc47fb9c25e54f54cd2e19"
+                                                    type="checkbox" value="true" name="RowDatas[21].IsModify">
+                                                <label class="checkbox-lable" for="cbe5bd44b7dc47fb9c25e54f54cd2e19">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                11
+                                            </td>
+                                            <td>B3E8B</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1158.875</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1736.375</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1773.000</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2143.375</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[22].RowDataId"
+                                                    value="65b74459b68346559711a3613bf6f1d3">
+                                                <input class="checkbox-input" id="8c1f0d556c5344c39334fd533594812a"
+                                                    type="checkbox" value="true" name="RowDatas[22].IsModify">
+                                                <label class="checkbox-lable" for="8c1f0d556c5344c39334fd533594812a">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                12
+                                            </td>
+                                            <td>D6BFE</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1292.750</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1880.875</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1501.875</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>1732.500</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[23].RowDataId"
+                                                    value="bfa17b7b61684df09d91aeff01d2ba69">
+                                                <input class="checkbox-input" id="215c94b628d444af856849fd2e61ebe3"
+                                                    type="checkbox" value="true" name="RowDatas[23].IsModify">
+                                                <label class="checkbox-lable" for="215c94b628d444af856849fd2e61ebe3">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                13
+                                            </td>
+                                            <td>43A37</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1146.375</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1790.500</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1246.875</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2623.000</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+                            </div>
+                            <div class="blueline-title">C - Cirque BlackHawk </div>
+                            <div class="block-table">
+                                <input type="hidden" name="TaskId" value="2c9127f5faa4486c8cbe162046454e89">
+                                <input type="hidden" name="IsResultCalculate" value="false">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>#</th>
+                                            <th>Participants</th>
+                                            <th>ID</th>
+                                            <th>Target / Distance</th>
+                                            <th>Cursor movement time</th>
+                                            <th>Error rate</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[24].RowDataId"
+                                                    value="d6b6e139f4f445e3aa86213500eeaa91">
+                                                <input class="checkbox-input" id="2b277ab3eebf47d292371513ac8561ca"
+                                                    type="checkbox" value="true" name="RowDatas[24].IsModify">
+                                                <label class="checkbox-lable" for="2b277ab3eebf47d292371513ac8561ca">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                1
+                                            </td>
+                                            <td>CD854</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1121.000</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>2168.500</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1728.875</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>3323.000</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[25].RowDataId"
+                                                    value="4c24b7faff764e54ab782ff195f2ba8e">
+                                                <input class="checkbox-input" id="7b30ddfdaa86479f8541e25cd041561c"
+                                                    type="checkbox" value="true" name="RowDatas[25].IsModify">
+                                                <label class="checkbox-lable" for="7b30ddfdaa86479f8541e25cd041561c">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                2
+                                            </td>
+                                            <td>89457</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1445.125</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>3881.375</td>
+                                            <td>25.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1755.875</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2778.750</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[26].RowDataId"
+                                                    value="282e56f69485435a802de1d948ca055f">
+                                                <input class="checkbox-input" id="0fc288b8f1364d42804313e524dd4d91"
+                                                    type="checkbox" value="true" name="RowDatas[26].IsModify">
+                                                <label class="checkbox-lable" for="0fc288b8f1364d42804313e524dd4d91">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                3
+                                            </td>
+                                            <td>82E99</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>832.250</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1288.125</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1245.375</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>1679.500</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[27].RowDataId"
+                                                    value="6cfc0727d8a94788b574b89e85be035a">
+                                                <input class="checkbox-input" id="bcc0723f63864492a66b116382538462"
+                                                    type="checkbox" value="true" name="RowDatas[27].IsModify">
+                                                <label class="checkbox-lable" for="bcc0723f63864492a66b116382538462">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                4
+                                            </td>
+                                            <td>BEEEA</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1234.250</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1659.250</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1616.500</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2603.500</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[28].RowDataId"
+                                                    value="3394955e62964313a0e9b2e26cb1d5c3">
+                                                <input class="checkbox-input" id="30594102ff7245bead51a90513d7eb70"
+                                                    type="checkbox" value="true" name="RowDatas[28].IsModify">
+                                                <label class="checkbox-lable" for="30594102ff7245bead51a90513d7eb70">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                5
+                                            </td>
+                                            <td>6BF64</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1065.250</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1598.000</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1294.125</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>1619.000</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[29].RowDataId"
+                                                    value="cc79c6a920de48f698450b2f139a69b5">
+                                                <input class="checkbox-input" id="f19a1f70e01d49b18a8c939b5f4d036a"
+                                                    type="checkbox" value="true" name="RowDatas[29].IsModify">
+                                                <label class="checkbox-lable" for="f19a1f70e01d49b18a8c939b5f4d036a">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                6
+                                            </td>
+                                            <td>4E47B</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>990.125</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>2023.375</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1588.250</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2361.875</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[30].RowDataId"
+                                                    value="162ded9b0cad4695ba5557b3c019887a">
+                                                <input class="checkbox-input" id="8b53b2d512284c1991dc35315989b864"
+                                                    type="checkbox" value="true" name="RowDatas[30].IsModify">
+                                                <label class="checkbox-lable" for="8b53b2d512284c1991dc35315989b864">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                7
+                                            </td>
+                                            <td>EEF23</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1199.375</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1526.750</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1350.500</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>3007.875</td>
+                                            <td>25.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[31].RowDataId"
+                                                    value="3d985caa620e47d98466c79dce178ae9">
+                                                <input class="checkbox-input" id="e56465a9f98644bc98ca2c4f960312b2"
+                                                    type="checkbox" value="true" name="RowDatas[31].IsModify">
+                                                <label class="checkbox-lable" for="e56465a9f98644bc98ca2c4f960312b2">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                9
+                                            </td>
+                                            <td>DAA8F</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1747.625</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>2868.875</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>2081.500</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>3650.625</td>
+                                            <td>37.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[32].RowDataId"
+                                                    value="4451077385d9485aa4c7c0a43752d71d">
+                                                <input class="checkbox-input" id="d3d98d2b49604d21b9fbee2f7a7b8e87"
+                                                    type="checkbox" value="true" name="RowDatas[32].IsModify">
+                                                <label class="checkbox-lable" for="d3d98d2b49604d21b9fbee2f7a7b8e87">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                10
+                                            </td>
+                                            <td>44268</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1614.125</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1977.625</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1920.375</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2520.250</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[33].RowDataId"
+                                                    value="ba8fb238b2b94fe3a18240f07eef8beb">
+                                                <input class="checkbox-input" id="e50c8834737e476a991b60cdac839cbc"
+                                                    type="checkbox" value="true" name="RowDatas[33].IsModify">
+                                                <label class="checkbox-lable" for="e50c8834737e476a991b60cdac839cbc">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                11
+                                            </td>
+                                            <td>B3E8B</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1200.375</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1863.125</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1622.625</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2327.375</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[34].RowDataId"
+                                                    value="250521afef4444d0b2eef2aaccd1151e">
+                                                <input class="checkbox-input" id="7ed0fd7fc7cb4dc38baf48e0f2a09746"
+                                                    type="checkbox" value="true" name="RowDatas[34].IsModify">
+                                                <label class="checkbox-lable" for="7ed0fd7fc7cb4dc38baf48e0f2a09746">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                12
+                                            </td>
+                                            <td>D6BFE</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1015.750</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1371.750</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1383.375</td>
+                                            <td>25.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>1976.750</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[35].RowDataId"
+                                                    value="27fb92d386d841a797bbe81706477f49">
+                                                <input class="checkbox-input" id="07ba2135de0b4c9490b4fcdc177b3abc"
+                                                    type="checkbox" value="true" name="RowDatas[35].IsModify">
+                                                <label class="checkbox-lable" for="07ba2135de0b4c9490b4fcdc177b3abc">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                13
+                                            </td>
+                                            <td>43A37</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>927.750</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1944.750</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1356.000</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2236.250</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+                            </div>
+                            <input name="__RequestVerificationToken" type="hidden"
+                                value="CfDJ8N0xpib1bjxFtXtBrhy_yHypwqyYMH-1CZ0lq6iGgGMGthvjeLigQk6isjhEFDeVhaOHuVJ3laNj9XQvTcoA8abDGOfXwQt_QTmr8VOAc5c0Lx3TI_qio66UNtFLyciyx8-2Ji2rPwhjTMUkECtBemMi1kRtzKPbwBOppba4Uy4Y15imBLzo6eRocyhO33IgFA" />
+                        </form>
+                        <div class="btn-row">
+                            <button type="button" form="formRemoveRowData" class="button-3 submit">Remove</button>
+                            <button type="button" class="button-3 loading" style="display:none;">Remove</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calculator Out -->
+                <div class="page-block">
+                    <h4>Remove list</h4>
+                    <div class="block-content">
+                        <form id="formRecoverRowData" method="post" enctype="multipart/form-data"
+                            action="/Project/ModifyWinfittsResultRowData">
+                            <div class="blueline-title">A - Elan BlackHawk </div>
+                            <div class="block-table">
+
+                                <input type="hidden" name="TaskId" value="2c9127f5faa4486c8cbe162046454e89">
+                                <input type="hidden" name="IsResultCalculate" value="true">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>#</th>
+                                            <th>Participants</th>
+                                            <th>ID</th>
+                                            <th>Target / Distance</th>
+                                            <th>Cursor movement time</th>
+                                            <th>Error rate</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[0].RowDataId"
+                                                    value="bcf981e4de99466ba15f514d01070261">
+                                                <input class="checkbox-input" id="3b3d518aedc94af798730900b47e07f4"
+                                                    type="checkbox" value="true" name="RowDatas[0].IsModify">
+                                                <label class="checkbox-lable" for="3b3d518aedc94af798730900b47e07f4">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                14
+                                            </td>
+                                            <td>EF406</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>915.125</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1341.625</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1430.625</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>1715.875</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[1].RowDataId"
+                                                    value="993b98ec32d84dbc94d776c16e21317c">
+                                                <input class="checkbox-input" id="1f4e177149e34fd7946307823941df2e"
+                                                    type="checkbox" value="true" name="RowDatas[1].IsModify">
+                                                <label class="checkbox-lable" for="1f4e177149e34fd7946307823941df2e">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                20
+                                            </td>
+                                            <td>FF079</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1041.875</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1620.250</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1750.500</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2170.125</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="blueline-title">B - Elan golden sample</div>
+                            <div class="block-table">
+
+                                <input type="hidden" name="TaskId" value="2c9127f5faa4486c8cbe162046454e89">
+                                <input type="hidden" name="IsResultCalculate" value="true">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>#</th>
+                                            <th>Participants</th>
+                                            <th>ID</th>
+                                            <th>Target / Distance</th>
+                                            <th>Cursor movement time</th>
+                                            <th>Error rate</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[2].RowDataId"
+                                                    value="b3723d1d7ada4b5598ce6d988fac9769">
+                                                <input class="checkbox-input" id="1a8300db95304ddf8cc8b1416bea3544"
+                                                    type="checkbox" value="true" name="RowDatas[2].IsModify">
+                                                <label class="checkbox-lable" for="1a8300db95304ddf8cc8b1416bea3544">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                14
+                                            </td>
+                                            <td>EF406</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>1160.500</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1543.750</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1536.625</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>1900.750</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[3].RowDataId"
+                                                    value="143d05b071094b48ab68e130a54cc73c">
+                                                <input class="checkbox-input" id="85b4aede64aa45bc92eb0c3a1731bb64"
+                                                    type="checkbox" value="true" name="RowDatas[3].IsModify">
+                                                <label class="checkbox-lable" for="85b4aede64aa45bc92eb0c3a1731bb64">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                20
+                                            </td>
+                                            <td>FF079</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>984.000</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1384.750</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1661.625</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>2434.000</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="blueline-title">C - Cirque BlackHawk </div>
+                            <div class="block-table">
+
+                                <input type="hidden" name="TaskId" value="2c9127f5faa4486c8cbe162046454e89">
+                                <input type="hidden" name="IsResultCalculate" value="true">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>#</th>
+                                            <th>Participants</th>
+                                            <th>ID</th>
+                                            <th>Target / Distance</th>
+                                            <th>Cursor movement time</th>
+                                            <th>Error rate</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[4].RowDataId"
+                                                    value="971a78b19d6e489cbada8ac95adb7e8f">
+                                                <input class="checkbox-input" id="8bf99a469bea4933a56f8cafc12bc531"
+                                                    type="checkbox" value="true" name="RowDatas[4].IsModify">
+                                                <label class="checkbox-lable" for="8bf99a469bea4933a56f8cafc12bc531">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                14
+                                            </td>
+                                            <td>EF406</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>930.375</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1404.875</td>
+                                            <td>12.50 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1804.375</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>1953.375</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="RowDatas[5].RowDataId"
+                                                    value="97854e96365c4c6383cba60e43fbd678">
+                                                <input class="checkbox-input" id="78793fa66c35485589ab5e886747447b"
+                                                    type="checkbox" value="true" name="RowDatas[5].IsModify">
+                                                <label class="checkbox-lable" for="78793fa66c35485589ab5e886747447b">
+                                                    <span>
+                                                        <svg width="20px" height="20px">
+                                                            <use xlink:href="#check"></use>
+                                                        </svg>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                20
+                                            </td>
+                                            <td>FF079</td>
+                                            <td>1.6</td>
+                                            <td>15/30</td>
+                                            <td>934.625</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>3/30</td>
+                                            <td>1537.500</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>3.5</td>
+                                            <td>10/105</td>
+                                            <td>1508.875</td>
+                                            <td>25.00 %</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>5.7</td>
+                                            <td>2/100</td>
+                                            <td>1756.750</td>
+                                            <td>0.00 %</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <input name="__RequestVerificationToken" type="hidden"
+                                value="CfDJ8N0xpib1bjxFtXtBrhy_yHypwqyYMH-1CZ0lq6iGgGMGthvjeLigQk6isjhEFDeVhaOHuVJ3laNj9XQvTcoA8abDGOfXwQt_QTmr8VOAc5c0Lx3TI_qio66UNtFLyciyx8-2Ji2rPwhjTMUkECtBemMi1kRtzKPbwBOppba4Uy4Y15imBLzo6eRocyhO33IgFA" />
+                        </form>
+                        <div class="btn-row">
+                            <button type="button" form="formRecoverRowData" class="button-3 submit">Recover</button>
+                            <button type="button" class="button-3 loading" style="display:none;">Recover</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="chartDatas" style="display:none;">
+                [{"ChartType":"cursormovementtime","labels":["1.6(15mm target,30mm distance)","3.5(10mm target,105mm
+                distance)","3.5(3mm target,30mm distance)","5.7(2mm target,100mm distance)"],"datasets":[{"label":"A -
+                Elan BlackHawk ","data":[1233.823000,1639.521000,1675.885000,2223.583000]},{"label":"B - Elan golden
+                sample","data":[1244.802000,1629.833000,1854.688000,2360.125000]},{"label":"C - Cirque BlackHawk
+                ","data":[1199.417000,1578.615000,2014.292000,2507.063000]}],"AxisYName":"Cursor movement time
+                (ms)","YMax":3000},{"ChartType":"errorrate","labels":["1.6(15mm target,30mm distance)","3.5(10mm
+                target,105mm distance)","3.5(3mm target,30mm distance)","5.7(2mm target,100mm
+                distance)"],"datasets":[{"label":"A - Elan BlackHawk ","data":[2.08,3.12,1.04,5.21]},{"label":"B - Elan
+                golden sample","data":[0.00,2.08,8.33,8.33]},{"label":"C - Cirque BlackHawk
+                ","data":[1.04,3.12,7.29,12.50]}],"AxisYName":"Error rate (%)","YMax":100}]
+            </div>
+
+
+
+        </div>
+    </main>
+    <!--SVG checkbox 必要-->
+    <svg b-mf9v14mmpt class="inline-svg">
+        <symbol b-mf9v14mmpt id="check" viewbox="0 0 12 10">
+            <polyline b-mf9v14mmpt points="1.5 6 4.5 9 10.5 1"></polyline>
+        </symbol>
+    </svg>
+
+
+
+    <script>
+        $(function () {
+            $(".modalOK").click(function () {
+                $(this).closest(".modal").removeClass("show");
+            });
+
+        });
+
+    </script>
+    </partial>
+
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/chart.js"></script>
+
+    <script>
+
+        let chartColors = ['#2D8DBE', '#F0BE28', '#73B530', '#9668B1'];
+        let ctx = $('#resultChart');
+        let chartDatas = JSON.parse($("#chartDatas").html());
+
+        $(function () {
+
+            $(".submit").click(function () {
+                $(".submit").hide();
+                $(".loading").show();
+
+                $("#" + $(this).attr("form")).submit();
+
+            });
+
+            $("from").submit(function () {
+                $("button[type='submit']").hide();
+                $(".loading").show();
+            });
+
+            $("#chartSelector").change(function () {
+
+                try {
+                    resultChart.destroy();
+                }
+                catch {
+
+                }
+
+                let thisData = undefined;
+                let chartType = $(this).find(" :selected").data('charttype');
+
+                for (var i = 0; i < chartDatas.length; i++) {
+                    if (chartDatas[i].ChartType == $(this).val()) {
+                        thisData = chartDatas[i];
+                    }
+                }
+
+                if (thisData != undefined) {
+                    setChart(thisData, chartType);
+
+                    setChartWidth('.resultChart', '#resultChart', 320);
+                }
+
+            });
+
+            $("#chartSelector").change();
+
+        });
+
+        // 固定圖表寬度 & 設定高度
+        function setChartWidth(canvasBox, canvasName, h) {
+            resultChart.canvas.parentNode.style.height = '320px';
+        }
+
+        function setChart(thisData, thisType) {
+
+            let config = {
+                type: thisType,
+                data: {
+                    labels: thisData.labels,
+                    datasets: thisData.datasets
+                },
+                options: {
+                    animation: false,
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index',
+                    },
+                    scales: {
+                        y: {
+                            title: {
+                                display: true,
+                                text: function () {
+                                    return thisData.AxisYName;
+                                }
+                            },
+                            suggestedMax: function () {
+                                return thisData.YMax;
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function (TooltipItem) {
+                                    if (thisData.ChartType === 'errorrate') {
+                                        return TooltipItem.dataset.label + ': ' + TooltipItem.parsed.y + '%';
+                                    }
+                                },
+                            }
+                        }
+                    }
+                },
+            }
+            resultChart = new Chart(ctx, config);
+        }
+    </script>
+
+
+    <script>
+
+        function AddOrdinal(num) {
+            if (num <= 0) return num.ToString();
+            switch (num % 100) {
+                case 11:
+                case 12:
+                case 13:
+                    return num + "th";
+            }
+            switch (num % 10) {
+                case 1:
+                    return num + "st";
+                case 2:
+                    return num + "nd";
+                case 3:
+                    return num + "rd";
+                default:
+                    return num + "th";
+            }
+        }
+
+        $(function () {
+
+            $(document).on("click", ".modalOK", function () {
+                $(this).closest(".my-modal").removeClass("show");
+            });
+
+        });
+
+    </script>
+</body>
+
+</html>

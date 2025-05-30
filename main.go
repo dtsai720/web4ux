@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"embed"
 
 	"github.com/wailsapp/wails/v2"
@@ -9,6 +10,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/web4ux/internal/service"
 	"github.com/web4ux/pkg"
+	"github.com/web4ux/repository"
 	"github.com/web4ux/src/logger"
 	"github.com/web4ux/src/request"
 	"go.uber.org/zap"
@@ -17,14 +19,31 @@ import (
 //go:embed all:frontend/dist
 var assets embed.FS
 
+const dbPath string = "local.db?_foreign_keys=on&_journal_mode=WAL&_synchronous=NORMAL"
+
 func main() {
+	db, err := sql.Open("sqlite3", dbPath)
+	if err != nil {
+		zap.L().Sugar().Panicln("An error occurred while opening database connection", "error", err)
+	}
+	defer db.Close()
+
+	if err := db.Ping(); err != nil {
+		zap.L().Sugar().Panicln("An error occurred while pinging database", "error", err)
+	}
+
+	repository, err := repository.New(db)
+	if err != nil {
+		zap.L().Sugar().Panicln("An error occurred while creating database connection", "error", err)
+	}
+
 	log, err := zap.NewDevelopment()
 	if err != nil {
-		zap.L().Sugar().Fatalw("An error occurred while creating logger", "error", err)
+		zap.L().Sugar().Panicln("An error occurred while creating logger", "error", err)
 	}
 	defer func() {
 		if err := log.Sync(); err != nil {
-			zap.L().Error("Failed to sync logger", zap.Error(err))
+			zap.L().Sugar().Error("An error occurred while syncing logger", "error", err)
 		}
 	}()
 
@@ -32,6 +51,7 @@ func main() {
 	logging := logger.New(log)
 	service := service.New(
 		service.WithClient(request.New()),
+		service.WithDatabase(repository),
 	)
 
 	go func(ctx context.Context, log logger.ILogger) {

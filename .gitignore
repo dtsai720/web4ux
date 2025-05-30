@@ -4,3 +4,4 @@ frontend/dist
 .DS_Store
 .vscode/
 build/
+local.db
