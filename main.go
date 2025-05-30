@@ -55,7 +55,7 @@ func main() {
 	)
 
 	go func(ctx context.Context, log logger.ILogger) {
-		_ = service.Login(ctx, log, "sandy.tu@emric.com.tw", "emric1238")
+		_ = service.Login(ctx, log, "", "")
 		response, _ := service.ListProject(ctx, log, 1)
 		log.Info("ListProject response", zap.Any("response", string(response)))
 	}(ctx, logging)
