@@ -3,7 +3,7 @@
     text-align: center;
 }
 
-#logo {
+/* #logo {
     display: block;
     width: 50%;
     height: 50%;
@@ -13,13 +13,13 @@
     background-repeat: no-repeat;
     background-size: 100% 100%;
     background-origin: content-box;
-}
+} */
 
-.result {
+/* .result {
     height: 20px;
     line-height: 20px;
     margin: 1.5rem auto;
-}
+} */
 
 .input-box .btn {
     width: 60px;
@@ -56,4 +56,145 @@
 .input-box .input:focus {
     border: none;
     background-color: rgba(255, 255, 255, 1);
+}
+
+/* 在你原有的 App.css 中加入以下樣式 */
+
+/* 主按鍵容器 */
+.button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 300px;
+}
+
+/* 主按鍵樣式 */
+.main-btn {
+    padding: 15px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.main-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 返回按鍵 */
+.back-btn {
+    margin-top: 20px;
+    background-color: #6c757d;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+}
+
+.back-btn:hover {
+    background-color: #5a6268;
+}
+
+/* 檔案上傳區域 */
+.file-upload-area {
+    margin-bottom: 20px;
+}
+
+.file-input {
+    display: none;
+}
+
+.file-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.file-btn:hover {
+    background-color: #0056b3;
+}
+
+.supported-formats {
+    margin: 15px 0;
+    font-size: 14px;
+    color: #666;
+}
+
+/* 登入表單 */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 300px;
+}
+
+.login-input {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.login-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.login-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 12px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.login-btn:hover {
+    background-color: #218838;
+}
+
+.login-links {
+    margin: 15px 0;
+    font-size: 14px;
+}
+
+.login-links a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.login-links a:hover {
+    text-decoration: underline;
+}
+
+/* 幫助內容 */
+.help-content {
+    text-align: left;
+    max-width: 400px;
+}
+
+.help-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+
+.help-section h3 {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 16px;
+}
+
+.help-section p {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
+    line-height: 1.4;
 }

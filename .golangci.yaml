@@ -16,6 +16,7 @@ linters:
     - varnamelen
     - wrapcheck
     - wsl
+    - ireturn
   exclusions:
     generated: lax
     presets:

@@ -12,7 +12,7 @@ body {
     sans-serif;
 }
 
-@font-face {
+/* @font-face {
     font-family: "Nunito";
     font-style: normal;
     font-weight: 400;
@@ -23,4 +23,4 @@ body {
 #app {
     height: 100vh;
     text-align: center;
-}
+} */
