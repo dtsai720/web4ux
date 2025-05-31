@@ -11,35 +11,32 @@ import (
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO
-    users (uid, email, password)
+    users (id, email, password)
 VALUES
-    (?, ?, ?) RETURNING uid
+    (?1, ?2, ?3) RETURNING id
 `
 
 type CreateUserParams struct {
-	Uid      string
+	ID       string
 	Email    string
 	Password string
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (string, error) {
-	row := q.db.QueryRowContext(ctx, createUser, arg.Uid, arg.Email, arg.Password)
-	var uid string
-	err := row.Scan(&uid)
-	return uid, err
+	row := q.db.QueryRowContext(ctx, createUser, arg.ID, arg.Email, arg.Password)
+	var id string
+	err := row.Scan(&id)
+	return id, err
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT
-    uid, email, password
-FROM
-    users
-WHERE
-    uid = ?
+SELECT id, email, password
+FROM users
+WHERE id = ?1
 `
 
-func (q *Queries) ListUsers(ctx context.Context, uid string) ([]User, error) {
-	rows, err := q.db.QueryContext(ctx, listUsers, uid)
+func (q *Queries) ListUsers(ctx context.Context, id string) ([]User, error) {
+	rows, err := q.db.QueryContext(ctx, listUsers, id)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +44,7 @@ func (q *Queries) ListUsers(ctx context.Context, uid string) ([]User, error) {
 	var items []User
 	for rows.Next() {
 		var i User
-		if err := rows.Scan(&i.Uid, &i.Email, &i.Password); err != nil {
+		if err := rows.Scan(&i.ID, &i.Email, &i.Password); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

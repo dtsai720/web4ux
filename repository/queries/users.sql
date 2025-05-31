@@ -1,13 +1,10 @@
 -- name: CreateUser :one
 INSERT INTO
-    users (uid, email, password)
+    users (id, email, password)
 VALUES
-    (?, ?, ?) RETURNING uid;
+    (@id, @email, @password) RETURNING id;
 
 -- name: ListUsers :many
-SELECT
-    *
-FROM
-    users
-WHERE
-    uid = ?;
+SELECT *
+FROM users
+WHERE id = @id;

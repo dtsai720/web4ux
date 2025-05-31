@@ -4,8 +4,56 @@
 
 package sqlc
 
+type Device struct {
+	ID        string
+	Name      string
+	ProjectID string
+}
+
+type Participant struct {
+	ID        string
+	Name      string
+	ProjectID string
+}
+
+type Project struct {
+	ID        string
+	Name      string
+	Creator   string
+	UpdatedAt string
+}
+
 type User struct {
-	Uid      string
+	ID       string
 	Email    string
 	Password string
+}
+
+type Winfitt struct {
+	ID            string
+	ProjectID     string
+	DeviceID      string
+	ParticipantID string
+	Foreign       interface{}
+}
+
+type WinfittsDetail struct {
+	ID            string
+	InformationID string
+	Mark          string
+	X             int64
+	Y             int64
+	CreatedAt     string
+}
+
+type WinfittsInformation struct {
+	ID          string
+	WinfittsID  string
+	TrailNumber int64
+	Width       int64
+	Distance    int64
+	Angle       int64
+	IsFailed    bool
+	ErrorTimes  int64
+	Deleted     bool
 }

@@ -1,37 +1,15 @@
 package parser
 
-import "time"
+import (
+	"github.com/web4ux/models"
+)
 
-type ProjectListResult struct {
-	Name    string
-	Creator string
-	Time    time.Time
-	Link    string
-}
+type ProjectListResult = models.ProjectListResult
 
-type Position struct {
-	X int
-	Y int
-}
+type Position = models.Position
 
-type WinfittsDetail struct {
-	Mark      string
-	Position  Position
-	CreatedAt time.Time
-}
+type WinfittsDetail = models.WinfittsDetail
 
-type WinfittsItem struct {
-	TrailNumber int
-	IsFailed    bool
-	Width       int
-	Distance    int
-	Angle       int
-	ErrorTimes  int
-	Details     []WinfittsDetail
-}
+type WinfittsItem = models.WinfittsItem
 
-type WinfittsResult struct {
-	Participant string
-	DeviceName  string
-	Items       []WinfittsItem
-}
+type WinfittsResult = models.WinfittsResult
