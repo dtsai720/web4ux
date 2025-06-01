@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"embed"
 
@@ -47,19 +46,11 @@ func main() {
 		}
 	}()
 
-	ctx := context.Background()
 	logging := logger.New(log)
 	service := fetcher.New(
 		fetcher.WithClient(request.New()),
 		fetcher.WithDatabase(repository),
 	)
-
-	go func(ctx context.Context, log logger.ILogger) {
-		_ = service.Login(ctx, log, "sandy.tu@emric.com.tw", "emric1238")
-		if err := service.FetchDataAndSave(ctx, log); err != nil {
-			log.Error(err)
-		}
-	}(ctx, logging)
 
 	// Create an instance of the app structure
 	app := pkg.New(

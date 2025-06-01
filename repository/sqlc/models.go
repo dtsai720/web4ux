@@ -56,4 +56,5 @@ type WinfittsInformation struct {
 	IsFailed    bool
 	ErrorTimes  int64
 	Deleted     bool
+	Reason      string
 }

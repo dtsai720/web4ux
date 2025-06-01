@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS winfitts_information (
     is_failed BOOLEAN NOT NULL,
     error_times INTEGER NOT NULL,
     deleted BOOLEAN NOT NULL,
+    reason TEXT NOT NULL,
     FOREIGN KEY (winfitts_id) REFERENCES winfitts(id) ON DELETE CASCADE
 );
 

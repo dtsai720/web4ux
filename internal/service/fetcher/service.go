@@ -3,6 +3,7 @@ package fetcher
 import (
 	"context"
 
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"github.com/web4ux/repository"
 	"github.com/web4ux/src/common"
 	"github.com/web4ux/src/logger"
@@ -43,6 +44,7 @@ func (s *Service) FetchDataAndSave(ctx context.Context, log logger.ILogger) erro
 	}
 
 	log.Info("update data finish...")
+	runtime.EventsEmit(ctx, "Finish.\n")
 
 	return nil
 }

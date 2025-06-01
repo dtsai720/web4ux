@@ -40,7 +40,9 @@ func (a *App) Greet(name string) string {
 	return fmt.Sprintf("Hello %s, It's show time! ....", name)
 }
 
-func (a *App) Login(username, password string) {
+func (a *App) LoginAndSync(username, password string) string {
 	_ = a.service.Login(a.ctx, a.log, username, password)
 	go a.service.FetchDataAndSave(a.ctx, a.log)
+
+	return "start syncing"
 }

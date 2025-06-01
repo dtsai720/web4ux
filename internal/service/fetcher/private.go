@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"github.com/web4ux/src/logger"
 	"go.uber.org/zap"
 )
@@ -23,6 +24,7 @@ func (s *Service) fetchOne(ctx context.Context, log logger.ILogger, offset int) 
 			continue
 		}
 
+		runtime.EventsEmit(ctx, "Start update project\nid: %s\nname: %s\n\n", summary.ID, summary.Name)
 		log.With(zap.String("id", summary.ID), zap.String("name", summary.Name)).Info("Start update project")
 		project, err := s.db.UpsertProject(ctx, &summary)
 		if err != nil {
