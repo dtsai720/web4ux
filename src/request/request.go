@@ -21,7 +21,7 @@ type Request struct {
 func (r *Request) Send(ctx context.Context, log logger.ILogger, in *SendParam) ([]byte, error) {
 	request, err := http.NewRequestWithContext(ctx, in.Method, in.Path, bytes.NewBuffer(in.Body))
 	if err != nil {
-		log.Error("An error occurred while creating request", "error", err)
+		log.With(zap.Error(err)).Error("An error occurred while creating request")
 
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func (r *Request) Send(ctx context.Context, log logger.ILogger, in *SendParam) (
 
 	response, err := r.client.Do(request)
 	if err != nil {
-		log.Error("An error occurred while sending request", "error", err)
+		log.With(zap.Error(err)).Error("An error occurred while sending request")
 
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (r *Request) Send(ctx context.Context, log logger.ILogger, in *SendParam) (
 
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		log.Error("An error occurred while reading response body", "error", err)
+		log.With(zap.Error(err)).Error("An error occurred while reading response body")
 
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (r *Request) Send(ctx context.Context, log logger.ILogger, in *SendParam) (
 func New() *Request {
 	jar, err := cookiejar.New(nil)
 	if err != nil {
-		zap.L().Sugar().Fatalw("An error occurred while creating cookie jar", "error", err)
+		zap.L().Sugar().With(zap.Error(err)).Fatal("An error occurred while creating cookie jar")
 	}
 
 	return &Request{client: &http.Client{Jar: jar}}

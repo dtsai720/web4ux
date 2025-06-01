@@ -5,7 +5,7 @@ ON CONFLICT(id) DO UPDATE SET
     name = EXCLUDED.name,
     creator = EXCLUDED.creator,
     updated_at = EXCLUDED.updated_at
-RETURNING id;
+RETURNING *;
 
 -- name: ListProjects :many
 SELECT * FROM projects

@@ -14,7 +14,7 @@ INSERT INTO devices (id, name, project_id)
 VALUES (?1, ?2, ?3)
 ON CONFLICT(name, project_id) DO UPDATE
     SET name = EXCLUDED.name
-RETURNING id
+RETURNING id, name, project_id
 `
 
 type UpsertDevicesParams struct {
@@ -23,11 +23,11 @@ type UpsertDevicesParams struct {
 	ProjectID string
 }
 
-func (q *Queries) UpsertDevices(ctx context.Context, arg UpsertDevicesParams) (string, error) {
+func (q *Queries) UpsertDevices(ctx context.Context, arg UpsertDevicesParams) (Device, error) {
 	row := q.db.QueryRowContext(ctx, upsertDevices, arg.ID, arg.Name, arg.ProjectID)
-	var id string
-	err := row.Scan(&id)
-	return id, err
+	var i Device
+	err := row.Scan(&i.ID, &i.Name, &i.ProjectID)
+	return i, err
 }
 
 const upsertParticipants = `-- name: UpsertParticipants :one
@@ -35,7 +35,7 @@ INSERT INTO participants (id, name, project_id)
 VALUES (?1, ?2, ?3)
 ON CONFLICT(name, project_id) DO UPDATE
     SET name = EXCLUDED.name
-RETURNING id
+RETURNING id, name, project_id
 `
 
 type UpsertParticipantsParams struct {
@@ -44,11 +44,11 @@ type UpsertParticipantsParams struct {
 	ProjectID string
 }
 
-func (q *Queries) UpsertParticipants(ctx context.Context, arg UpsertParticipantsParams) (string, error) {
+func (q *Queries) UpsertParticipants(ctx context.Context, arg UpsertParticipantsParams) (Participant, error) {
 	row := q.db.QueryRowContext(ctx, upsertParticipants, arg.ID, arg.Name, arg.ProjectID)
-	var id string
-	err := row.Scan(&id)
-	return id, err
+	var i Participant
+	err := row.Scan(&i.ID, &i.Name, &i.ProjectID)
+	return i, err
 }
 
 const upsertWinfitts = `-- name: UpsertWinfitts :one
@@ -56,7 +56,7 @@ INSERT INTO winfitts (id, project_id, device_id, participant_id)
 VALUES (?1, ?2, ?3, ?4)
 ON CONFLICT(project_id, device_id, participant_id) DO UPDATE
     SET device_id = EXCLUDED.device_id
-RETURNING id
+RETURNING id, project_id, device_id, participant_id, "foreign"
 `
 
 type UpsertWinfittsParams struct {
@@ -66,16 +66,22 @@ type UpsertWinfittsParams struct {
 	ParticipantID string
 }
 
-func (q *Queries) UpsertWinfitts(ctx context.Context, arg UpsertWinfittsParams) (string, error) {
+func (q *Queries) UpsertWinfitts(ctx context.Context, arg UpsertWinfittsParams) (Winfitt, error) {
 	row := q.db.QueryRowContext(ctx, upsertWinfitts,
 		arg.ID,
 		arg.ProjectID,
 		arg.DeviceID,
 		arg.ParticipantID,
 	)
-	var id string
-	err := row.Scan(&id)
-	return id, err
+	var i Winfitt
+	err := row.Scan(
+		&i.ID,
+		&i.ProjectID,
+		&i.DeviceID,
+		&i.ParticipantID,
+		&i.Foreign,
+	)
+	return i, err
 }
 
 const upsertWinfittsDetail = `-- name: UpsertWinfittsDetail :one
@@ -83,7 +89,7 @@ INSERT INTO winfitts_details (id, information_id, mark, x, y, created_at)
 VALUES (?1, ?2, ?3, ?4, ?5, ?6)
 ON CONFLICT(information_id, created_at) DO UPDATE
     SET created_at = EXCLUDED.created_at
-RETURNING id
+RETURNING id, information_id, mark, x, y, created_at
 `
 
 type UpsertWinfittsDetailParams struct {
@@ -95,7 +101,7 @@ type UpsertWinfittsDetailParams struct {
 	CreatedAt     string
 }
 
-func (q *Queries) UpsertWinfittsDetail(ctx context.Context, arg UpsertWinfittsDetailParams) (string, error) {
+func (q *Queries) UpsertWinfittsDetail(ctx context.Context, arg UpsertWinfittsDetailParams) (WinfittsDetail, error) {
 	row := q.db.QueryRowContext(ctx, upsertWinfittsDetail,
 		arg.ID,
 		arg.InformationID,
@@ -104,9 +110,16 @@ func (q *Queries) UpsertWinfittsDetail(ctx context.Context, arg UpsertWinfittsDe
 		arg.Y,
 		arg.CreatedAt,
 	)
-	var id string
-	err := row.Scan(&id)
-	return id, err
+	var i WinfittsDetail
+	err := row.Scan(
+		&i.ID,
+		&i.InformationID,
+		&i.Mark,
+		&i.X,
+		&i.Y,
+		&i.CreatedAt,
+	)
+	return i, err
 }
 
 const upsertWinfittsInformation = `-- name: UpsertWinfittsInformation :one
@@ -116,7 +129,7 @@ ON CONFLICT(winfitts_id, trail_number) DO UPDATE
     SET is_failed = EXCLUDED.is_failed,
     error_times = EXCLUDED.error_times,
     deleted = EXCLUDED.deleted
-RETURNING id
+RETURNING id, winfitts_id, trail_number, width, distance, angle, is_failed, error_times, deleted
 `
 
 type UpsertWinfittsInformationParams struct {
@@ -131,7 +144,7 @@ type UpsertWinfittsInformationParams struct {
 	Deleted     bool
 }
 
-func (q *Queries) UpsertWinfittsInformation(ctx context.Context, arg UpsertWinfittsInformationParams) (string, error) {
+func (q *Queries) UpsertWinfittsInformation(ctx context.Context, arg UpsertWinfittsInformationParams) (WinfittsInformation, error) {
 	row := q.db.QueryRowContext(ctx, upsertWinfittsInformation,
 		arg.ID,
 		arg.WinfittsID,
@@ -143,7 +156,17 @@ func (q *Queries) UpsertWinfittsInformation(ctx context.Context, arg UpsertWinfi
 		arg.ErrorTimes,
 		arg.Deleted,
 	)
-	var id string
-	err := row.Scan(&id)
-	return id, err
+	var i WinfittsInformation
+	err := row.Scan(
+		&i.ID,
+		&i.WinfittsID,
+		&i.TrailNumber,
+		&i.Width,
+		&i.Distance,
+		&i.Angle,
+		&i.IsFailed,
+		&i.ErrorTimes,
+		&i.Deleted,
+	)
+	return i, err
 }

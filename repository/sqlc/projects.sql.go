@@ -57,7 +57,7 @@ ON CONFLICT(id) DO UPDATE SET
     name = EXCLUDED.name,
     creator = EXCLUDED.creator,
     updated_at = EXCLUDED.updated_at
-RETURNING id
+RETURNING id, name, creator, updated_at
 `
 
 type UpsertProjectParams struct {
@@ -67,14 +67,19 @@ type UpsertProjectParams struct {
 	UpdatedAt string
 }
 
-func (q *Queries) UpsertProject(ctx context.Context, arg UpsertProjectParams) (string, error) {
+func (q *Queries) UpsertProject(ctx context.Context, arg UpsertProjectParams) (Project, error) {
 	row := q.db.QueryRowContext(ctx, upsertProject,
 		arg.ID,
 		arg.Name,
 		arg.Creator,
 		arg.UpdatedAt,
 	)
-	var id string
-	err := row.Scan(&id)
-	return id, err
+	var i Project
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Creator,
+		&i.UpdatedAt,
+	)
+	return i, err
 }

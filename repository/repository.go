@@ -22,8 +22,21 @@ type Repository struct {
 	queries IDatabase
 }
 
+// UpsertExtractWinfittsDetails implements IRepository.
+func (r *Repository) UpsertExtractWinfittsDetails(ctx context.Context, id string, rows []models.WinfittsRawData) error {
+	for _, row := range rows {
+		if err := r.UpsertExtractWinfittsDetail(ctx, id, &row); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // UpsertWinfitts implements IRepository.
-func (r *Repository) UpsertWinfitts(ctx context.Context, projectID string, in models.WinfittsResult) error {
+//
+//nolint:funlen
+func (r *Repository) UpsertExtractWinfittsDetail(ctx context.Context, id string, in *models.WinfittsRawData) error {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
@@ -32,16 +45,17 @@ func (r *Repository) UpsertWinfitts(ctx context.Context, projectID string, in mo
 
 	device, err := q.UpsertDevices(ctx, sqlc.UpsertDevicesParams{
 		ID:        uuid.NewString(),
-		ProjectID: projectID,
+		ProjectID: id,
 		Name:      in.DeviceName,
 	})
 	if err != nil {
 		return tx.Rollback()
 	}
+
 	participant, err := q.UpsertParticipants(ctx, sqlc.UpsertParticipantsParams{
 		ID:        uuid.NewString(),
 		Name:      in.Participant,
-		ProjectID: projectID,
+		ProjectID: id,
 	})
 	if err != nil {
 		return tx.Rollback()
@@ -49,17 +63,18 @@ func (r *Repository) UpsertWinfitts(ctx context.Context, projectID string, in mo
 
 	winfitts, err := q.UpsertWinfitts(ctx, sqlc.UpsertWinfittsParams{
 		ID:            uuid.NewString(),
-		ProjectID:     projectID,
-		DeviceID:      device,
-		ParticipantID: participant,
+		ProjectID:     id,
+		DeviceID:      device.ID,
+		ParticipantID: participant.ID,
 	})
 	if err != nil {
 		return tx.Rollback()
 	}
+
 	for _, item := range in.Items {
 		information, err := q.UpsertWinfittsInformation(ctx, sqlc.UpsertWinfittsInformationParams{
 			ID:          uuid.NewString(),
-			WinfittsID:  winfitts,
+			WinfittsID:  winfitts.ID,
 			TrailNumber: int64(item.TrailNumber),
 			Width:       int64(item.Width),
 			Distance:    int64(item.Distance),
@@ -71,10 +86,11 @@ func (r *Repository) UpsertWinfitts(ctx context.Context, projectID string, in mo
 		if err != nil {
 			return tx.Rollback()
 		}
+
 		for _, detail := range item.Details {
 			_, err := q.UpsertWinfittsDetail(ctx, sqlc.UpsertWinfittsDetailParams{
 				ID:            uuid.NewString(),
-				InformationID: information,
+				InformationID: information.ID,
 				Mark:          detail.Mark,
 				X:             int64(detail.Position.X),
 				Y:             int64(detail.Position.Y),
@@ -90,7 +106,7 @@ func (r *Repository) UpsertWinfitts(ctx context.Context, projectID string, in mo
 }
 
 // UpsertProject implements IRepository.
-func (r *Repository) UpsertProject(ctx context.Context, arg models.ProjectListResult) (string, error) {
+func (r *Repository) UpsertProject(ctx context.Context, arg *models.ProjectSummary) (sqlc.Project, error) {
 	return r.queries.UpsertProject(ctx, sqlc.UpsertProjectParams{
 		ID:        arg.ID,
 		Name:      arg.Name,

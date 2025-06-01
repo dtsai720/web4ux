@@ -1,4 +1,4 @@
-package service
+package fetcher
 
 const (
 	HOST        string = "https://edgux.com"

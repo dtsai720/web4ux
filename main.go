@@ -8,7 +8,7 @@ import (
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
-	"github.com/web4ux/internal/service"
+	"github.com/web4ux/internal/service/fetcher"
 	"github.com/web4ux/pkg"
 	"github.com/web4ux/repository"
 	"github.com/web4ux/src/logger"
@@ -49,15 +49,16 @@ func main() {
 
 	ctx := context.Background()
 	logging := logger.New(log)
-	service := service.New(
-		service.WithClient(request.New()),
-		service.WithDatabase(repository),
+	service := fetcher.New(
+		fetcher.WithClient(request.New()),
+		fetcher.WithDatabase(repository),
 	)
 
 	go func(ctx context.Context, log logger.ILogger) {
 		_ = service.Login(ctx, log, "", "")
-		response, _ := service.ListProject(ctx, log, 1)
-		log.Info("ListProject response", zap.Any("response", string(response)))
+		if err := service.FetchDataAndSave(ctx, log); err != nil {
+			log.Error(err)
+		}
 	}(ctx, logging)
 
 	// Create an instance of the app structure

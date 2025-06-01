@@ -50,3 +50,14 @@ func Find[T any](slice []T, fn func(T) bool) (T, bool) {
 
 	return zero, false
 }
+
+func SameLen[T any](slice []T, options ...[]T) bool {
+	size := len(slice)
+	for _, option := range options {
+		if len(option) != size {
+			return false
+		}
+	}
+
+	return true
+}

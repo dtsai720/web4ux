@@ -1,4 +1,4 @@
-package service
+package fetcher
 
 import (
 	"context"
@@ -8,5 +8,5 @@ import (
 
 type IService interface {
 	Login(ctx context.Context, log logger.ILogger, email, password string) error
-	ListProject(ctx context.Context, log logger.ILogger, offset int) ([]byte, error)
+	FetchDataAndSave(ctx context.Context, log logger.ILogger) error
 }

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 // import logo from './assets/images/logo-universal.png';
 // import './App.css';
-import {Login} from "../wailsjs/go/pkg/App";
 
 function App() {
     const [currentPage, setCurrentPage] = useState('home');

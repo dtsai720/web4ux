@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/web4ux/internal/service"
+	"github.com/web4ux/internal/service/fetcher"
 	"github.com/web4ux/src/common"
 	"github.com/web4ux/src/logger"
 )
 
-func WithService(service service.IService) common.OptionalFn[App] {
+func WithService(service fetcher.IService) common.OptionalFn[App] {
 	return func(s *App) { s.service = service }
 }
 
@@ -21,7 +21,7 @@ func WithLogger(log logger.ILogger) common.OptionalFn[App] {
 type App struct {
 	ctx     context.Context
 	log     logger.ILogger
-	service service.IService
+	service fetcher.IService
 }
 
 // NewApp creates a new App application struct.
