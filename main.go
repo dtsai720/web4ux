@@ -22,7 +22,7 @@ var assets embed.FS
 const dbPath string = "local.db?_foreign_keys=on&_journal_mode=WAL&_synchronous=NORMAL"
 
 func main() {
-	db, err := sql.Open("sqlite3", dbPath)
+	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		zap.L().Sugar().Panicln("An error occurred while opening database connection", "error", err)
 	}
