@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/web4ux/models"
 	"github.com/web4ux/repository/sqlc"
+	_ "modernc.org/sqlite"
 )
 
 //go:embed schema.sql
@@ -37,41 +37,40 @@ func (r *Repository) UpsertExtractWinfittsDetails(ctx context.Context, id string
 //
 //nolint:funlen
 func (r *Repository) UpsertExtractWinfittsDetail(ctx context.Context, id string, in *models.WinfittsRawData) error {
-	tx, err := r.db.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-	q := r.queries.WithTx(tx)
-
-	device, err := q.UpsertDevices(ctx, sqlc.UpsertDevicesParams{
+	device, err := r.queries.UpsertDevices(ctx, sqlc.UpsertDevicesParams{
 		ID:        uuid.NewString(),
 		ProjectID: id,
 		Name:      in.DeviceName,
 	})
 	if err != nil {
-		return tx.Rollback()
+		return err
 	}
 
-	participant, err := q.UpsertParticipants(ctx, sqlc.UpsertParticipantsParams{
+	participant, err := r.queries.UpsertParticipants(ctx, sqlc.UpsertParticipantsParams{
 		ID:        uuid.NewString(),
 		Name:      in.Participant,
 		ProjectID: id,
 	})
 	if err != nil {
-		return tx.Rollback()
+		return err
 	}
 
-	winfitts, err := q.UpsertWinfitts(ctx, sqlc.UpsertWinfittsParams{
+	winfitts, err := r.queries.UpsertWinfitts(ctx, sqlc.UpsertWinfittsParams{
 		ID:            uuid.NewString(),
 		ProjectID:     id,
 		DeviceID:      device.ID,
 		ParticipantID: participant.ID,
 	})
 	if err != nil {
-		return tx.Rollback()
+		return err
 	}
 
 	for _, item := range in.Items {
+		tx, err := r.db.BeginTx(ctx, nil)
+		if err != nil {
+			return err
+		}
+		q := r.queries.WithTx(tx)
 		information, err := q.UpsertWinfittsInformation(ctx, sqlc.UpsertWinfittsInformationParams{
 			ID:          uuid.NewString(),
 			WinfittsID:  winfitts.ID,
@@ -94,15 +93,19 @@ func (r *Repository) UpsertExtractWinfittsDetail(ctx context.Context, id string,
 				Mark:          detail.Mark,
 				X:             int64(detail.Position.X),
 				Y:             int64(detail.Position.Y),
-				CreatedAt:     detail.CreatedAt.UTC().Format(time.RFC3339),
+				Timestamp:     int64(detail.Timestamp),
 			})
 			if err != nil {
 				return tx.Rollback()
 			}
 		}
+
+		if err := tx.Commit(); err != nil {
+			return err
+		}
 	}
 
-	return tx.Commit()
+	return nil
 }
 
 // UpsertProject implements IRepository.

@@ -25,7 +25,7 @@ type Position struct {
 type WinfittsDetail struct {
 	Mark      string
 	Position  Position
-	CreatedAt time.Time
+	Timestamp int
 }
 
 func (w *WinfittsDetail) Load(slice []string) error {
@@ -44,9 +44,7 @@ func (w *WinfittsDetail) Load(slice []string) error {
 	if err != nil {
 		return err
 	}
-	seconds := int64(timestamp / 1000)
-	nanoseconds := int64((timestamp % 1000) * 1_000_000)
-	w.CreatedAt = time.Unix(seconds, nanoseconds).UTC()
+	w.Timestamp = timestamp
 
 	return nil
 }
@@ -150,6 +148,7 @@ func (w *WinfittsRawData) Load(slice []string) error {
 		builder.WriteString(line)
 		contexts = append(contexts, line)
 	}
+	w.Items = w.Items[1:]
 
 	return nil
 }

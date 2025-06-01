@@ -29,8 +29,8 @@ ON CONFLICT(winfitts_id, trail_number) DO UPDATE
 RETURNING *;
 
 -- name: UpsertWinfittsDetail :one
-INSERT INTO winfitts_details (id, information_id, mark, x, y, created_at)
-VALUES (@id, @information_id, @mark, @x, @y, @created_at)
-ON CONFLICT(information_id, created_at) DO UPDATE
-    SET created_at = EXCLUDED.created_at
+INSERT INTO winfitts_details (id, information_id, mark, x, y, timestamp)
+VALUES (@id, @information_id, @mark, @x, @y, @timestamp)
+ON CONFLICT(information_id, timestamp) DO UPDATE
+    SET timestamp = EXCLUDED.timestamp
 RETURNING *;

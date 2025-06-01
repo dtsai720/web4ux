@@ -42,4 +42,5 @@ func (a *App) Greet(name string) string {
 
 func (a *App) Login(username, password string) {
 	_ = a.service.Login(a.ctx, a.log, username, password)
+	go a.service.FetchDataAndSave(a.ctx, a.log)
 }

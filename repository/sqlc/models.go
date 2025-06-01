@@ -43,7 +43,7 @@ type WinfittsDetail struct {
 	Mark          string
 	X             int64
 	Y             int64
-	CreatedAt     string
+	Timestamp     int64
 }
 
 type WinfittsInformation struct {

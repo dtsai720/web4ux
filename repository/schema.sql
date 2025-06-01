@@ -63,8 +63,8 @@ CREATE TABLE IF NOT EXISTS winfitts_details (
     mark TEXT NOT NULL,
     x INTEGER NOT NULL,
     y INTEGER NOT NULL,
-    created_at TEXT NOT NULL,
+    timestamp INTEGER NOT NULL,
     FOREIGN KEY (information_id) REFERENCES winfitts_information(id) ON DELETE CASCADE
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS unique_winfitts_details_winfitts_created_at ON winfitts_details (information_id, created_at);
+CREATE UNIQUE INDEX IF NOT EXISTS unique_winfitts_details_winfitts_timestamp ON winfitts_details (information_id, timestamp);

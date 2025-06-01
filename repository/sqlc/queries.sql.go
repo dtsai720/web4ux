@@ -85,11 +85,11 @@ func (q *Queries) UpsertWinfitts(ctx context.Context, arg UpsertWinfittsParams) 
 }
 
 const upsertWinfittsDetail = `-- name: UpsertWinfittsDetail :one
-INSERT INTO winfitts_details (id, information_id, mark, x, y, created_at)
+INSERT INTO winfitts_details (id, information_id, mark, x, y, timestamp)
 VALUES (?1, ?2, ?3, ?4, ?5, ?6)
-ON CONFLICT(information_id, created_at) DO UPDATE
-    SET created_at = EXCLUDED.created_at
-RETURNING id, information_id, mark, x, y, created_at
+ON CONFLICT(information_id, timestamp) DO UPDATE
+    SET timestamp = EXCLUDED.timestamp
+RETURNING id, information_id, mark, x, y, timestamp
 `
 
 type UpsertWinfittsDetailParams struct {
@@ -98,7 +98,7 @@ type UpsertWinfittsDetailParams struct {
 	Mark          string
 	X             int64
 	Y             int64
-	CreatedAt     string
+	Timestamp     int64
 }
 
 func (q *Queries) UpsertWinfittsDetail(ctx context.Context, arg UpsertWinfittsDetailParams) (WinfittsDetail, error) {
@@ -108,7 +108,7 @@ func (q *Queries) UpsertWinfittsDetail(ctx context.Context, arg UpsertWinfittsDe
 		arg.Mark,
 		arg.X,
 		arg.Y,
-		arg.CreatedAt,
+		arg.Timestamp,
 	)
 	var i WinfittsDetail
 	err := row.Scan(
@@ -117,7 +117,7 @@ func (q *Queries) UpsertWinfittsDetail(ctx context.Context, arg UpsertWinfittsDe
 		&i.Mark,
 		&i.X,
 		&i.Y,
-		&i.CreatedAt,
+		&i.Timestamp,
 	)
 	return i, err
 }

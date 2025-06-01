@@ -55,7 +55,7 @@ func main() {
 	)
 
 	go func(ctx context.Context, log logger.ILogger) {
-		_ = service.Login(ctx, log, "", "")
+		_ = service.Login(ctx, log, "sandy.tu@emric.com.tw", "emric1238")
 		if err := service.FetchDataAndSave(ctx, log); err != nil {
 			log.Error(err)
 		}

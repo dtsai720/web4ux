@@ -9,6 +9,71 @@ import (
 	"context"
 )
 
+const getProjectDetail = `-- name: GetProjectDetail :many
+SELECT projects.name AS project_name,
+	devices.name AS device_name,
+	participants.name AS participant_name,
+	winfitts_informatiON.error_times,
+	winfitts_informatiON.is_failed,
+	winfitts_informatiON.trail_number,
+	winfitts_details.mark,
+	winfitts_details.timestamp
+FROM projects
+INNER JOIN devices ON projects.id = devices.project_id
+INNER JOIN participants ON projects.id  = participants.project_id
+INNER JOIN winfitts ON
+	projects.id = winfitts.project_id
+	AND devices.id = winfitts.device_id
+	AND participants.id = winfitts.participant_id
+INNER JOIN winfitts_informatiON ON winfitts.id = winfitts_informatiON.winfitts_id
+INNER JOIN winfitts_details ON winfitts_informatiON.id = winfitts_details.informatiON_id
+WHERE projects.id = ?1
+ORDER BY device_name,  participant_name, trail_number ASC
+`
+
+type GetProjectDetailRow struct {
+	ProjectName     string
+	DeviceName      string
+	ParticipantName string
+	ErrorTimes      int64
+	IsFailed        bool
+	TrailNumber     int64
+	Mark            string
+	Timestamp       int64
+}
+
+func (q *Queries) GetProjectDetail(ctx context.Context, projectID string) ([]GetProjectDetailRow, error) {
+	rows, err := q.db.QueryContext(ctx, getProjectDetail, projectID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetProjectDetailRow
+	for rows.Next() {
+		var i GetProjectDetailRow
+		if err := rows.Scan(
+			&i.ProjectName,
+			&i.DeviceName,
+			&i.ParticipantName,
+			&i.ErrorTimes,
+			&i.IsFailed,
+			&i.TrailNumber,
+			&i.Mark,
+			&i.Timestamp,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listProjects = `-- name: ListProjects :many
 SELECT id, name, creator, updated_at FROM projects
 WHERE (COALESCE(?1, '') = '' OR id = ?1)
