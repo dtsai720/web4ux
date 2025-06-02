@@ -6,6 +6,6 @@ export function Greet(arg1) {
   return window['go']['pkg']['App']['Greet'](arg1);
 }
 
-export function Sync(arg1, arg2) {
-  return window['go']['pkg']['App']['Sync'](arg1, arg2);
+export function LoginAndSync(arg1, arg2) {
+  return window['go']['pkg']['App']['LoginAndSync'](arg1, arg2);
 }
