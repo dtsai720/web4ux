@@ -17,6 +17,18 @@ type ProjectSummary struct {
 	Link    string
 }
 
+type ProjectSummaries struct {
+	Total int       `json:"total,omitempty"`
+	Data  []Project `json:"data,omitempty"`
+}
+
+type Project struct {
+	ID        string    `json:"id,omitempty"`
+	Name      string    `json:"name,omitempty"`
+	Creator   string    `json:"creator,omitempty"`
+	UpdatedAt time.Time `json:"updatedAt,omitempty"`
+}
+
 type Position struct {
 	X int
 	Y int

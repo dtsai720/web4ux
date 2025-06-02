@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-// import { SummaryPage } from './Summary';
+import { LoginAndSync, ListProjects, DeleteOrRestore, GetProjectDetail } from '../wailsjs/go/pkg/App';
+import * as runtime from '@wailsio/runtime';
 
 const App = () => {
   const [currentPage, setCurrentPage] = useState('home');
@@ -9,44 +10,7 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [selectedSummaryId, setSelectedSummaryId] = useState(null);
-
-  // Mock API calls - 在實際應用中會替換為 Wails 的 Go 函數調用
-  const mockLogin = async (email, password) => {
-    setLoading(true);
-    setProgress(0);
-
-    // 模擬登入和同步過程
-    for (let i = 0; i <= 100; i += 10) {
-      setProgress(i);
-      await new Promise(resolve => setTimeout(resolve, 200));
-    }
-
-    setIsLoggedIn(true);
-    setSyncData({
-      totalRecords: 1250,
-      lastSync: new Date().toISOString(),
-      categories: ['Documents', 'Images', 'Settings'],
-      status: 'success'
-    });
-    setLoading(false);
-    setProgress(100);
-  };
-
-  const mockGetSummaryData = () => {
-    // 模擬從 Go 後端獲取 JSON 數據
-    return syncData ? {
-      summary: {
-        totalItems: 1250,
-        categories: [
-          { name: 'Documents', count: 800 },
-          { name: 'Images', count: 350 },
-          { name: 'Settings', count: 100 }
-        ],
-        lastUpdate: syncData.lastSync,
-        syncStatus: 'Synchronized'
-      }
-    } : null;
-  };
+  const [syncing, setSyncing] = useState(false);
 
   const HomePage = () => (
     <div className="container-fluid vh-100 d-flex flex-column justify-content-center align-items-center bg-light">
@@ -90,9 +54,19 @@ const App = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
+
     const handleLogin = async () => {
       if (email && password) {
-        await mockLogin(email, password);
+        setLoading(true);
+        setCurrentProject(null);
+
+        try {
+          await LoginAndSync(email, password);
+        } catch (e) {
+          console.error("Sync failed:", e);
+        }
+
+        setLoading(false);
       }
     };
 
@@ -325,26 +299,7 @@ const App = () => {
 
       try {
         const offset = (currentPageNum - 1) * itemsPerPage;
-        const order = `${orderBy}_${orderDirection}`;
-
-        // 使用 mock data 進行測試
-        // const result = await window.go.main.App.get_summary(
-        //   searchName,
-        //   searchCreator,
-        //   order,
-        //   offset,
-        //   itemsPerPage
-        // );
-
-        // Mock data for testing
-        const result = {
-          data: [
-            { id: '111', name: '222', creator: '333', updatedAt: '2025-06-25T00:00:00Z' },
-            { id: '112', name: 'Test Data', creator: 'User A', updatedAt: '2025-06-24T10:30:00Z' },
-            { id: '113', name: 'Sample', creator: 'User B', updatedAt: '2025-06-23T15:45:00Z' }
-          ],
-          total: 3
-        };
+        const result = await ListProjects(searchName, searchCreator, orderBy, orderDirection, offset);
 
         setSummaries(result.data || []);
         setTotalItems(result.total || 0);
@@ -365,8 +320,8 @@ const App = () => {
     const handleReset = () => {
       setSearchName('');
       setSearchCreator('');
-      setOrderBy('name');
-      setOrderDirection('asc');
+      setOrderBy('updatedAt');
+      setOrderDirection('desc');
       setCurrentPageNum(1);
     };
 
@@ -593,477 +548,6 @@ const App = () => {
     );
   };
 
-  // const DetailPage = () => {
-  //   const [details, setDetails] = useState([]);
-  //   const [loading, setLoading] = useState(false);
-  //   const [error, setError] = useState('');
-  //   const [summaryInfo, setSummaryInfo] = useState(null);
-  //   const [groupBy, setGroupBy] = useState('device'); // device, participant, trail
-  //   const [expandedLevel1, setExpandedLevel1] = useState({}); // 第一層展開狀態
-  //   const [expandedLevel2, setExpandedLevel2] = useState({}); // 第二層展開狀態
-  //   const [expandedLevel3, setExpandedLevel3] = useState({}); // 第三層展開狀態
-
-  //   // 載入詳細資料
-  //   const loadDetails = async () => {
-  //     if (!selectedSummaryId) {
-  //       setError('No summary ID provided');
-  //       return;
-  //     }
-
-  //     setLoading(true);
-  //     setError('');
-
-  //     try {
-  //       // Mock data 生成更完整的測試數據
-  //       const mockDetails = [];
-
-  //       // 4 devices, 12 participants, 32 trails per participant per device
-  //       for (let deviceNum = 1; deviceNum <= 4; deviceNum++) {
-  //         for (let participantNum = 1; participantNum <= 12; participantNum++) {
-  //           for (let trailNum = 1; trailNum <= 32; trailNum++) {
-  //             mockDetails.push({
-  //               id: `${deviceNum}-${participantNum}-${trailNum}`,
-  //               device: `Device ${deviceNum}`,
-  //               participant: `Participant ${participantNum}`,
-  //               trail: trailNum,
-  //               from: `Point ${Math.floor(Math.random() * 100)}`,
-  //               to: `Point ${Math.floor(Math.random() * 100)}`,
-  //               is_error: Math.random() < 0.1, // 10% error rate
-  //               is_available: Math.random() < 0.8, // 80% available
-  //               deleted: Math.random() < 0.05 // 5% deleted
-  //             });
-  //           }
-  //         }
-  //       }
-
-  //       const result = {
-  //         summary: {
-  //           id: selectedSummaryId,
-  //           name: 'Test Summary',
-  //           creator: 'Test Creator',
-  //           updatedAt: '2025-06-25T00:00:00Z'
-  //         },
-  //         details: mockDetails
-  //       };
-
-  //       setDetails(result.details || []);
-  //       setSummaryInfo(result.summary || null);
-  //     } catch (err) {
-  //       setError('Failed to load details: ' + err.message);
-  //       setDetails([]);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   useEffect(() => {
-  //     loadDetails();
-  //   }, [selectedSummaryId]);
-
-  //   // 切換刪除狀態
-  //   const toggleDelete = (itemId) => {
-  //     setDetails(prevDetails =>
-  //       prevDetails.map(detail =>
-  //         detail.id === itemId
-  //           ? { ...detail, deleted: !detail.deleted }
-  //           : detail
-  //       )
-  //     );
-  //   };
-
-  //   // 統計資訊
-  //   const stats = {
-  //     total: details.length,
-  //     errors: details.filter(d => d.is_error).length,
-  //     available: details.filter(d => d.is_available).length,
-  //     deleted: details.filter(d => d.deleted).length
-  //   };
-
-  //   // 分組資料 - 三層結構
-  //   const getGroupedData = () => {
-  //     const grouped = {};
-
-  //     details.forEach(detail => {
-  //       let level1Key, level2Key, level3Key;
-
-  //       // 根據分組方式決定三層的鍵值
-  //       if (groupBy === 'device') {
-  //         level1Key = detail.device;
-  //         level2Key = detail.participant;
-  //         level3Key = `Trail ${detail.trail}`;
-  //       } else if (groupBy === 'participant') {
-  //         level1Key = detail.participant;
-  //         level2Key = detail.device;
-  //         level3Key = `Trail ${detail.trail}`;
-  //       } else { // trail
-  //         level1Key = `Trail ${detail.trail}`;
-  //         level2Key = detail.device;
-  //         level3Key = detail.participant;
-  //       }
-
-  //       // 建立三層結構
-  //       if (!grouped[level1Key]) {
-  //         grouped[level1Key] = {};
-  //       }
-  //       if (!grouped[level1Key][level2Key]) {
-  //         grouped[level1Key][level2Key] = {};
-  //       }
-  //       if (!grouped[level1Key][level2Key][level3Key]) {
-  //         grouped[level1Key][level2Key][level3Key] = [];
-  //       }
-
-  //       grouped[level1Key][level2Key][level3Key].push(detail);
-  //     });
-
-  //     return grouped;
-  //   };
-
-  //   // 切換展開狀態
-  //   const toggleExpandLevel1 = (key) => {
-  //     setExpandedLevel1(prev => ({
-  //       ...prev,
-  //       [key]: !prev[key]
-  //     }));
-  //   };
-
-  //   const toggleExpandLevel2 = (level1Key, level2Key) => {
-  //     const combinedKey = `${level1Key}-${level2Key}`;
-  //     setExpandedLevel2(prev => ({
-  //       ...prev,
-  //       [combinedKey]: !prev[combinedKey]
-  //     }));
-  //   };
-
-  //   const toggleExpandLevel3 = (level1Key, level2Key, level3Key) => {
-  //     const combinedKey = `${level1Key}-${level2Key}-${level3Key}`;
-  //     setExpandedLevel3(prev => ({
-  //       ...prev,
-  //       [combinedKey]: !prev[combinedKey]
-  //     }));
-  //   };
-
-  //   const groupedData = getGroupedData();
-
-  //   // 獲取狀態徽章
-  //   const getStatusBadges = (detail) => {
-  //     const badges = [];
-  //     if (detail.is_available) {
-  //       badges.push(<span key="available" className="badge bg-success me-1">Available</span>);
-  //     }
-  //     if (detail.is_error) {
-  //       badges.push(<span key="error" className="badge bg-danger me-1">Error</span>);
-  //     }
-  //     if (detail.deleted) {
-  //       badges.push(<span key="deleted" className="badge bg-warning me-1">Deleted</span>);
-  //     }
-  //     if (badges.length === 0) {
-  //       badges.push(<span key="normal" className="badge bg-secondary">Normal</span>);
-  //     }
-  //     return badges;
-  //   };
-
-  //   // 計算統計數據
-  //   const getGroupStats = (group) => {
-  //     let totalItems = 0;
-  //     const traverse = (obj) => {
-  //       if (Array.isArray(obj)) {
-  //         totalItems += obj.length;
-  //       } else {
-  //         Object.values(obj).forEach(traverse);
-  //       }
-  //     };
-  //     traverse(group);
-  //     return totalItems;
-  //   };
-
-  //   return (
-  //     <div className="container mt-5">
-  //       <div className="row">
-  //         <div className="col-12">
-  //           <div className="d-flex justify-content-between align-items-center mb-4">
-  //             <h2>Detail View</h2>
-  //             <div>
-  //               <button
-  //                 className="btn btn-outline-secondary me-2"
-  //                 onClick={() => setCurrentPage('summary')}
-  //               >
-  //                 Back to Summary
-  //               </button>
-  //               <button
-  //                 className="btn btn-secondary"
-  //                 onClick={() => setCurrentPage('home')}
-  //               >
-  //                 Home
-  //               </button>
-  //             </div>
-  //           </div>
-
-  //           {/* 摘要資訊 */}
-  //           {summaryInfo && (
-  //             <div className="card mb-4">
-  //               <div className="card-header">
-  //                 <h5 className="mb-0">Summary Information</h5>
-  //               </div>
-  //               <div className="card-body">
-  //                 <div className="row">
-  //                   <div className="col-md-4">
-  //                     <strong>Name:</strong> {summaryInfo.name}
-  //                   </div>
-  //                   <div className="col-md-4">
-  //                     <strong>Creator:</strong> {summaryInfo.creator}
-  //                   </div>
-  //                   <div className="col-md-4">
-  //                     <strong>Updated:</strong> {new Date(summaryInfo.updatedAt).toLocaleString()}
-  //                   </div>
-  //                 </div>
-  //               </div>
-  //             </div>
-  //           )}
-
-  //           {/* 統計卡片 */}
-  //           <div className="row mb-4">
-  //             <div className="col-md-3">
-  //               <div className="card bg-primary text-white">
-  //                 <div className="card-body text-center">
-  //                   <h3>{stats.total}</h3>
-  //                   <p className="mb-0">Total Items</p>
-  //                 </div>
-  //               </div>
-  //             </div>
-  //             <div className="col-md-3">
-  //               <div className="card bg-success text-white">
-  //                 <div className="card-body text-center">
-  //                   <h3>{stats.available}</h3>
-  //                   <p className="mb-0">Available</p>
-  //                 </div>
-  //               </div>
-  //             </div>
-  //             <div className="col-md-3">
-  //               <div className="card bg-danger text-white">
-  //                 <div className="card-body text-center">
-  //                   <h3>{stats.errors}</h3>
-  //                   <p className="mb-0">Errors</p>
-  //                 </div>
-  //               </div>
-  //             </div>
-  //             <div className="col-md-3">
-  //               <div className="card bg-warning text-white">
-  //                 <div className="card-body text-center">
-  //                   <h3>{stats.deleted}</h3>
-  //                   <p className="mb-0">Deleted</p>
-  //                 </div>
-  //               </div>
-  //             </div>
-  //           </div>
-
-  //           {/* 分組選項 */}
-  //           <div className="card mb-4">
-  //             <div className="card-body">
-  //               <h6 className="mb-3">Group By:</h6>
-  //               <div className="btn-group" role="group">
-  //                 <button
-  //                   type="button"
-  //                   className={`btn ${groupBy === 'device' ? 'btn-primary' : 'btn-outline-primary'}`}
-  //                   onClick={() => {
-  //                     setGroupBy('device');
-  //                     setExpandedLevel1({});
-  //                     setExpandedLevel2({});
-  //                     setExpandedLevel3({});
-  //                   }}
-  //                 >
-  //                   Device
-  //                 </button>
-  //                 <button
-  //                   type="button"
-  //                   className={`btn ${groupBy === 'participant' ? 'btn-primary' : 'btn-outline-primary'}`}
-  //                   onClick={() => {
-  //                     setGroupBy('participant');
-  //                     setExpandedLevel1({});
-  //                     setExpandedLevel2({});
-  //                     setExpandedLevel3({});
-  //                   }}
-  //                 >
-  //                   Participant
-  //                 </button>
-  //                 <button
-  //                   type="button"
-  //                   className={`btn ${groupBy === 'trail' ? 'btn-primary' : 'btn-outline-primary'}`}
-  //                   onClick={() => {
-  //                     setGroupBy('trail');
-  //                     setExpandedLevel1({});
-  //                     setExpandedLevel2({});
-  //                     setExpandedLevel3({});
-  //                   }}
-  //                 >
-  //                   Trail
-  //                 </button>
-  //               </div>
-  //             </div>
-  //           </div>
-
-  //           {/* 載入狀態 */}
-  //           {loading && (
-  //             <div className="text-center mb-4">
-  //               <div className="spinner-border" role="status">
-  //                 <span className="visually-hidden">Loading...</span>
-  //               </div>
-  //             </div>
-  //           )}
-
-  //           {/* 錯誤訊息 */}
-  //           {error && (
-  //             <div className="alert alert-danger" role="alert">
-  //               {error}
-  //             </div>
-  //           )}
-
-  //           {/* 三層分組詳細資料 */}
-  //           {!loading && !error && (
-  //             <div className="card">
-  //               <div className="card-header">
-  //                 <h5 className="mb-0">
-  //                   Detail Records (Grouped by {groupBy.charAt(0).toUpperCase() + groupBy.slice(1)})
-  //                 </h5>
-  //               </div>
-  //               <div className="card-body">
-  //                 {Object.keys(groupedData).length > 0 ? (
-  //                   <div className="accordion" id="detailAccordion">
-  //                     {/* 第一層 */}
-  //                     {Object.entries(groupedData).map(([level1Key, level2Data]) => (
-  //                       <div key={level1Key} className="accordion-item mb-3">
-  //                         <h2 className="accordion-header">
-  //                           <button
-  //                             className="accordion-button collapsed"
-  //                             type="button"
-  //                             onClick={() => toggleExpandLevel1(level1Key)}
-  //                             aria-expanded={expandedLevel1[level1Key] || false}
-  //                           >
-  //                             <strong className="text-primary">{level1Key}</strong>
-  //                             <span className="badge bg-primary ms-2">
-  //                               {getGroupStats(level2Data)} total items
-  //                             </span>
-  //                           </button>
-  //                         </h2>
-  //                         {(expandedLevel1[level1Key] || false) && (
-  //                           <div className="accordion-collapse collapse show">
-  //                             <div className="accordion-body">
-
-  //                               {/* 第二層 */}
-  //                               <div className="accordion" id={`level2-${level1Key}`}>
-  //                                 {Object.entries(level2Data).map(([level2Key, level3Data]) => (
-  //                                   <div key={`${level1Key}-${level2Key}`} className="accordion-item mb-2">
-  //                                     <h2 className="accordion-header">
-  //                                       <button
-  //                                         className="accordion-button collapsed"
-  //                                         type="button"
-  //                                         onClick={() => toggleExpandLevel2(level1Key, level2Key)}
-  //                                         aria-expanded={expandedLevel2[`${level1Key}-${level2Key}`] || false}
-  //                                       >
-  //                                         <strong className="text-success">{level2Key}</strong>
-  //                                         <span className="badge bg-success ms-2">
-  //                                           {getGroupStats(level3Data)} items
-  //                                         </span>
-  //                                       </button>
-  //                                     </h2>
-  //                                     {(expandedLevel2[`${level1Key}-${level2Key}`] || false) && (
-  //                                       <div className="accordion-collapse collapse show">
-  //                                         <div className="accordion-body">
-
-  //                                           {/* 第三層 */}
-  //                                           <div className="accordion" id={`level3-${level1Key}-${level2Key}`}>
-  //                                             {Object.entries(level3Data).map(([level3Key, items]) => (
-  //                                               <div key={`${level1Key}-${level2Key}-${level3Key}`} className="accordion-item mb-2">
-  //                                                 <h2 className="accordion-header">
-  //                                                   <button
-  //                                                     className="accordion-button collapsed"
-  //                                                     type="button"
-  //                                                     onClick={() => toggleExpandLevel3(level1Key, level2Key, level3Key)}
-  //                                                     aria-expanded={expandedLevel3[`${level1Key}-${level2Key}-${level3Key}`] || false}
-  //                                                   >
-  //                                                     <strong className="text-info">{level3Key}</strong>
-  //                                                     <span className="badge bg-info ms-2">
-  //                                                       {items.length} records
-  //                                                     </span>
-  //                                                   </button>
-  //                                                 </h2>
-  //                                                 {(expandedLevel3[`${level1Key}-${level2Key}-${level3Key}`] || false) && (
-  //                                                   <div className="accordion-collapse collapse show">
-  //                                                     <div className="accordion-body">
-
-  //                                                       {/* 最內層資料 */}
-  //                                                       {items.map((item) => (
-  //                                                         <div key={item.id} className="card mb-3">
-  //                                                           <div className="card-body">
-  //                                                             <div className="row">
-  //                                                               <div className="col-md-8">
-  //                                                                 <h6 className="card-title">
-  //                                                                   {item.device} - {item.participant} - Trail {item.trail}
-  //                                                                 </h6>
-  //                                                                 <p className="card-text">
-  //                                                                   <strong>From:</strong> {item.from} <br/>
-  //                                                                   <strong>To:</strong> {item.to}
-  //                                                                 </p>
-  //                                                                 <div className="mb-2">
-  //                                                                   {getStatusBadges(item)}
-  //                                                                 </div>
-  //                                                                 <small className="text-muted">ID: {item.id}</small>
-  //                                                               </div>
-  //                                                               <div className="col-md-4 text-end">
-  //                                                                 <button
-  //                                                                   className={`btn btn-sm ${
-  //                                                                     item.deleted
-  //                                                                       ? 'btn-outline-success'
-  //                                                                       : 'btn-outline-danger'
-  //                                                                   } mb-2`}
-  //                                                                   onClick={() => toggleDelete(item.id)}
-  //                                                                 >
-  //                                                                   {item.deleted ? 'Restore' : 'Delete'}
-  //                                                                 </button>
-  //                                                                 <br/>
-  //                                                                 <button className="btn btn-sm btn-outline-info">
-  //                                                                   View Details
-  //                                                                 </button>
-  //                                                               </div>
-  //                                                             </div>
-  //                                                           </div>
-  //                                                         </div>
-  //                                                       ))}
-
-  //                                                     </div>
-  //                                                   </div>
-  //                                                 )}
-  //                                               </div>
-  //                                             ))}
-  //                                           </div>
-
-  //                                         </div>
-  //                                       </div>
-  //                                     )}
-  //                                   </div>
-  //                                 ))}
-  //                               </div>
-
-  //                             </div>
-  //                           </div>
-  //                         )}
-  //                       </div>
-  //                     ))}
-  //                   </div>
-  //                 ) : (
-  //                   <div className="text-center p-4">
-  //                     <h5>No Detail Records Found</h5>
-  //                     <p className="text-muted">This summary has no associated detail records</p>
-  //                   </div>
-  //                 )}
-  //               </div>
-  //             </div>
-  //           )}
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // };
-
   const DetailPage = () => {
     const [details, setDetails] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -1146,6 +630,7 @@ const App = () => {
 
     // 切換組級刪除狀態
     const toggleGroupDelete = (groupItems) => {
+      DeleteOrRestore(selectedSummaryId, groupItems);
       const hasAnyDeleted = groupItems.some(item => item.deleted);
       const newDeletedState = !hasAnyDeleted;
 
@@ -1616,8 +1101,8 @@ const App = () => {
                                                                       <div className="col-md-3 text-end">
                                                                         <button
                                                                           className={`btn btn-sm ${item.deleted
-                                                                              ? 'btn-outline-success'
-                                                                              : 'btn-outline-danger'
+                                                                            ? 'btn-outline-success'
+                                                                            : 'btn-outline-danger'
                                                                             }`}
                                                                           onClick={() => toggleDelete(item.id)}
                                                                         >

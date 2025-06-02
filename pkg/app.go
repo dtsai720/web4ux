@@ -2,7 +2,6 @@ package pkg
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/web4ux/internal/service/fetcher"
 	"github.com/web4ux/src/common"
@@ -33,16 +32,4 @@ func New(options ...common.OptionalFn[App]) *App {
 // so we can call the runtime methods.
 func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
-}
-
-// Greet returns a greeting for the given name.
-func (a *App) Greet(name string) string {
-	return fmt.Sprintf("Hello %s, It's show time! ....", name)
-}
-
-func (a *App) LoginAndSync(username, password string) string {
-	_ = a.service.Login(a.ctx, a.log, username, password)
-	go a.service.FetchDataAndSave(a.ctx, a.log)
-
-	return "start syncing"
 }
