@@ -18,9 +18,11 @@ func WithLogger(log logger.ILogger) common.OptionalFn[App] {
 
 //nolint:containedctx
 type App struct {
-	ctx     context.Context
-	log     logger.ILogger
-	service fetcher.IService
+	ctx        context.Context
+	log        logger.ILogger
+	service    fetcher.IService
+	cancelFunc context.CancelFunc
+	isSyncing  bool
 }
 
 // NewApp creates a new App application struct.

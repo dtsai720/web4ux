@@ -3,10 +3,16 @@
 import {pkg} from '../models';
 import {models} from '../models';
 
+export function CancelSync():Promise<void>;
+
 export function DeleteOrRestore(arg1:string,arg2:Array<pkg.Request>):Promise<string>;
 
 export function GetProjectDetail(arg1:string):Promise<string>;
 
+export function GetSyncStatus():Promise<Record<string, any>>;
+
 export function ListProjects(arg1:string,arg2:string,arg3:string,arg4:string,arg5:number):Promise<models.ProjectSummaries>;
 
-export function LoginAndSync(arg1:string,arg2:string):Promise<string>;
+export function LoginAndSync(arg1:string,arg2:string):Promise<pkg.LoginResponse>;
+
+export function StartSync():Promise<void>;
