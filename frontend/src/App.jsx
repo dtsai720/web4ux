@@ -714,17 +714,165 @@ const App = () => {
   };
 
   const DetailPage = () => {
-    const [details, setDetails] = useState([]);
+    const [data, setData] = useState({});
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [summaryInfo, setSummaryInfo] = useState(null);
-    const [groupBy, setGroupBy] = useState('device'); // device, participant, trail
-    const [expandedLevel1, setExpandedLevel1] = useState({}); // 第一層展開狀態
-    const [expandedLevel2, setExpandedLevel2] = useState({}); // 第二層展開狀態
-    const [expandedLevel3, setExpandedLevel3] = useState({}); // 第三層展開狀態
+    const [groupBy, setGroupBy] = useState('by_device'); // by_device, by_participant
+    const [expandedLevel1, setExpandedLevel1] = useState({});
+    const [expandedLevel2, setExpandedLevel2] = useState({});
+    const [detailedData, setDetailedData] = useState({});
+    const [loadingDetailed, setLoadingDetailed] = useState({});
+    const [deletedRecords, setDeletedRecords] = useState([]);
+    const [showDeletedModal, setShowDeletedModal] = useState(false);
 
-    // 載入詳細資料
-    const loadDetails = async () => {
+    // Mock API 函數們
+    const mockApi = {
+      // 獲取主要資料
+      async getDetailData(summaryId, groupByType) {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            const mockData = this.generateMockData(groupByType);
+            resolve({
+              success: true,
+              data: mockData.data,
+              summary: mockData.summary,
+              deletedRecords: mockData.deletedRecords
+            });
+          }, 800); // 模擬網路延遲
+        });
+      },
+
+      // 獲取詳細資料
+      async getDetailedData(summaryId, level1Key, level2Key) {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            const mockDetailedData = [];
+            for (let i = 1; i <= 10; i++) {
+              mockDetailedData.push({
+                device: level1Key.startsWith('Device') ? level1Key : level2Key,
+                participant: level1Key.startsWith('Participant') ? level1Key : level2Key,
+                trail: `Trail ${i}`,
+                target: `Target ${Math.floor(Math.random() * 100)}`,
+                position: `${Math.floor(Math.random() * 100)}, ${Math.floor(Math.random() * 100)}`,
+                createdAt: new Date(Date.now() - Math.random() * 10000000000).toISOString()
+              });
+            }
+
+            resolve({
+              success: true,
+              data: mockDetailedData
+            });
+          }, 500);
+        });
+      },
+
+      // 切換刪除狀態
+      async toggleDelete(summaryId, params) {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve({ success: true });
+          }, 300);
+        });
+      },
+
+      // 復原已刪除記錄
+      async restoreRecord(recordId) {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve({ success: true });
+          }, 300);
+        });
+      },
+
+      // 生成 Mock 資料
+      generateMockData(groupByType) {
+        const data = {};
+        const deletedRecords = [];
+
+        if (groupByType === 'by_device') {
+          // Device -> Participant 結構
+          for (let deviceNum = 1; deviceNum <= 4; deviceNum++) {
+            const deviceKey = `Device ${deviceNum}`;
+            data[deviceKey] = {};
+
+            for (let participantNum = 1; participantNum <= 12; participantNum++) {
+              const participantKey = `Participant ${participantNum}`;
+              const records = [];
+
+              for (let i = 0; i < 5; i++) {
+                const record = {
+                  device: deviceKey,
+                  participant: participantKey,
+                  error_time: Math.floor(Math.random() * 100),
+                  event_time: Math.floor(Math.random() * 1000),
+                  available: Math.random() > 0.2,
+                  deleted: Math.random() < 0.1
+                };
+
+                records.push(record);
+                if (record.deleted) {
+                  deletedRecords.push({
+                    ...record,
+                    id: `${deviceKey}-${participantKey}-${i}`,
+                    deletedAt: new Date().toISOString()
+                  });
+                }
+              }
+
+              data[deviceKey][participantKey] = records;
+            }
+          }
+        } else {
+          // Participant -> Device 結構
+          for (let participantNum = 1; participantNum <= 12; participantNum++) {
+            const participantKey = `Participant ${participantNum}`;
+            data[participantKey] = {};
+
+            for (let deviceNum = 1; deviceNum <= 4; deviceNum++) {
+              const deviceKey = `Device ${deviceNum}`;
+              const records = [];
+
+              for (let i = 0; i < 5; i++) {
+                const record = {
+                  device: deviceKey,
+                  participant: participantKey,
+                  error_time: Math.floor(Math.random() * 100),
+                  event_time: Math.floor(Math.random() * 1000),
+                  available: Math.random() > 0.2,
+                  deleted: Math.random() < 0.1
+                };
+
+                records.push(record);
+                if (record.deleted) {
+                  deletedRecords.push({
+                    ...record,
+                    id: `${participantKey}-${deviceKey}-${i}`,
+                    deletedAt: new Date().toISOString()
+                  });
+                }
+              }
+
+              data[participantKey][deviceKey] = records;
+            }
+          }
+        }
+
+        return {
+          data,
+          summary: {
+            id: selectedSummaryId,
+            name: 'Test Summary',
+            creator: 'Test Creator',
+            updatedAt: '2025-06-04T00:00:00Z'
+          },
+          deletedRecords
+        };
+      }
+    };
+
+    // 載入主要資料
+    const loadData = async () => {
       if (!selectedSummaryId) {
         setError('No summary ID provided');
         return;
@@ -734,125 +882,97 @@ const App = () => {
       setError('');
 
       try {
-        // Mock data 生成更完整的測試數據
-        const mockDetails = [];
+        const result = await mockApi.getDetailData(selectedSummaryId, groupBy);
 
-        // 4 devices, 12 participants, 32 trails per participant per device
-        for (let deviceNum = 1; deviceNum <= 4; deviceNum++) {
-          for (let participantNum = 1; participantNum <= 12; participantNum++) {
-            for (let trailNum = 1; trailNum <= 32; trailNum++) {
-              mockDetails.push({
-                id: `${deviceNum}-${participantNum}-${trailNum}`,
-                device: `Device ${deviceNum}`,
-                participant: `Participant ${participantNum}`,
-                trail: trailNum,
-                from: `Point ${Math.floor(Math.random() * 100)}`,
-                to: `Point ${Math.floor(Math.random() * 100)}`,
-                is_error: Math.random() < 0.1, // 10% error rate
-                is_available: Math.random() < 0.8, // 80% available
-                deleted: Math.random() < 0.05, // 5% deleted
-                event_time: Math.floor(Math.random() * 1000), // 隨機事件時間
-                has_error: Math.random() < 0.15 // 15% has error
-              });
-            }
-          }
+        if (result.success) {
+          setData(result.data || {});
+          setSummaryInfo(result.summary || null);
+          setDeletedRecords(result.deletedRecords || []);
+        } else {
+          throw new Error(result.message || 'Failed to load data');
         }
-
-        const result = {
-          summary: {
-            id: selectedSummaryId,
-            name: 'Test Summary',
-            creator: 'Test Creator',
-            updatedAt: '2025-06-25T00:00:00Z'
-          },
-          details: mockDetails
-        };
-
-        setDetails(result.details || []);
-        setSummaryInfo(result.summary || null);
       } catch (err) {
-        setError('Failed to load details: ' + err.message);
-        setDetails([]);
+        setError(err.message || 'An error occurred while loading data');
       } finally {
         setLoading(false);
       }
     };
 
     useEffect(() => {
-      loadDetails();
-    }, [selectedSummaryId]);
+      loadData();
+    }, [selectedSummaryId, groupBy]);
 
-    // 切換刪除狀態
-    const toggleDelete = (itemId) => {
-      setDetails(prevDetails =>
-        prevDetails.map(detail =>
-          detail.id === itemId
-            ? { ...detail, deleted: !detail.deleted }
-            : detail
-        )
-      );
+    // 載入最內層詳細資料
+    const loadDetailedData = async (level1Key, level2Key) => {
+      const combinedKey = `${level1Key}-${level2Key}`;
+      setLoadingDetailed(prev => ({ ...prev, [combinedKey]: true }));
+
+      try {
+        const result = await mockApi.getDetailedData(selectedSummaryId, level1Key, level2Key);
+
+        if (result.success) {
+          setDetailedData(prev => ({
+            ...prev,
+            [combinedKey]: result.data
+          }));
+        } else {
+          throw new Error(result.message || 'Failed to load detailed data');
+        }
+      } catch (err) {
+        console.error('Load detailed data failed:', err);
+      } finally {
+        setLoadingDetailed(prev => ({ ...prev, [combinedKey]: false }));
+      }
     };
 
-    // 切換組級刪除狀態
-    const toggleGroupDelete = (groupItems) => {
-      DeleteOrRestore(selectedSummaryId, groupItems);
-      const hasAnyDeleted = groupItems.some(item => item.deleted);
-      const newDeletedState = !hasAnyDeleted;
+    // 刪除/復原第二層資料
+    const toggleLevel2Delete = async (level1Key, level2Key) => {
+      try {
+        const result = await mockApi.toggleDelete(selectedSummaryId, {
+          level1: level1Key,
+          level2: level2Key,
+          type: 'level2'
+        });
 
-      setDetails(prevDetails =>
-        prevDetails.map(detail => {
-          const shouldUpdate = groupItems.some(item => item.id === detail.id);
-          return shouldUpdate
-            ? { ...detail, deleted: newDeletedState }
-            : detail;
-        })
-      );
+        if (result.success) {
+          await loadData();
+        }
+      } catch (err) {
+        console.error('Toggle delete failed:', err);
+      }
     };
 
-    // 統計資訊
-    const stats = {
-      total: details.length,
-      errors: details.filter(d => d.is_error).length,
-      deleted: details.filter(d => d.deleted).length
+    // 刪除/復原第三層資料
+    const toggleLevel3Delete = async (level1Key, level2Key, recordIndex) => {
+      try {
+        const result = await mockApi.toggleDelete(selectedSummaryId, {
+          level1: level1Key,
+          level2: level2Key,
+          recordIndex: recordIndex,
+          type: 'level3'
+        });
+
+        if (result.success) {
+          await loadData();
+        }
+      } catch (err) {
+        console.error('Toggle delete failed:', err);
+      }
     };
 
-    // 分組資料 - 三層結構
-    const getGroupedData = () => {
-      const grouped = {};
+    // 復原已刪除的記錄
+    const restoreDeletedRecord = async (recordId) => {
+      try {
+        const result = await mockApi.restoreRecord(recordId);
 
-      details.forEach(detail => {
-        let level1Key, level2Key, level3Key;
-
-        // 根據分組方式決定三層的鍵值
-        if (groupBy === 'device') {
-          level1Key = detail.device;
-          level2Key = detail.participant;
-          level3Key = `Trail ${detail.trail}`;
-        } else if (groupBy === 'participant') {
-          level1Key = detail.participant;
-          level2Key = detail.device;
-          level3Key = `Trail ${detail.trail}`;
-        } else { // trail
-          level1Key = `Trail ${detail.trail}`;
-          level2Key = detail.device;
-          level3Key = detail.participant;
+        if (result.success) {
+          await loadData();
         }
-
-        // 建立三層結構
-        if (!grouped[level1Key]) {
-          grouped[level1Key] = {};
-        }
-        if (!grouped[level1Key][level2Key]) {
-          grouped[level1Key][level2Key] = {};
-        }
-        if (!grouped[level1Key][level2Key][level3Key]) {
-          grouped[level1Key][level2Key][level3Key] = [];
-        }
-
-        grouped[level1Key][level2Key][level3Key].push(detail);
-      });
-
-      return grouped;
+      } catch (err) {
+        console.error('Restore failed:', err);
+        // Fallback: 移除本地記錄
+        setDeletedRecords(prev => prev.filter(record => record.id !== recordId));
+      }
     };
 
     // 切換展開狀態
@@ -865,110 +985,51 @@ const App = () => {
 
     const toggleExpandLevel2 = (level1Key, level2Key) => {
       const combinedKey = `${level1Key}-${level2Key}`;
+      const isExpanded = !expandedLevel2[combinedKey];
+
       setExpandedLevel2(prev => ({
         ...prev,
-        [combinedKey]: !prev[combinedKey]
+        [combinedKey]: isExpanded
       }));
-    };
 
-    const toggleExpandLevel3 = (level1Key, level2Key, level3Key) => {
-      const combinedKey = `${level1Key}-${level2Key}-${level3Key}`;
-      setExpandedLevel3(prev => ({
-        ...prev,
-        [combinedKey]: !prev[combinedKey]
-      }));
-    };
-
-    const groupedData = getGroupedData();
-
-    // 獲取狀態徽章
-    const getStatusBadges = (detail) => {
-      const badges = [];
-      if (detail.is_available) {
-        badges.push(<span key="available" className="badge bg-success me-1">Available</span>);
+      // 如果展開且沒有載入過詳細資料，則載入
+      if (isExpanded && !detailedData[combinedKey]) {
+        loadDetailedData(level1Key, level2Key);
       }
-      if (detail.is_error) {
-        badges.push(<span key="error" className="badge bg-danger me-1">Error</span>);
+    };
+
+    // 計算統計資料
+    const getLevel2Stats = (records) => {
+      const total = records.length;
+      const errors = records.filter(r => r.error_time > 50).length;
+      const deleted = records.filter(r => r.deleted).length;
+      const avgEventTime = Math.round(records.reduce((sum, r) => sum + r.event_time, 0) / total) || 0;
+
+      return { total, errors, deleted, avgEventTime };
+    };
+
+    // 分組選項配置
+    const groupByOptions = {
+      by_device: {
+        label: 'Grouped by Device',
+        description: 'Organize data with devices as primary groups, participants as subgroups',
+        icon: '🖥️',
+        structure: 'Device ➜ Participant'
+      },
+      by_participant: {
+        label: 'Grouped by Participant',
+        description: 'Organize data with participants as primary groups, devices as subgroups',
+        icon: '👤',
+        structure: 'Participant ➜ Device'
       }
-      if (detail.deleted) {
-        badges.push(<span key="deleted" className="badge bg-warning me-1">Deleted</span>);
-      }
-      if (badges.length === 0) {
-        badges.push(<span key="normal" className="badge bg-secondary">Normal</span>);
-      }
-      return badges;
     };
 
-    // 計算第一、二層統計數據
-    const getLevel1Stats = (level2Data) => {
-      let errorCount = 0;
-      let eventTimeSum = 0;
-      let totalItems = 0;
-      let deletedCount = 0;
-
-      const traverse = (obj) => {
-        if (Array.isArray(obj)) {
-          obj.forEach(item => {
-            totalItems++;
-            if (item.is_error || item.has_error) errorCount++;
-            eventTimeSum += item.event_time || 0;
-            if (item.deleted) deletedCount++;
-          });
-        } else {
-          Object.values(obj).forEach(traverse);
-        }
-      };
-
-      traverse(level2Data);
-      return { errorCount, avgEventTime: Math.round(eventTimeSum / totalItems) || 0, totalItems, deletedCount };
-    };
-
-    const getLevel2Stats = (level3Data) => {
-      let errorCount = 0;
-      let eventTimeSum = 0;
-      let totalItems = 0;
-      let deletedCount = 0;
-
-      const traverse = (obj) => {
-        if (Array.isArray(obj)) {
-          obj.forEach(item => {
-            totalItems++;
-            if (item.is_error || item.has_error) errorCount++;
-            eventTimeSum += item.event_time || 0;
-            if (item.deleted) deletedCount++;
-          });
-        } else {
-          Object.values(obj).forEach(traverse);
-        }
-      };
-
-      traverse(level3Data);
-      return { errorCount, avgEventTime: Math.round(eventTimeSum / totalItems) || 0, totalItems, deletedCount };
-    };
-
-    // 計算第三層統計數據
-    const getLevel3Stats = (items) => {
-      const errorCount = items.filter(item => item.is_error || item.has_error).length;
-      const deletedCount = items.filter(item => item.deleted).length;
-      const hasError = items.some(item => item.is_error || item.has_error);
-      const isAvailable = items.some(item => item.is_available);
-      const avgEventTime = Math.round(items.reduce((sum, item) => sum + (item.event_time || 0), 0) / items.length) || 0;
-
-      return { errorCount, deletedCount, hasError, isAvailable, avgEventTime };
-    };
-
-    // 獲取組級所有項目
-    const getGroupItems = (groupData) => {
-      const items = [];
-      const traverse = (obj) => {
-        if (Array.isArray(obj)) {
-          items.push(...obj);
-        } else {
-          Object.values(obj).forEach(traverse);
-        }
-      };
-      traverse(groupData);
-      return items;
+    // 處理分組切換
+    const handleGroupByChange = (newGroupBy) => {
+      setGroupBy(newGroupBy);
+      setExpandedLevel1({});
+      setExpandedLevel2({});
+      setDetailedData({});
     };
 
     return (
@@ -979,111 +1040,107 @@ const App = () => {
               <h2>Detail View</h2>
               <div>
                 <button
+                  className="btn btn-outline-warning me-2"
+                  onClick={() => setShowDeletedModal(true)}
+                >
+                  <i className="bi bi-trash"></i> Deleted Records ({deletedRecords.length})
+                </button>
+                <button
                   className="btn btn-outline-secondary me-2"
                   onClick={() => setCurrentPage('summary')}
                 >
-                  Back to Summary
+                  <i className="bi bi-arrow-left"></i> Back to Summary
                 </button>
                 <button
                   className="btn btn-secondary"
                   onClick={() => setCurrentPage('home')}
                 >
-                  Home
+                  <i className="bi bi-house"></i> Home
                 </button>
               </div>
             </div>
 
             {/* 摘要資訊 */}
             {summaryInfo && (
-              <div className="card mb-4">
-                <div className="card-header">
-                  <h5 className="mb-0">Summary Information</h5>
+              <div className="card mb-4 border-primary">
+                <div className="card-header bg-primary text-white">
+                  <h5 className="mb-0">
+                    <i className="bi bi-info-circle me-2"></i>
+                    Summary Information
+                  </h5>
                 </div>
                 <div className="card-body">
                   <div className="row">
                     <div className="col-md-4">
-                      <strong>Name:</strong> {summaryInfo.name}
+                      <div className="d-flex align-items-center">
+                        <i className="bi bi-file-text me-2 text-primary"></i>
+                        <div>
+                          <small className="text-muted">Name</small>
+                          <div><strong>{summaryInfo.name}</strong></div>
+                        </div>
+                      </div>
                     </div>
                     <div className="col-md-4">
-                      <strong>Creator:</strong> {summaryInfo.creator}
+                      <div className="d-flex align-items-center">
+                        <i className="bi bi-person me-2 text-success"></i>
+                        <div>
+                          <small className="text-muted">Creator</small>
+                          <div><strong>{summaryInfo.creator}</strong></div>
+                        </div>
+                      </div>
                     </div>
                     <div className="col-md-4">
-                      <strong>Updated:</strong> {new Date(summaryInfo.updatedAt).toLocaleString()}
+                      <div className="d-flex align-items-center">
+                        <i className="bi bi-clock me-2 text-info"></i>
+                        <div>
+                          <small className="text-muted">Last Updated</small>
+                          <div><strong>{new Date(summaryInfo.updatedAt).toLocaleString()}</strong></div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* 統計卡片 - 移除 Available */}
-            <div className="row mb-4">
-              <div className="col-md-4">
-                <div className="card bg-primary text-white">
-                  <div className="card-body text-center">
-                    <h3>{stats.total}</h3>
-                    <p className="mb-0">Total Items</p>
-                  </div>
-                </div>
+            {/* 改良的分組選項 */}
+            <div className="card mb-4 border-info">
+              <div className="card-header bg-light">
+                <h6 className="mb-0">
+                  <i className="bi bi-diagram-3 me-2"></i>
+                  Data Organization
+                </h6>
               </div>
-              <div className="col-md-4">
-                <div className="card bg-danger text-white">
-                  <div className="card-body text-center">
-                    <h3>{stats.errors}</h3>
-                    <p className="mb-0">Errors</p>
-                  </div>
-                </div>
-              </div>
-              <div className="col-md-4">
-                <div className="card bg-warning text-white">
-                  <div className="card-body text-center">
-                    <h3>{stats.deleted}</h3>
-                    <p className="mb-0">Deleted</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 分組選項 */}
-            <div className="card mb-4">
               <div className="card-body">
-                <h6 className="mb-3">Group By:</h6>
-                <div className="btn-group" role="group">
-                  <button
-                    type="button"
-                    className={`btn ${groupBy === 'device' ? 'btn-primary' : 'btn-outline-primary'}`}
-                    onClick={() => {
-                      setGroupBy('device');
-                      setExpandedLevel1({});
-                      setExpandedLevel2({});
-                      setExpandedLevel3({});
-                    }}
-                  >
-                    Device
-                  </button>
-                  <button
-                    type="button"
-                    className={`btn ${groupBy === 'participant' ? 'btn-primary' : 'btn-outline-primary'}`}
-                    onClick={() => {
-                      setGroupBy('participant');
-                      setExpandedLevel1({});
-                      setExpandedLevel2({});
-                      setExpandedLevel3({});
-                    }}
-                  >
-                    Participant
-                  </button>
-                  <button
-                    type="button"
-                    className={`btn ${groupBy === 'trail' ? 'btn-primary' : 'btn-outline-primary'}`}
-                    onClick={() => {
-                      setGroupBy('trail');
-                      setExpandedLevel1({});
-                      setExpandedLevel2({});
-                      setExpandedLevel3({});
-                    }}
-                  >
-                    Trail
-                  </button>
+                <div className="row">
+                  {Object.entries(groupByOptions).map(([key, option]) => (
+                    <div key={key} className="col-md-6 mb-3">
+                      <div
+                        className={`card h-100 cursor-pointer border-2 ${groupBy === key ? 'border-primary bg-primary bg-opacity-10' : 'border-light'}`}
+                        onClick={() => handleGroupByChange(key)}
+                        style={{ cursor: 'pointer', transition: 'all 0.2s' }}
+                      >
+                        <div className="card-body text-center">
+                          <div className="fs-2 mb-2">{option.icon}</div>
+                          <h6 className={`card-title ${groupBy === key ? 'text-primary' : ''}`}>
+                            {option.label}
+                          </h6>
+                          <p className="card-text text-muted small mb-2">
+                            {option.description}
+                          </p>
+                          <div className={`badge ${groupBy === key ? 'bg-primary' : 'bg-secondary'}`}>
+                            {option.structure}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="text-center mt-3">
+                  <small className="text-muted">
+                    <i className="bi bi-lightbulb me-1"></i>
+                    Click on a card to change the data organization view
+                  </small>
                 </div>
               </div>
             </div>
@@ -1091,220 +1148,216 @@ const App = () => {
             {/* 載入狀態 */}
             {loading && (
               <div className="text-center mb-4">
-                <div className="spinner-border" role="status">
+                <div className="spinner-border text-primary" role="status">
                   <span className="visually-hidden">Loading...</span>
                 </div>
+                <div className="mt-2 text-muted">Loading detail data...</div>
               </div>
             )}
 
             {/* 錯誤訊息 */}
             {error && (
-              <div className="alert alert-danger" role="alert">
-                {error}
+              <div className="alert alert-danger d-flex align-items-center" role="alert">
+                <i className="bi bi-exclamation-triangle me-2"></i>
+                <div>{error}</div>
               </div>
             )}
 
-            {/* 三層分組詳細資料 */}
+            {/* 分組資料 */}
             {!loading && !error && (
-              <div className="card">
-                <div className="card-header">
+              <div className="card border-success">
+                <div className="card-header bg-success text-white">
                   <h5 className="mb-0">
-                    Detail Records (Grouped by {groupBy.charAt(0).toUpperCase() + groupBy.slice(1)})
+                    <i className="bi bi-table me-2"></i>
+                    Detail Records - {groupByOptions[groupBy].label}
                   </h5>
+                  <small className="opacity-75">{groupByOptions[groupBy].structure}</small>
                 </div>
                 <div className="card-body">
-                  {Object.keys(groupedData).length > 0 ? (
+                  {Object.keys(data).length > 0 ? (
                     <div className="accordion" id="detailAccordion">
                       {/* 第一層 */}
-                      {Object.entries(groupedData).map(([level1Key, level2Data]) => {
-                        const level1Stats = getLevel1Stats(level2Data);
-                        const level1Items = getGroupItems(level2Data);
+                      {Object.entries(data).map(([level1Key, level2Data]) => (
+                        <div key={level1Key} className="accordion-item mb-3 border-2">
+                          <h2 className="accordion-header">
+                            <button
+                              className="accordion-button collapsed fw-bold"
+                              type="button"
+                              onClick={() => toggleExpandLevel1(level1Key)}
+                              aria-expanded={expandedLevel1[level1Key] || false}
+                            >
+                              <div className="d-flex align-items-center">
+                                <span className="me-2">
+                                  {groupBy === 'by_device' ? '🖥️' : '👤'}
+                                </span>
+                                <span className="text-primary">{level1Key}</span>
+                                <span className="badge bg-info ms-3">
+                                  {Object.keys(level2Data).length} items
+                                </span>
+                              </div>
+                            </button>
+                          </h2>
+                          {(expandedLevel1[level1Key] || false) && (
+                            <div className="accordion-collapse collapse show">
+                              <div className="accordion-body bg-light">
 
-                        return (
-                          <div key={level1Key} className="accordion-item mb-3">
-                            <h2 className="accordion-header">
-                              <button
-                                className="accordion-button collapsed d-flex justify-content-between align-items-center"
-                                type="button"
-                                onClick={() => toggleExpandLevel1(level1Key)}
-                                aria-expanded={expandedLevel1[level1Key] || false}
-                              >
-                                <div className="d-flex align-items-center">
-                                  <strong className="text-primary me-3">{level1Key}</strong>
-                                  <span className="badge bg-danger me-2">Error: {level1Stats.errorCount}</span>
-                                  <span className="badge bg-info me-2">Event Time: {level1Stats.avgEventTime}</span>
-                                  <span className="badge bg-warning me-2">Deleted: {level1Stats.deletedCount}</span>
-                                </div>
-                                <button
-                                  className={`btn btn-sm ms-2 ${level1Items.some(item => item.deleted) ? 'btn-outline-success' : 'btn-outline-danger'}`}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    toggleGroupDelete(level1Items);
-                                  }}
-                                >
-                                  {level1Items.some(item => item.deleted) ? 'Recover' : 'Delete'}
-                                </button>
-                              </button>
-                            </h2>
-                            {(expandedLevel1[level1Key] || false) && (
-                              <div className="accordion-collapse collapse show">
-                                <div className="accordion-body">
+                                {/* 第二層 */}
+                                <div className="accordion" id={`level2-${level1Key}`}>
+                                  {Object.entries(level2Data).map(([level2Key, records]) => {
+                                    const stats = getLevel2Stats(records);
+                                    const hasDeleted = records.some(r => r.deleted);
 
-                                  {/* 第二層 */}
-                                  <div className="accordion" id={`level2-${level1Key}`}>
-                                    {Object.entries(level2Data).map(([level2Key, level3Data]) => {
-                                      const level2Stats = getLevel2Stats(level3Data);
-                                      const level2Items = getGroupItems(level3Data);
-
-                                      return (
-                                        <div key={`${level1Key}-${level2Key}`} className="accordion-item mb-2">
-                                          <h2 className="accordion-header">
+                                    return (
+                                      <div key={`${level1Key}-${level2Key}`} className="accordion-item mb-2 border">
+                                        <h2 className="accordion-header">
+                                          <button
+                                            className="accordion-button collapsed d-flex justify-content-between align-items-center w-100"
+                                            type="button"
+                                            onClick={() => toggleExpandLevel2(level1Key, level2Key)}
+                                            aria-expanded={expandedLevel2[`${level1Key}-${level2Key}`] || false}
+                                          >
+                                            <div className="d-flex align-items-center flex-wrap">
+                                              <span className="me-2">
+                                                {groupBy === 'by_device' ? '👤' : '🖥️'}
+                                              </span>
+                                              <strong className="text-success me-3">{level2Key}</strong>
+                                              <span className="badge bg-primary me-2">📊 {stats.total}</span>
+                                              <span className="badge bg-danger me-2">⚠️ {stats.errors}</span>
+                                              <span className="badge bg-warning me-2">🗑️ {stats.deleted}</span>
+                                              <span className="badge bg-info me-2">⏱️ {stats.avgEventTime}ms</span>
+                                            </div>
                                             <button
-                                              className="accordion-button collapsed d-flex justify-content-between align-items-center"
-                                              type="button"
-                                              onClick={() => toggleExpandLevel2(level1Key, level2Key)}
-                                              aria-expanded={expandedLevel2[`${level1Key}-${level2Key}`] || false}
+                                              className={`btn btn-sm ms-2 ${hasDeleted ? 'btn-outline-success' : 'btn-outline-danger'}`}
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleLevel2Delete(level1Key, level2Key);
+                                              }}
                                             >
-                                              <div className="d-flex align-items-center">
-                                                <strong className="text-success me-3">{level2Key}</strong>
-                                                <span className="badge bg-danger me-2">Error: {level2Stats.errorCount}</span>
-                                                <span className="badge bg-info me-2">Event Time: {level2Stats.avgEventTime}</span>
-                                                <span className="badge bg-warning me-2">Deleted: {level2Stats.deletedCount}</span>
-                                              </div>
-                                              <button
-                                                className={`btn btn-sm ms-2 ${level2Items.some(item => item.deleted) ? 'btn-outline-success' : 'btn-outline-danger'}`}
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  toggleGroupDelete(level2Items);
-                                                }}
-                                              >
-                                                {level2Items.some(item => item.deleted) ? 'Recover' : 'Delete'}
-                                              </button>
+                                              <i className={`bi ${hasDeleted ? 'bi-arrow-clockwise' : 'bi-trash'} me-1`}></i>
+                                              {hasDeleted ? 'Restore All' : 'Delete All'}
                                             </button>
-                                          </h2>
-                                          {(expandedLevel2[`${level1Key}-${level2Key}`] || false) && (
-                                            <div className="accordion-collapse collapse show">
-                                              <div className="accordion-body">
+                                          </button>
+                                        </h2>
+                                        {(expandedLevel2[`${level1Key}-${level2Key}`] || false) && (
+                                          <div className="accordion-collapse collapse show">
+                                            <div className="accordion-body bg-white">
 
-                                                {/* 第三層 */}
-                                                <div className="accordion" id={`level3-${level1Key}-${level2Key}`}>
-                                                  {Object.entries(level3Data).map(([level3Key, items]) => {
-                                                    const level3Stats = getLevel3Stats(items);
-
-                                                    return (
-                                                      <div key={`${level1Key}-${level2Key}-${level3Key}`} className="accordion-item mb-2">
-                                                        <h2 className="accordion-header">
-                                                          <button
-                                                            className="accordion-button collapsed d-flex justify-content-between align-items-center"
-                                                            type="button"
-                                                            onClick={() => toggleExpandLevel3(level1Key, level2Key, level3Key)}
-                                                            aria-expanded={expandedLevel3[`${level1Key}-${level2Key}-${level3Key}`] || false}
-                                                          >
-                                                            <div className="d-flex align-items-center">
-                                                              <strong className="text-info me-3">{level3Key}</strong>
-                                                              <span className={`badge me-2 ${level3Stats.hasError ? 'bg-danger' : 'bg-success'}`}>
-                                                                Has Error: {level3Stats.hasError ? 'Yes' : 'No'}
+                                              {/* 第三層 - 記錄列表 */}
+                                              <div className="row mb-3">
+                                                <div className="col-12">
+                                                  <h6 className="border-bottom pb-2">
+                                                    <i className="bi bi-list-ul me-2"></i>
+                                                    Records ({records.length})
+                                                  </h6>
+                                                  {records.map((record, index) => (
+                                                    <div key={index} className="card mb-2 border-start border-4 border-primary">
+                                                      <div className="card-body py-2">
+                                                        <div className="row align-items-center">
+                                                          <div className="col-md-8">
+                                                            <div className="d-flex align-items-center flex-wrap">
+                                                              <span className="me-3">
+                                                                <i className="bi bi-exclamation-circle text-warning me-1"></i>
+                                                                <strong>Error:</strong> {record.error_time}ms
                                                               </span>
-                                                              <span className={`badge me-2 ${level3Stats.isAvailable ? 'bg-success' : 'bg-secondary'}`}>
-                                                                Available: {level3Stats.isAvailable ? 'Yes' : 'No'}
+                                                              <span className="me-3">
+                                                                <i className="bi bi-stopwatch text-info me-1"></i>
+                                                                <strong>Event:</strong> {record.event_time}ms
                                                               </span>
-                                                              <span className="badge bg-info me-2">Event Time: {level3Stats.avgEventTime}</span>
-                                                              <span className="badge bg-warning me-2">Deleted: {level3Stats.deletedCount}</span>
-                                                            </div>
-                                                            <button
-                                                              className={`btn btn-sm ms-2 ${items.some(item => item.deleted) ? 'btn-outline-success' : 'btn-outline-danger'}`}
-                                                              onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                toggleGroupDelete(items);
-                                                              }}
-                                                            >
-                                                              {items.some(item => item.deleted) ? 'Recover' : 'Delete'}
-                                                            </button>
-                                                          </button>
-                                                        </h2>
-                                                        {(expandedLevel3[`${level1Key}-${level2Key}-${level3Key}`] || false) && (
-                                                          <div className="accordion-collapse collapse show">
-                                                            <div className="accordion-body">
-
-                                                              {/* 最內層資料 - 顯示完整詳細資訊 */}
-                                                              {items.map((item) => (
-                                                                <div key={item.id} className="card mb-3">
-                                                                  <div className="card-body">
-                                                                    <div className="row">
-                                                                      <div className="col-md-9">
-                                                                        <h6 className="card-title">
-                                                                          {item.device} - {item.participant} - Trail {item.trail}
-                                                                        </h6>
-                                                                        <div className="row mb-3">
-                                                                          <div className="col-md-6">
-                                                                            <p className="card-text mb-1">
-                                                                              <strong>From:</strong> {item.from}
-                                                                            </p>
-                                                                            <p className="card-text mb-1">
-                                                                              <strong>To:</strong> {item.to}
-                                                                            </p>
-                                                                            <p className="card-text mb-1">
-                                                                              <strong>ID:</strong> {item.id}
-                                                                            </p>
-                                                                          </div>
-                                                                          <div className="col-md-6">
-                                                                            <p className="card-text mb-1">
-                                                                              <strong>Event Time:</strong> {item.event_time}
-                                                                            </p>
-                                                                            <p className="card-text mb-1">
-                                                                              <strong>Available:</strong> {item.is_available ? 'Yes' : 'No'}
-                                                                            </p>
-                                                                            <p className="card-text mb-1">
-                                                                              <strong>Has Error:</strong> {item.has_error || item.is_error ? 'Yes' : 'No'}
-                                                                            </p>
-                                                                          </div>
-                                                                        </div>
-                                                                        <div className="mb-2">
-                                                                          {getStatusBadges(item)}
-                                                                        </div>
-                                                                      </div>
-                                                                      <div className="col-md-3 text-end">
-                                                                        <button
-                                                                          className={`btn btn-sm ${item.deleted
-                                                                            ? 'btn-outline-success'
-                                                                            : 'btn-outline-danger'
-                                                                            }`}
-                                                                          onClick={() => toggleDelete(item.id)}
-                                                                        >
-                                                                          {item.deleted ? 'Recover' : 'Delete'}
-                                                                        </button>
-                                                                      </div>
-                                                                    </div>
-                                                                  </div>
-                                                                </div>
-                                                              ))}
-
+                                                              <span className={`badge me-2 ${record.available ? 'bg-success' : 'bg-secondary'}`}>
+                                                                <i className={`bi ${record.available ? 'bi-check-circle' : 'bi-x-circle'} me-1`}></i>
+                                                                {record.available ? 'Available' : 'Unavailable'}
+                                                              </span>
+                                                              {record.deleted && (
+                                                                <span className="badge bg-warning">
+                                                                  <i className="bi bi-trash me-1"></i>Deleted
+                                                                </span>
+                                                              )}
                                                             </div>
                                                           </div>
-                                                        )}
+                                                          <div className="col-md-4 text-end">
+                                                            <button
+                                                              className={`btn btn-sm ${record.deleted ? 'btn-outline-success' : 'btn-outline-danger'}`}
+                                                              onClick={() => toggleLevel3Delete(level1Key, level2Key, index)}
+                                                            >
+                                                              <i className={`bi ${record.deleted ? 'bi-arrow-clockwise' : 'bi-trash'} me-1`}></i>
+                                                              {record.deleted ? 'Restore' : 'Delete'}
+                                                            </button>
+                                                          </div>
+                                                        </div>
                                                       </div>
-                                                    );
-                                                  })}
+                                                    </div>
+                                                  ))}
                                                 </div>
-
                                               </div>
-                                            </div>
-                                          )}
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
 
+                                              {/* 詳細資料載入按鈕和內容 */}
+                                              <div className="border-top pt-3">
+                                                <h6 className="border-bottom pb-2">
+                                                  <i className="bi bi-zoom-in me-2"></i>
+                                                  Detailed Information
+                                                </h6>
+                                                {loadingDetailed[`${level1Key}-${level2Key}`] ? (
+                                                  <div className="text-center py-3">
+                                                    <div className="spinner-border spinner-border-sm text-primary" role="status">
+                                                      <span className="visually-hidden">Loading...</span>
+                                                    </div>
+                                                    <div className="mt-2 text-muted small">Loading detailed data...</div>
+                                                  </div>
+                                                ) : detailedData[`${level1Key}-${level2Key}`] ? (
+                                                  <div className="table-responsive">
+                                                    <table className="table table-sm table-striped">
+                                                      <thead className="table-dark">
+                                                        <tr>
+                                                          <th><i className="bi bi-display me-1"></i>Device</th>
+                                                          <th><i className="bi bi-person me-1"></i>Participant</th>
+                                                          <th><i className="bi bi-path me-1"></i>Trail</th>
+                                                          <th><i className="bi bi-bullseye me-1"></i>Target</th>
+                                                          <th><i className="bi bi-geo-alt me-1"></i>Position</th>
+                                                          <th><i className="bi bi-calendar me-1"></i>Created</th>
+                                                        </tr>
+                                                      </thead>
+                                                      <tbody>
+                                                        {detailedData[`${level1Key}-${level2Key}`].map((item, idx) => (
+                                                          <tr key={idx}>
+                                                            <td><span className="badge bg-primary">{item.device}</span></td>
+                                                            <td><span className="badge bg-success">{item.participant}</span></td>
+                                                            <td>{item.trail}</td>
+                                                            <td>{item.target}</td>
+                                                            <td><code>{item.position}</code></td>
+                                                            <td>
+                                                              <small>{new Date(item.createdAt).toLocaleString()}</small>
+                                                            </td>
+                                                          </tr>
+                                                        ))}
+                                                      </tbody>
+                                                    </table>
+                                                  </div>
+                                                ) : (
+                                                  <div className="text-center py-3 text-muted">
+                                                    <i className="bi bi-info-circle fs-4"></i>
+                                                    <p className="mt-2">Detailed information will load when you expand this section.</p>
+                                                  </div>
+                                                )}
+                                              </div>
+
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
                                 </div>
+
                               </div>
-                            )}
-                          </div>
-                        );
-                      })}
+                            </div>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   ) : (
                     <div className="text-center p-4">
-                      <h5>No Detail Records Found</h5>
+                      <i className="bi bi-inbox fs-1 text-muted"></i>
+                      <h5 className="mt-3">No Detail Records Found</h5>
                       <p className="text-muted">This summary has no associated detail records</p>
                     </div>
                   )}
@@ -1313,6 +1366,78 @@ const App = () => {
             )}
           </div>
         </div>
+
+        {/* 已刪除記錄 Modal */}
+        {showDeletedModal && (
+          <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+            <div className="modal-dialog modal-lg">
+              <div className="modal-content">
+                <div className="modal-header bg-warning text-dark">
+                  <h5 className="modal-title">
+                    <i className="bi bi-trash me-2"></i>
+                    Deleted Records ({deletedRecords.length})
+                  </h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={() => setShowDeletedModal(false)}
+                  ></button>
+                </div>
+                <div className="modal-body">
+                  {deletedRecords.length > 0 ? (
+                    <div>
+                      {deletedRecords.map((record, index) => (
+                        <div key={record.id || index} className="card mb-2 border-warning">
+                          <div className="card-body py-2">
+                            <div className="row align-items-center">
+                              <div className="col-md-8">
+                                <div className="d-flex align-items-center">
+                                  <i className="bi bi-display me-2 text-primary"></i>
+                                  <strong className="me-2">{record.device}</strong>
+                                  <i className="bi bi-arrow-right mx-2"></i>
+                                  <i className="bi bi-person me-2 text-success"></i>
+                                  <strong>{record.participant}</strong>
+                                </div>
+                                <small className="text-muted">
+                                  <i className="bi bi-clock me-1"></i>
+                                  Deleted: {new Date(record.deletedAt).toLocaleString()}
+                                </small>
+                              </div>
+                              <div className="col-md-4 text-end">
+                                <button
+                                  className="btn btn-sm btn-outline-success"
+                                  onClick={() => restoreDeletedRecord(record.id)}
+                                >
+                                  <i className="bi bi-arrow-clockwise me-1"></i>
+                                  Restore
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-4">
+                      <i className="bi bi-check-circle fs-1 text-success"></i>
+                      <p className="text-center text-muted mt-3">No deleted records found.</p>
+                    </div>
+                  )}
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setShowDeletedModal(false)}
+                  >
+                    <i className="bi bi-x me-1"></i>
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   };
