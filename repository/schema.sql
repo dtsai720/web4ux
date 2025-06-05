@@ -23,6 +23,7 @@ CREATE INDEX IF NOT EXISTS idx_devices_project_id ON devices (project_id);
 
 CREATE TABLE IF NOT EXISTS participants (
     id TEXT PRIMARY KEY,
+    serial TEXT NOT NULL,
     name TEXT NOT NULL,
     project_id TEXT NOT NULL,
     FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE

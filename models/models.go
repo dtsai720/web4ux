@@ -122,9 +122,10 @@ func (w *WinfittsSummary) Load(slice []string) error {
 }
 
 type WinfittsRawData struct {
-	Participant string
-	DeviceName  string
-	Items       []WinfittsSummary
+	ParticipantSerial string
+	Participant       string
+	DeviceName        string
+	Items             []WinfittsSummary
 }
 
 func (w *WinfittsRawData) Load(slice []string) error {
@@ -134,9 +135,10 @@ func (w *WinfittsRawData) Load(slice []string) error {
 	for _, line := range slice {
 		if strings.Contains(line, "<div class=\"data-pack\">") {
 			matches := spanRegex.FindAllStringSubmatch(builder.String(), -1)
-			if len(matches) != 2 || len(matches[1]) != 2 {
+			if len(matches) != 2 || len(matches[0]) != 2 || len(matches[1]) != 2 {
 				return errs.ErrRegexMismatch
 			}
+			w.ParticipantSerial = matches[0][1]
 			w.Participant = matches[1][1]
 
 			matches = deviceRegex.FindAllStringSubmatch(builder.String(), -1)

@@ -37,13 +37,18 @@ func (r *Repository) UpsertExtractWinfittsDetails(ctx context.Context, id string
 //
 //nolint:funlen
 func (r *Repository) UpsertExtractWinfittsDetail(ctx context.Context, id string, in *models.WinfittsRawData) error {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	q := r.queries.WithTx(tx)
 	device, err := r.queries.UpsertDevices(ctx, sqlc.UpsertDevicesParams{
 		ID:        uuid.NewString(),
 		ProjectID: id,
 		Name:      in.DeviceName,
 	})
 	if err != nil {
-		return err
+		return tx.Rollback()
 	}
 
 	participant, err := r.queries.UpsertParticipants(ctx, sqlc.UpsertParticipantsParams{
@@ -52,7 +57,7 @@ func (r *Repository) UpsertExtractWinfittsDetail(ctx context.Context, id string,
 		ProjectID: id,
 	})
 	if err != nil {
-		return err
+		return tx.Rollback()
 	}
 
 	winfitts, err := r.queries.UpsertWinfitts(ctx, sqlc.UpsertWinfittsParams{
@@ -62,15 +67,10 @@ func (r *Repository) UpsertExtractWinfittsDetail(ctx context.Context, id string,
 		ParticipantID: participant.ID,
 	})
 	if err != nil {
-		return err
+		return tx.Rollback()
 	}
 
 	for _, item := range in.Items {
-		tx, err := r.db.BeginTx(ctx, nil)
-		if err != nil {
-			return err
-		}
-		q := r.queries.WithTx(tx)
 		information, err := q.UpsertWinfittsInformation(ctx, sqlc.UpsertWinfittsInformationParams{
 			ID:          uuid.NewString(),
 			WinfittsID:  winfitts.ID,
@@ -99,10 +99,10 @@ func (r *Repository) UpsertExtractWinfittsDetail(ctx context.Context, id string,
 				return tx.Rollback()
 			}
 		}
+	}
 
-		if err := tx.Commit(); err != nil {
-			return err
-		}
+	if err := tx.Commit(); err != nil {
+		return tx.Rollback()
 	}
 
 	return nil

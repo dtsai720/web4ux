@@ -12,6 +12,7 @@ type Device struct {
 
 type Participant struct {
 	ID        string
+	Serial    string
 	Name      string
 	ProjectID string
 }

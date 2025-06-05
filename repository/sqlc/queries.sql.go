@@ -35,7 +35,7 @@ INSERT INTO participants (id, name, project_id)
 VALUES (?1, ?2, ?3)
 ON CONFLICT(name, project_id) DO UPDATE
     SET name = EXCLUDED.name
-RETURNING id, name, project_id
+RETURNING id, serial, name, project_id
 `
 
 type UpsertParticipantsParams struct {
@@ -47,7 +47,12 @@ type UpsertParticipantsParams struct {
 func (q *Queries) UpsertParticipants(ctx context.Context, arg UpsertParticipantsParams) (Participant, error) {
 	row := q.db.QueryRowContext(ctx, upsertParticipants, arg.ID, arg.Name, arg.ProjectID)
 	var i Participant
-	err := row.Scan(&i.ID, &i.Name, &i.ProjectID)
+	err := row.Scan(
+		&i.ID,
+		&i.Serial,
+		&i.Name,
+		&i.ProjectID,
+	)
 	return i, err
 }
 
