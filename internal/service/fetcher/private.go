@@ -2,57 +2,24 @@ package fetcher
 
 import (
 	"context"
-	"strings"
+	"time"
 
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"github.com/web4ux/src/logger"
-	"go.uber.org/zap"
 )
 
-func (s *Service) fetchOne(ctx context.Context, log logger.ILogger, offset int) (bool, error) {
-	summaries, err := s.extractProjectSummaries(ctx, log, offset)
-	if err != nil {
-		return false, err
-	}
+type HandleSingleParam[T any, R any] func(ctx context.Context, log logger.ILogger, in T) (R, error)
 
-	if len(summaries) == 0 {
-		return true, nil
-	}
-
-	for _, summary := range summaries {
-		if !strings.Contains(strings.ToLower(summary.Link), "winfitts") {
-			continue
-		}
-
-		runtime.EventsEmit(ctx, "Start update project\nid: %s\nname: %s\n\n", summary.ID, summary.Name)
-		log.With(zap.String("id", summary.ID), zap.String("name", summary.Name)).Info("Start update project")
-		project, err := s.db.UpsertProject(ctx, &summary)
+func WrapFSingleParam[T any, R any](duration time.Duration, f HandleSingleParam[T, R]) HandleSingleParam[T, R] {
+	var zero R
+	return func(ctx context.Context, log logger.ILogger, in T) (R, error) {
+		target := time.Now().Add(duration)
+		output, err := f(ctx, log, in)
 		if err != nil {
-			return false, err
+			return zero, err
 		}
 
-		links, err := s.extractRawDataLinks(ctx, log, &summary)
-		if err != nil {
-			return false, err
-		}
+		<-time.After(time.Until(target))
 
-		for _, link := range links {
-			if !strings.Contains(strings.ToLower(link), "winfitts") {
-				continue
-			}
-
-			array := strings.Split(link, "/")
-			taskId := array[len(array)-1]
-			rows, err := s.extractWinfittsDetails(ctx, log, taskId)
-			if err != nil {
-				return false, err
-			}
-
-			if err := s.db.UpsertExtractWinfittsDetails(ctx, project.ID, rows); err != nil {
-				return false, err
-			}
-		}
+		return output, nil
 	}
-
-	return false, nil
 }

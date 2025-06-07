@@ -31,8 +31,8 @@ func (q *Queries) UpsertDevices(ctx context.Context, arg UpsertDevicesParams) (D
 }
 
 const upsertParticipants = `-- name: UpsertParticipants :one
-INSERT INTO participants (id, name, project_id)
-VALUES (?1, ?2, ?3)
+INSERT INTO participants (id, name, project_id, serial)
+VALUES (?1, ?2, ?3, ?4)
 ON CONFLICT(name, project_id) DO UPDATE
     SET name = EXCLUDED.name
 RETURNING id, serial, name, project_id
@@ -42,10 +42,16 @@ type UpsertParticipantsParams struct {
 	ID        string
 	Name      string
 	ProjectID string
+	Serial    string
 }
 
 func (q *Queries) UpsertParticipants(ctx context.Context, arg UpsertParticipantsParams) (Participant, error) {
-	row := q.db.QueryRowContext(ctx, upsertParticipants, arg.ID, arg.Name, arg.ProjectID)
+	row := q.db.QueryRowContext(ctx, upsertParticipants,
+		arg.ID,
+		arg.Name,
+		arg.ProjectID,
+		arg.Serial,
+	)
 	var i Participant
 	err := row.Scan(
 		&i.ID,

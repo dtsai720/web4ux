@@ -4,14 +4,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
+	"strings"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"github.com/web4ux/src/htmlparser"
+	"github.com/web4ux/src/sliceutils"
 )
 
 // SyncProgress represents the sync progress data
 type SyncProgress struct {
 	CurrentProject string `json:"currentProject"`
+	CurrentIndex   int    `json:"currentIndex"`
 	Progress       int    `json:"progress"`
 	TotalProjects  int    `json:"totalProjects"`
 	IsCompleted    bool   `json:"isCompleted"`
@@ -25,22 +28,7 @@ type LoginResponse struct {
 }
 
 func (a *App) LoginAndSync(email, password string) (*LoginResponse, error) {
-	// 簡單的登入驗證
-	if email == "" || password == "" {
-		return &LoginResponse{
-			Success: false,
-			Message: "Email and password are required",
-		}, errors.New("invalid credentials")
-	}
-
-	// if email != "admin@example.com" || password != "password123" {
-	// 	return &LoginResponse{
-	// 		Success: false,
-	// 		Message: "Invalid email or password",
-	// 	}, errors.New("invalid credentials")
-	// }
-
-	// 如果已經在同步中，不允許再次開始
+	fmt.Println("LoginAndSync:  ", email, password)
 	if a.isSyncing {
 		return &LoginResponse{
 			Success: false,
@@ -48,10 +36,14 @@ func (a *App) LoginAndSync(email, password string) (*LoginResponse, error) {
 		}, errors.New("sync in progress")
 	}
 
-	return &LoginResponse{
-		Success: true,
-		Message: "Login successful",
-	}, nil
+	if err := a.service.Login(a.ctx, a.log, email, password); err != nil {
+		return &LoginResponse{
+			Success: false,
+			Message: "invalid email or password",
+		}, errors.New("failed to login")
+	}
+
+	return &LoginResponse{Success: true, Message: "Login successful"}, nil
 }
 
 // StartSync starts the synchronization process
@@ -65,8 +57,8 @@ func (a *App) StartSync() error {
 	// 創建一個可取消的 context
 	ctx, cancel := context.WithCancel(a.ctx)
 	a.cancelFunc = cancel
-
 	go a.performSync(ctx)
+
 	return nil
 }
 
@@ -77,55 +69,59 @@ func (a *App) performSync(ctx context.Context) {
 		a.cancelFunc = nil
 	}()
 
-	projects := []string{"Project 1", "Project 2", "Project 3", "Project 4", "Project 5"}
-	totalProjects := len(projects)
+	projectList, err := a.service.ListAllProjects(a.ctx, a.log)
+	if err != nil {
+		a.emitSyncProgress(SyncProgress{
+			CurrentProject: err.Error(),
+			Progress:       100,
+			TotalProjects:  0,
+			IsCompleted:    false,
+			IsCancelled:    true,
+		})
 
-	for i, project := range projects {
+		return
+	}
+
+	projectList = sliceutils.Filter(projectList, func(in htmlparser.ProjectSummary) bool {
+		return strings.Contains(strings.ToLower(in.Link), "winfitts")
+	})
+
+	for i, project := range projectList {
 		select {
 		case <-ctx.Done():
 			// 發送取消事件
 			a.emitSyncProgress(SyncProgress{
-				CurrentProject: project,
-				Progress:       (i * 100) / totalProjects,
-				TotalProjects:  totalProjects,
+				CurrentProject: project.Name,
+				CurrentIndex:   i,
+				Progress:       (i * 100) / len(projectList),
+				TotalProjects:  len(projectList),
 				IsCompleted:    false,
 				IsCancelled:    true,
 			})
+
 			return
 		default:
-			// 發送當前進度
-			progress := (i * 100) / totalProjects
-			a.emitSyncProgress(SyncProgress{
-				CurrentProject: project,
-				Progress:       progress,
-				TotalProjects:  totalProjects,
-				IsCompleted:    false,
-				IsCancelled:    false,
-			})
+			if err := a.service.FetchDataAndSave(a.ctx, a.log, project); err != nil {
+				a.emitSyncProgress(SyncProgress{
+					CurrentProject: project.Name,
+					CurrentIndex:   i,
+					Progress:       100,
+					TotalProjects:  0,
+					IsCompleted:    false,
+					IsCancelled:    true,
+				})
 
-			// 模擬 30 秒的同步時間，每秒更新一次進度
-			for second := 0; second < 30; second++ {
-				select {
-				case <-ctx.Done():
-					a.emitSyncProgress(SyncProgress{
-						CurrentProject: project,
-						Progress:       progress,
-						TotalProjects:  totalProjects,
-						IsCompleted:    false,
-						IsCancelled:    true,
-					})
-					return
-				case <-time.After(1 * time.Second):
-					// 每秒更新一次，顯示更細緻的進度
-					subProgress := progress + (second * 20 / 30) // 每個項目佔20%，30秒內線性增長
-					a.emitSyncProgress(SyncProgress{
-						CurrentProject: fmt.Sprintf("%s (%d/30s)", project, second+1),
-						Progress:       subProgress,
-						TotalProjects:  totalProjects,
-						IsCompleted:    false,
-						IsCancelled:    false,
-					})
-				}
+				return
+			} else {
+				progress := (i * 100) / len(projectList)
+				a.emitSyncProgress(SyncProgress{
+					CurrentProject: project.Name,
+					CurrentIndex:   i,
+					Progress:       progress,
+					TotalProjects:  len(projectList),
+					IsCompleted:    false,
+					IsCancelled:    false,
+				})
 			}
 		}
 	}
@@ -134,7 +130,8 @@ func (a *App) performSync(ctx context.Context) {
 	a.emitSyncProgress(SyncProgress{
 		CurrentProject: "All projects completed",
 		Progress:       100,
-		TotalProjects:  totalProjects,
+		CurrentIndex:   len(projectList),
+		TotalProjects:  len(projectList),
 		IsCompleted:    true,
 		IsCancelled:    false,
 	})

@@ -6,8 +6,8 @@ ON CONFLICT(name, project_id) DO UPDATE
 RETURNING *;
 
 -- name: UpsertParticipants :one
-INSERT INTO participants (id, name, project_id)
-VALUES (@id, @name, @project_id)
+INSERT INTO participants (id, name, project_id, serial)
+VALUES (@id, @name, @project_id, @serial)
 ON CONFLICT(name, project_id) DO UPDATE
     SET name = EXCLUDED.name
 RETURNING *;

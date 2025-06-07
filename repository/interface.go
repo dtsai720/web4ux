@@ -23,6 +23,6 @@ type IDatabase interface {
 
 type IRepository interface {
 	UpsertProject(ctx context.Context, arg *models.ProjectSummary) (sqlc.Project, error)
-	UpsertExtractWinfittsDetail(ctx context.Context, id string, in *models.WinfittsRawData) error
-	UpsertExtractWinfittsDetails(ctx context.Context, id string, rows []models.WinfittsRawData) error
+	// UpsertExtractWinfittsDetail(ctx context.Context, id string, in *models.WinfittsRawData) error
+	UpsertExtractWinfittsDetails(ctx context.Context, in models.ProjectSummary, rows []models.WinfittsRawData) error
 }

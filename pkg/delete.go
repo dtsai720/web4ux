@@ -7,6 +7,5 @@ type Request struct {
 }
 
 func (a *App) DeleteOrRestore(projectID string, slice []Request) string {
-
 	return ""
 }

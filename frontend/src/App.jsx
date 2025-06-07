@@ -58,6 +58,7 @@ const App = () => {
     const [isSyncing, setIsSyncing] = useState(false);
     const [syncProgress, setSyncProgress] = useState({
       currentProject: '',
+      currentIndex: 0,
       progress: 0,
       totalProjects: 0,
       isCompleted: false,
@@ -285,7 +286,7 @@ const App = () => {
                         <strong>Status:</strong> {syncProgress.currentProject || 'Initializing...'}
                       </p>
                       <p className="text-muted small mb-3">
-                        Progress: {syncProgress.progress}% ({Math.floor(syncProgress.progress / 20)}/{syncProgress.totalProjects} projects)
+                        Progress: {syncProgress.progress}% ({Math.floor(syncProgress.currentIndex? syncProgress.currentIndex: 0)}/{syncProgress.totalProjects} projects)
                       </p>
 
                       <button
