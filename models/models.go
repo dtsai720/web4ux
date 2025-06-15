@@ -177,17 +177,21 @@ func (w *WinfittsRawData) Load(slice []string) error {
 }
 
 type ProjectDetail struct {
-	ProjectName       string `json:"projectName,omitempty"`
-	ProjectCreator    string `json:"projectCreator,omitempty"`
-	ProjectUpdatedAt  string `json:"projectUpdatedAt,omitempty"`
-	DeviceName        string `json:"deviceName,omitempty"`
-	ParticipantName   string `json:"participantName,omitempty"`
-	ParticipantSerial string `json:"participantSerial,omitempty"`
-	InformationID     string `json:"informationId,omitempty"`
+	ProjectName       string `json:"projectName"`
+	ProjectCreator    string `json:"projectCreator"`
+	ProjectUpdatedAt  string `json:"projectUpdatedAt"`
+	DeviceName        string `json:"deviceName"`
+	ParticipantName   string `json:"participantName"`
+	ParticipantSerial string `json:"participantSerial"`
+	InformationID     string `json:"informationId"`
 	Deleted           bool   `json:"deleted"`
 	ErrorTimes        int64  `json:"errorTimes"`
 	IsFailed          bool   `json:"isFailed"`
 	TrailNumber       int64  `json:"trailNumber"`
-	Mark              string `json:"mark,omitempty"`
+	Mark              string `json:"mark"`
 	Timestamp         int64  `json:"timestamp"`
+	Width             int64  `json:"width"`
+	Distance          int64  `json:"distance"`
+	X                 int64  `json:"x"`
+	Y                 int64  `json:"y"`
 }

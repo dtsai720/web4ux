@@ -55,8 +55,12 @@ SELECT projects.name AS project_name,
 	winfitts_information.error_times,
 	winfitts_information.is_failed,
 	winfitts_information.trail_number,
+	winfitts_information.width,
+	winfitts_information.distance,
 	winfitts_details.mark,
-	winfitts_details.timestamp
+	winfitts_details.timestamp,
+	winfitts_details.x,
+	winfitts_details.y
 FROM projects
 INNER JOIN devices ON projects.id = devices.project_id
 INNER JOIN participants ON projects.id  = participants.project_id
@@ -82,8 +86,12 @@ type GetProjectDetailByIDRow struct {
 	ErrorTimes        int64
 	IsFailed          bool
 	TrailNumber       int64
+	Width             int64
+	Distance          int64
 	Mark              string
 	Timestamp         int64
+	X                 int64
+	Y                 int64
 }
 
 func (q *Queries) GetProjectDetailByID(ctx context.Context, projectID string) ([]GetProjectDetailByIDRow, error) {
@@ -107,8 +115,12 @@ func (q *Queries) GetProjectDetailByID(ctx context.Context, projectID string) ([
 			&i.ErrorTimes,
 			&i.IsFailed,
 			&i.TrailNumber,
+			&i.Width,
+			&i.Distance,
 			&i.Mark,
 			&i.Timestamp,
+			&i.X,
+			&i.Y,
 		); err != nil {
 			return nil, err
 		}

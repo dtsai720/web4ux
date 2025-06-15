@@ -38,19 +38,21 @@ export namespace models {
 		}
 	}
 	export class ProjectDetail {
-	    projectName?: string;
-	    projectCreator?: string;
-	    projectUpdatedAt?: string;
-	    deviceName?: string;
-	    participantName?: string;
-	    participantSerial?: string;
-	    informationId?: string;
+	    projectName: string;
+	    projectCreator: string;
+	    projectUpdatedAt: string;
+	    deviceName: string;
+	    participantName: string;
+	    participantSerial: string;
+	    informationId: string;
 	    deleted: boolean;
 	    errorTimes: number;
 	    isFailed: boolean;
 	    trailNumber: number;
-	    mark?: string;
+	    mark: string;
 	    timestamp: number;
+	    width: number;
+	    distance: number;
 
 	    static createFrom(source: any = {}) {
 	        return new ProjectDetail(source);
@@ -71,6 +73,8 @@ export namespace models {
 	        this.trailNumber = source["trailNumber"];
 	        this.mark = source["mark"];
 	        this.timestamp = source["timestamp"];
+	        this.width = source["width"];
+	        this.distance = source["distance"];
 	    }
 	}
 	export class ProjectSummaries {

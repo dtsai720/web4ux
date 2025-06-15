@@ -69,8 +69,12 @@ SELECT projects.name AS project_name,
 	winfitts_information.error_times,
 	winfitts_information.is_failed,
 	winfitts_information.trail_number,
+	winfitts_information.width,
+	winfitts_information.distance,
 	winfitts_details.mark,
-	winfitts_details.timestamp
+	winfitts_details.timestamp,
+	winfitts_details.x,
+	winfitts_details.y
 FROM projects
 INNER JOIN devices ON projects.id = devices.project_id
 INNER JOIN participants ON projects.id  = participants.project_id

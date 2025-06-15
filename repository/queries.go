@@ -139,6 +139,10 @@ func (r *Repository) GetProjectDetailByID(ctx context.Context, projectID string)
 			TrailNumber:       in.TrailNumber,
 			Mark:              in.Mark,
 			Timestamp:         in.Timestamp,
+			Width:             in.Width,
+			Distance:          in.Distance,
+			X:                 in.X,
+			Y:                 in.Y,
 		}
 	}), nil
 }
