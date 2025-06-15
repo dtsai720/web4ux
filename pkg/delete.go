@@ -6,6 +6,7 @@ type Request struct {
 	Trail       int
 }
 
+// TODO:
 func (a *App) DeleteOrRestore(projectID string, slice []Request) string {
 	return ""
 }

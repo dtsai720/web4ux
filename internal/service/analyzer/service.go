@@ -1,4 +1,4 @@
-package fetcher
+package analyzer
 
 import (
 	"github.com/web4ux/repository"

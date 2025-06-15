@@ -1,9 +1,13 @@
 package pkg
 
-import "fmt"
+import "github.com/web4ux/models"
 
-func (a *App) GetProjectDetail(projectID string) string {
-	fmt.Println(projectID)
+func (a *App) GetProjectDetailByID(projectID string) []models.ProjectDetail {
+	output, err := a.analyzer.GetProjectDetailByID(a.ctx, projectID)
+	if err != nil {
+		a.log.Errorf("An error occurred while getting project by id: %s", err)
+		return nil
+	}
 
-	return ""
+	return output
 }

@@ -10,16 +10,16 @@ export function DeleteOrRestore(arg1, arg2) {
   return window['go']['pkg']['App']['DeleteOrRestore'](arg1, arg2);
 }
 
-export function GetProjectDetail(arg1) {
-  return window['go']['pkg']['App']['GetProjectDetail'](arg1);
+export function GetProjectDetailByID(arg1) {
+  return window['go']['pkg']['App']['GetProjectDetailByID'](arg1);
 }
 
 export function GetSyncStatus() {
   return window['go']['pkg']['App']['GetSyncStatus']();
 }
 
-export function ListProjects(arg1, arg2, arg3, arg4, arg5, arg6) {
-  return window['go']['pkg']['App']['ListProjects'](arg1, arg2, arg3, arg4, arg5, arg6);
+export function ListSummaries(arg1, arg2, arg3, arg4, arg5, arg6) {
+  return window['go']['pkg']['App']['ListSummaries'](arg1, arg2, arg3, arg4, arg5, arg6);
 }
 
 export function LoginAndSync(arg1, arg2) {

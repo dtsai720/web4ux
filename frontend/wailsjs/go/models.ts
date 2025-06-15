@@ -37,6 +37,42 @@ export namespace models {
 		    return a;
 		}
 	}
+	export class ProjectDetail {
+	    projectName?: string;
+	    projectCreator?: string;
+	    projectUpdatedAt?: string;
+	    deviceName?: string;
+	    participantName?: string;
+	    participantSerial?: string;
+	    informationId?: string;
+	    deleted: boolean;
+	    errorTimes: number;
+	    isFailed: boolean;
+	    trailNumber: number;
+	    mark?: string;
+	    timestamp: number;
+
+	    static createFrom(source: any = {}) {
+	        return new ProjectDetail(source);
+	    }
+
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.projectName = source["projectName"];
+	        this.projectCreator = source["projectCreator"];
+	        this.projectUpdatedAt = source["projectUpdatedAt"];
+	        this.deviceName = source["deviceName"];
+	        this.participantName = source["participantName"];
+	        this.participantSerial = source["participantSerial"];
+	        this.informationId = source["informationId"];
+	        this.deleted = source["deleted"];
+	        this.errorTimes = source["errorTimes"];
+	        this.isFailed = source["isFailed"];
+	        this.trailNumber = source["trailNumber"];
+	        this.mark = source["mark"];
+	        this.timestamp = source["timestamp"];
+	    }
+	}
 	export class ProjectSummaries {
 	    total?: number;
 	    data?: Project[];

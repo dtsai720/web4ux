@@ -31,6 +31,8 @@ type Command interface {
 type Queries interface {
 	ListProject
 	ListUsers(ctx context.Context, uid string) ([]sqlc.User, error)
+	GetProject(ctx context.Context, id string) (sqlc.Project, error)
+	GetProjectDetailByID(ctx context.Context, projectID string) ([]sqlc.GetProjectDetailByIDRow, error)
 }
 
 type IDatabase interface {
@@ -44,7 +46,9 @@ type CommandRepository interface {
 }
 
 type QueryRepository interface {
+	GetProject(ctx context.Context, id string) (models.Project, error)
 	ListProjects(ctx context.Context, name, creator, orderBy, direction string, offset, limit int64) (models.ProjectSummaries, error)
+	GetProjectDetailByID(ctx context.Context, projectID string) ([]models.ProjectDetail, error)
 }
 
 type IRepository interface {

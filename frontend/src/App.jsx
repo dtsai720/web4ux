@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { LoginAndSync, ListProjects, DeleteOrRestore, GetProjectDetail, StartSync, CancelSync, GetSyncStatus } from '../wailsjs/go/pkg/App';
+import { LoginAndSync, ListSummaries, DeleteOrRestore, GetProjectDetailByID, StartSync, CancelSync, GetSyncStatus } from '../wailsjs/go/pkg/App';
 import { EventsOn, EventsOff } from '../wailsjs/runtime/runtime';
 
 const App = () => {
@@ -468,7 +468,7 @@ const App = () => {
         const limit = itemsPerPage;
         const offset = (currentPageNum - 1) * limit;
 
-        const result = await ListProjects(searchName, searchCreator, orderBy, orderDirection, offset, limit);
+        const result = await ListSummaries(searchName, searchCreator, orderBy, orderDirection, offset, limit);
         setSummaries(result.data || []);
         setTotalItems(result.total || 0);
       } catch (err) {
@@ -799,153 +799,8 @@ const App = () => {
     const [loadingDetailed, setLoadingDetailed] = useState({});
     const [deletedRecords, setDeletedRecords] = useState([]);
     const [showDeletedModal, setShowDeletedModal] = useState(false);
+    const [rawData, setRawData] = useState([]); // 儲存原始數據
 
-    // Mock API 函數們
-    const mockApi = {
-      // 獲取主要資料
-      async getDetailData(summaryId, groupByType) {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            const mockData = this.generateMockData(groupByType);
-            resolve({
-              success: true,
-              data: mockData.data,
-              summary: mockData.summary,
-              deletedRecords: mockData.deletedRecords
-            });
-          }, 800); // 模擬網路延遲
-        });
-      },
-
-      // 獲取詳細資料
-      async getDetailedData(summaryId, level1Key, level2Key) {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            const mockDetailedData = [];
-            for (let i = 1; i <= 10; i++) {
-              mockDetailedData.push({
-                device: level1Key.startsWith('Device') ? level1Key : level2Key,
-                participant: level1Key.startsWith('Participant') ? level1Key : level2Key,
-                trail: `Trail ${i}`,
-                target: `Target ${Math.floor(Math.random() * 100)}`,
-                position: `${Math.floor(Math.random() * 100)}, ${Math.floor(Math.random() * 100)}`,
-                createdAt: new Date(Date.now() - Math.random() * 10000000000).toISOString()
-              });
-            }
-
-            resolve({
-              success: true,
-              data: mockDetailedData
-            });
-          }, 500);
-        });
-      },
-
-      // 切換刪除狀態
-      async toggleDelete(summaryId, params) {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            resolve({ success: true });
-          }, 300);
-        });
-      },
-
-      // 復原已刪除記錄
-      async restoreRecord(recordId) {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            resolve({ success: true });
-          }, 300);
-        });
-      },
-
-      // 生成 Mock 資料
-      generateMockData(groupByType) {
-        const data = {};
-        const deletedRecords = [];
-
-        if (groupByType === 'by_device') {
-          // Device -> Participant 結構
-          for (let deviceNum = 1; deviceNum <= 4; deviceNum++) {
-            const deviceKey = `Device ${deviceNum}`;
-            data[deviceKey] = {};
-
-            for (let participantNum = 1; participantNum <= 12; participantNum++) {
-              const participantKey = `Participant ${participantNum}`;
-              const records = [];
-
-              for (let i = 0; i < 5; i++) {
-                const record = {
-                  device: deviceKey,
-                  participant: participantKey,
-                  error_time: Math.floor(Math.random() * 100),
-                  event_time: Math.floor(Math.random() * 1000),
-                  available: Math.random() > 0.2,
-                  deleted: Math.random() < 0.1
-                };
-
-                records.push(record);
-                if (record.deleted) {
-                  deletedRecords.push({
-                    ...record,
-                    id: `${deviceKey}-${participantKey}-${i}`,
-                    deletedAt: new Date().toISOString()
-                  });
-                }
-              }
-
-              data[deviceKey][participantKey] = records;
-            }
-          }
-        } else {
-          // Participant -> Device 結構
-          for (let participantNum = 1; participantNum <= 12; participantNum++) {
-            const participantKey = `Participant ${participantNum}`;
-            data[participantKey] = {};
-
-            for (let deviceNum = 1; deviceNum <= 4; deviceNum++) {
-              const deviceKey = `Device ${deviceNum}`;
-              const records = [];
-
-              for (let i = 0; i < 5; i++) {
-                const record = {
-                  device: deviceKey,
-                  participant: participantKey,
-                  error_time: Math.floor(Math.random() * 100),
-                  event_time: Math.floor(Math.random() * 1000),
-                  available: Math.random() > 0.2,
-                  deleted: Math.random() < 0.1
-                };
-
-                records.push(record);
-                if (record.deleted) {
-                  deletedRecords.push({
-                    ...record,
-                    id: `${participantKey}-${deviceKey}-${i}`,
-                    deletedAt: new Date().toISOString()
-                  });
-                }
-              }
-
-              data[participantKey][deviceKey] = records;
-            }
-          }
-        }
-
-        return {
-          data,
-          summary: {
-            id: selectedSummaryId,
-            name: 'Test Summary',
-            creator: 'Test Creator',
-            updatedAt: '2025-06-04T00:00:00Z'
-          },
-          deletedRecords
-        };
-      }
-    };
-
-    // 載入主要資料
     const loadData = async () => {
       if (!selectedSummaryId) {
         setError('No summary ID provided');
@@ -956,42 +811,165 @@ const App = () => {
       setError('');
 
       try {
-        const result = await mockApi.getDetailData(selectedSummaryId, groupBy);
+        const result = await GetProjectDetailByID(selectedSummaryId);
 
-        if (result.success) {
-          setData(result.data || {});
-          setSummaryInfo(result.summary || null);
-          setDeletedRecords(result.deletedRecords || []);
+        if (result && Array.isArray(result)) {
+          setRawData(result);
+
+          // 處理並組織數據
+          const organizedData = organizeData(result, groupBy);
+          setData(organizedData.data);
+
+          // 設置摘要信息（從第一筆數據獲取）
+          if (result.length > 0) {
+            setSummaryInfo({
+              id: selectedSummaryId,
+              name: result[0].projectName,
+              creator: result[0].projectCreator,
+              updatedAt: result[0].projectUpdatedAt
+            });
+          }
+
+          // 設置已刪除記錄
+          const deleted = result
+            .filter(record => record.deleted)
+            .map(record => ({
+              ...record,
+              id: record.informationId,
+              deletedAt: new Date(record.timestamp).toISOString()
+            }));
+          setDeletedRecords(deleted);
+
         } else {
-          throw new Error(result.message || 'Failed to load data');
+          throw new Error('Invalid data format received');
         }
       } catch (err) {
+        console.error('Load data error:', err);
         setError(err.message || 'An error occurred while loading data');
       } finally {
         setLoading(false);
       }
     };
 
+    // 組織數據的函數
+    const organizeData = (rawData, groupByType) => {
+      const organized = {};
+
+      // 過濾掉已刪除的記錄（除非在特定情況下需要顯示）
+      const activeData = rawData.filter(record => !record.deleted);
+
+      if (groupByType === 'by_device') {
+        // Device -> Participant 結構
+        activeData.forEach(record => {
+          const deviceKey = record.deviceName;
+          // const participantKey = record.participantName;
+          const participantKey = record.participantSerial;
+
+          if (!organized[deviceKey]) {
+            organized[deviceKey] = {};
+          }
+
+          if (!organized[deviceKey][participantKey]) {
+            organized[deviceKey][participantKey] = [];
+          }
+
+          organized[deviceKey][participantKey].push({
+            device: record.deviceName,
+            participant: record.participantName,
+            error_time: record.errorTimes || 0,
+            event_time: record.timestamp ? new Date(record.timestamp).getTime() % 1000 : 0, // 簡化顯示
+            available: !record.deleted,
+            deleted: record.deleted,
+            trailNumber: record.trailNumber,
+            mark: record.mark,
+            participantSerial: record.participantSerial,
+            informationID: record.informationID,
+            originalRecord: record
+          });
+        });
+      } else {
+        // Participant -> Device 結構
+        activeData.forEach(record => {
+          // const participantKey = record.participantName;
+          const participantKey = record.participantSerial;
+          const deviceKey = record.deviceName;
+
+          if (!organized[participantKey]) {
+            organized[participantKey] = {};
+          }
+
+          if (!organized[participantKey][deviceKey]) {
+            organized[participantKey][deviceKey] = [];
+          }
+
+          organized[participantKey][deviceKey].push({
+            device: record.deviceName,
+            participant: record.participantName,
+            error_time: record.errorTimes || 0,
+            event_time: record.timestamp ? new Date(record.timestamp).getTime() % 1000 : 0,
+            available: !record.deleted,
+            deleted: record.deleted,
+            trailNumber: record.trailNumber,
+            mark: record.mark,
+            participantSerial: record.participantSerial,
+            informationID: record.informationID,
+            originalRecord: record
+          });
+        });
+      }
+
+      return { data: organized };
+    };
+
     useEffect(() => {
       loadData();
-    }, [selectedSummaryId, groupBy]);
+    }, [selectedSummaryId]);
 
-    // 載入最內層詳細資料
+    // 當 groupBy 改變時重新組織數據
+    useEffect(() => {
+      if (rawData.length > 0) {
+        const organizedData = organizeData(rawData, groupBy);
+        setData(organizedData.data);
+
+        // 重置展開狀態
+        setExpandedLevel1({});
+        setExpandedLevel2({});
+        setDetailedData({});
+      }
+    }, [groupBy, rawData]);
+
+    // 載入最內層詳細資料（現在從已有數據中篩選）
     const loadDetailedData = async (level1Key, level2Key) => {
       const combinedKey = `${level1Key}-${level2Key}`;
       setLoadingDetailed(prev => ({ ...prev, [combinedKey]: true }));
 
       try {
-        const result = await mockApi.getDetailedData(selectedSummaryId, level1Key, level2Key);
+        // 從原始數據中篩選相關記錄
+        const filteredData = rawData.filter(record => {
+          if (groupBy === 'by_device') {
+            return record.deviceName === level1Key && record.participantSerial === level2Key;
+          } else {
+            return record.participantSerial === level1Key && record.deviceName === level2Key;
+          }
+        });
 
-        if (result.success) {
-          setDetailedData(prev => ({
-            ...prev,
-            [combinedKey]: result.data
-          }));
-        } else {
-          throw new Error(result.message || 'Failed to load detailed data');
-        }
+        // 格式化詳細數據
+        const detailedRecords = filteredData.map(record => ({
+          device: record.deviceName,
+          participant: record.participantSerial,
+          trail: `Trail ${record.trailNumber}`,
+          target: record.mark,
+          position: `Serial: ${record.participantSerial}`,
+          createdAt: new Date(record.timestamp).toISOString(),
+          informationID: record.informationID,
+          errorTimes: record.errorTimes
+        }));
+
+        setDetailedData(prev => ({
+          ...prev,
+          [combinedKey]: detailedRecords
+        }));
+
       } catch (err) {
         console.error('Load detailed data failed:', err);
       } finally {
@@ -999,18 +977,27 @@ const App = () => {
       }
     };
 
-    // 刪除/復原第二層資料
+    // 刪除/復原第二層資料（這裡需要實際的API調用）
     const toggleLevel2Delete = async (level1Key, level2Key) => {
       try {
-        const result = await mockApi.toggleDelete(selectedSummaryId, {
-          level1: level1Key,
-          level2: level2Key,
-          type: 'level2'
+        // 找到相關記錄
+        const recordsToUpdate = rawData.filter(record => {
+          if (groupBy === 'by_device') {
+            return record.deviceName === level1Key && record.participantName === level2Key;
+          } else {
+            return record.participantName === level1Key && record.deviceName === level2Key;
+          }
         });
 
-        if (result.success) {
-          await loadData();
+        // 這裡需要調用實際的刪除/復原API
+        // 假設有一個 updateRecordStatus 函數
+        for (const record of recordsToUpdate) {
+          // await updateRecordStatus(record.informationID, !record.deleted);
+          console.log(`Would toggle delete status for record: ${record.informationID}`);
         }
+
+        // 重新載入資料
+        await loadData();
       } catch (err) {
         console.error('Toggle delete failed:', err);
       }
@@ -1019,14 +1006,17 @@ const App = () => {
     // 刪除/復原第三層資料
     const toggleLevel3Delete = async (level1Key, level2Key, recordIndex) => {
       try {
-        const result = await mockApi.toggleDelete(selectedSummaryId, {
-          level1: level1Key,
-          level2: level2Key,
-          recordIndex: recordIndex,
-          type: 'level3'
-        });
+        // 找到特定記錄
+        const records = data[level1Key][level2Key];
+        if (records && records[recordIndex]) {
+          const record = records[recordIndex];
+          const informationID = record.informationID;
 
-        if (result.success) {
+          // 這裡需要調用實際的刪除/復原API
+          // await updateRecordStatus(informationID, !record.deleted);
+          console.log(`Would toggle delete status for record: ${informationID}`);
+
+          // 重新載入資料
           await loadData();
         }
       } catch (err) {
@@ -1037,11 +1027,12 @@ const App = () => {
     // 復原已刪除的記錄
     const restoreDeletedRecord = async (recordId) => {
       try {
-        const result = await mockApi.restoreRecord(recordId);
+        // 這裡需要調用實際的復原API
+        // await updateRecordStatus(recordId, false);
+        console.log(`Would restore record: ${recordId}`);
 
-        if (result.success) {
-          await loadData();
-        }
+        // 重新載入資料
+        await loadData();
       } catch (err) {
         console.error('Restore failed:', err);
         // Fallback: 移除本地記錄
@@ -1075,7 +1066,7 @@ const App = () => {
     // 計算統計資料
     const getLevel2Stats = (records) => {
       const total = records.length;
-      const errors = records.filter(r => r.error_time > 50).length;
+      const errors = records.filter(r => r.error_time > 0).length; // 修改條件
       const deleted = records.filter(r => r.deleted).length;
       const avgEventTime = Math.round(records.reduce((sum, r) => sum + r.event_time, 0) / total) || 0;
 
@@ -1101,9 +1092,6 @@ const App = () => {
     // 處理分組切換
     const handleGroupByChange = (newGroupBy) => {
       setGroupBy(newGroupBy);
-      setExpandedLevel1({});
-      setExpandedLevel2({});
-      setDetailedData({});
     };
 
     return (
@@ -1331,11 +1319,15 @@ const App = () => {
                                                             <div className="d-flex align-items-center flex-wrap">
                                                               <span className="me-3">
                                                                 <i className="bi bi-exclamation-circle text-warning me-1"></i>
-                                                                <strong>Error:</strong> {record.error_time}ms
+                                                                <strong>Errors:</strong> {record.error_time}
                                                               </span>
                                                               <span className="me-3">
-                                                                <i className="bi bi-stopwatch text-info me-1"></i>
-                                                                <strong>Event:</strong> {record.event_time}ms
+                                                                <i className="bi bi-path text-info me-1"></i>
+                                                                <strong>Trail:</strong> {record.trailNumber}
+                                                              </span>
+                                                              <span className="me-3">
+                                                                <i className="bi bi-bullseye text-success me-1"></i>
+                                                                <strong>Mark:</strong> {record.mark}
                                                               </span>
                                                               <span className={`badge me-2 ${record.available ? 'bg-success' : 'bg-secondary'}`}>
                                                                 <i className={`bi ${record.available ? 'bi-check-circle' : 'bi-x-circle'} me-1`}></i>
@@ -1388,6 +1380,7 @@ const App = () => {
                                                           <th><i className="bi bi-bullseye me-1"></i>Target</th>
                                                           <th><i className="bi bi-geo-alt me-1"></i>Position</th>
                                                           <th><i className="bi bi-calendar me-1"></i>Created</th>
+                                                          <th><i className="bi bi-exclamation-triangle me-1"></i>Errors</th>
                                                         </tr>
                                                       </thead>
                                                       <tbody>
@@ -1400,6 +1393,11 @@ const App = () => {
                                                             <td><code>{item.position}</code></td>
                                                             <td>
                                                               <small>{new Date(item.createdAt).toLocaleString()}</small>
+                                                            </td>
+                                                            <td>
+                                                              <span className={`badge ${item.errorTimes > 0 ? 'bg-danger' : 'bg-success'}`}>
+                                                                {item.errorTimes}
+                                                              </span>
                                                             </td>
                                                           </tr>
                                                         ))}
@@ -1515,6 +1513,8 @@ const App = () => {
       </div>
     );
   };
+
+
 
   const renderCurrentPage = () => {
     switch (currentPage) {

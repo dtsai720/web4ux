@@ -3,7 +3,6 @@ package pkg
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -11,7 +10,6 @@ import (
 	"github.com/web4ux/src/sliceutils"
 )
 
-// SyncProgress represents the sync progress data
 type SyncProgress struct {
 	CurrentProject string `json:"currentProject"`
 	CurrentIndex   int    `json:"currentIndex"`
@@ -21,14 +19,12 @@ type SyncProgress struct {
 	IsCancelled    bool   `json:"isCancelled"`
 }
 
-// LoginResponse represents the login response
 type LoginResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
 }
 
 func (a *App) LoginAndSync(email, password string) (*LoginResponse, error) {
-	fmt.Println("LoginAndSync:  ", email, password)
 	if a.isSyncing {
 		return &LoginResponse{
 			Success: false,
@@ -36,7 +32,7 @@ func (a *App) LoginAndSync(email, password string) (*LoginResponse, error) {
 		}, errors.New("sync in progress")
 	}
 
-	if err := a.service.Login(a.ctx, a.log, email, password); err != nil {
+	if err := a.fetcher.Login(a.ctx, a.log, email, password); err != nil {
 		return &LoginResponse{
 			Success: false,
 			Message: "invalid email or password",
@@ -46,7 +42,6 @@ func (a *App) LoginAndSync(email, password string) (*LoginResponse, error) {
 	return &LoginResponse{Success: true, Message: "Login successful"}, nil
 }
 
-// StartSync starts the synchronization process
 func (a *App) StartSync() error {
 	if a.isSyncing {
 		return errors.New("sync already in progress")
@@ -62,14 +57,14 @@ func (a *App) StartSync() error {
 	return nil
 }
 
-// performSync performs the actual sync operation
+//nolint:funlen
 func (a *App) performSync(ctx context.Context) {
 	defer func() {
 		a.isSyncing = false
 		a.cancelFunc = nil
 	}()
 
-	projectList, err := a.service.ListAllProjects(a.ctx, a.log)
+	projectList, err := a.fetcher.ListAllProjects(a.ctx, a.log)
 	if err != nil {
 		a.emitSyncProgress(SyncProgress{
 			CurrentProject: err.Error(),
@@ -87,6 +82,7 @@ func (a *App) performSync(ctx context.Context) {
 	})
 
 	for i, project := range projectList {
+		a.log.Infof("project: %+v", project)
 		select {
 		case <-ctx.Done():
 			// 發送取消事件
@@ -101,7 +97,9 @@ func (a *App) performSync(ctx context.Context) {
 
 			return
 		default:
-			if err := a.service.FetchDataAndSave(a.ctx, a.log, project); err != nil {
+			if err := a.fetcher.FetchDataAndSave(a.ctx, a.log, project); err != nil {
+				a.log.Errorf("An error occurred while fetching ans saving data: %s", err)
+
 				a.emitSyncProgress(SyncProgress{
 					CurrentProject: project.Name,
 					CurrentIndex:   i,
@@ -137,26 +135,24 @@ func (a *App) performSync(ctx context.Context) {
 	})
 }
 
-// emitSyncProgress emits sync progress to frontend
 func (a *App) emitSyncProgress(progress SyncProgress) {
 	// 使用 Wails 的事件系統發送進度更新
 	runtime.EventsEmit(a.ctx, "sync:progress", progress)
-	fmt.Printf("Sync Progress: %+v\n", progress)
+	a.log.Infof("Sync Progress: %+v\n", progress)
 }
 
-// CancelSync cancels the ongoing sync operation
 func (a *App) CancelSync() error {
 	if !a.isSyncing || a.cancelFunc == nil {
 		return errors.New("no sync operation in progress")
 	}
 
 	a.cancelFunc()
+
 	return nil
 }
 
-// GetSyncStatus returns current sync status
-func (a *App) GetSyncStatus() map[string]interface{} {
-	return map[string]interface{}{
+func (a *App) GetSyncStatus() map[string]any {
+	return map[string]any{
 		"isSyncing": a.isSyncing,
 	}
 }

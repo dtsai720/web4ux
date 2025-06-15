@@ -11,6 +11,7 @@ type HandleSingleParam[T any, R any] func(ctx context.Context, log logger.ILogge
 
 func WrapFSingleParam[T any, R any](duration time.Duration, f HandleSingleParam[T, R]) HandleSingleParam[T, R] {
 	var zero R
+
 	return func(ctx context.Context, log logger.ILogger, in T) (R, error) {
 		target := time.Now().Add(duration)
 		output, err := f(ctx, log, in)

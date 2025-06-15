@@ -27,13 +27,34 @@ func (q *Queries) CountProjects(ctx context.Context, arg CountProjectsParams) (i
 	return count, err
 }
 
-const getProjectDetail = `-- name: GetProjectDetail :many
+const getProject = `-- name: GetProject :one
+SELECT id, name, creator, updated_at FROM projects WHERE id = ?1
+`
+
+func (q *Queries) GetProject(ctx context.Context, id string) (Project, error) {
+	row := q.db.QueryRowContext(ctx, getProject, id)
+	var i Project
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Creator,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getProjectDetailByID = `-- name: GetProjectDetailByID :many
 SELECT projects.name AS project_name,
+	projects.creator AS project_creator,
+	projects.updated_at AS project_updated_at,
 	devices.name AS device_name,
 	participants.name AS participant_name,
-	winfitts_informatiON.error_times,
-	winfitts_informatiON.is_failed,
-	winfitts_informatiON.trail_number,
+	participants.serial AS participant_serial,
+	winfitts_information.id AS information_id,
+	winfitts_information.deleted,
+	winfitts_information.error_times,
+	winfitts_information.is_failed,
+	winfitts_information.trail_number,
 	winfitts_details.mark,
 	winfitts_details.timestamp
 FROM projects
@@ -43,36 +64,46 @@ INNER JOIN winfitts ON
 	projects.id = winfitts.project_id
 	AND devices.id = winfitts.device_id
 	AND participants.id = winfitts.participant_id
-INNER JOIN winfitts_informatiON ON winfitts.id = winfitts_informatiON.winfitts_id
-INNER JOIN winfitts_details ON winfitts_informatiON.id = winfitts_details.informatiON_id
+INNER JOIN winfitts_information ON winfitts.id = winfitts_information.winfitts_id
+INNER JOIN winfitts_details ON winfitts_information.id = winfitts_details.information_id
 WHERE projects.id = ?1
 ORDER BY device_name,  participant_name, trail_number ASC
 `
 
-type GetProjectDetailRow struct {
-	ProjectName     string
-	DeviceName      string
-	ParticipantName string
-	ErrorTimes      int64
-	IsFailed        bool
-	TrailNumber     int64
-	Mark            string
-	Timestamp       int64
+type GetProjectDetailByIDRow struct {
+	ProjectName       string
+	ProjectCreator    string
+	ProjectUpdatedAt  string
+	DeviceName        string
+	ParticipantName   string
+	ParticipantSerial string
+	InformationID     string
+	Deleted           bool
+	ErrorTimes        int64
+	IsFailed          bool
+	TrailNumber       int64
+	Mark              string
+	Timestamp         int64
 }
 
-func (q *Queries) GetProjectDetail(ctx context.Context, projectID string) ([]GetProjectDetailRow, error) {
-	rows, err := q.db.QueryContext(ctx, getProjectDetail, projectID)
+func (q *Queries) GetProjectDetailByID(ctx context.Context, projectID string) ([]GetProjectDetailByIDRow, error) {
+	rows, err := q.db.QueryContext(ctx, getProjectDetailByID, projectID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetProjectDetailRow
+	var items []GetProjectDetailByIDRow
 	for rows.Next() {
-		var i GetProjectDetailRow
+		var i GetProjectDetailByIDRow
 		if err := rows.Scan(
 			&i.ProjectName,
+			&i.ProjectCreator,
+			&i.ProjectUpdatedAt,
 			&i.DeviceName,
 			&i.ParticipantName,
+			&i.ParticipantSerial,
+			&i.InformationID,
+			&i.Deleted,
 			&i.ErrorTimes,
 			&i.IsFailed,
 			&i.TrailNumber,

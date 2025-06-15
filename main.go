@@ -7,6 +7,7 @@ import (
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"github.com/web4ux/internal/service/analyzer"
 	"github.com/web4ux/internal/service/fetcher"
 	"github.com/web4ux/pkg"
 	"github.com/web4ux/repository"
@@ -47,14 +48,19 @@ func main() {
 	}()
 
 	logging := logger.New(log)
-	service := fetcher.New(
+	fetcher := fetcher.New(
 		fetcher.WithClient(request.New()),
 		fetcher.WithDatabase(repository),
+	)
+	analyzer := analyzer.New(
+		analyzer.WithClient(request.New()),
+		analyzer.WithDatabase(repository),
 	)
 
 	// Create an instance of the app structure
 	app := pkg.New(
-		pkg.WithService(service),
+		pkg.WithFetcherService(fetcher),
+		pkg.WithAnalyzerService(analyzer),
 		pkg.WithLogger(logging),
 	)
 

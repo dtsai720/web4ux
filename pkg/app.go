@@ -3,13 +3,18 @@ package pkg
 import (
 	"context"
 
+	"github.com/web4ux/internal/service/analyzer"
 	"github.com/web4ux/internal/service/fetcher"
 	"github.com/web4ux/src/common"
 	"github.com/web4ux/src/logger"
 )
 
-func WithService(service fetcher.IService) common.OptionalFn[App] {
-	return func(s *App) { s.service = service }
+func WithFetcherService(service fetcher.IService) common.OptionalFn[App] {
+	return func(s *App) { s.fetcher = service }
+}
+
+func WithAnalyzerService(service analyzer.IService) common.OptionalFn[App] {
+	return func(s *App) { s.analyzer = service }
 }
 
 func WithLogger(log logger.ILogger) common.OptionalFn[App] {
@@ -20,7 +25,8 @@ func WithLogger(log logger.ILogger) common.OptionalFn[App] {
 type App struct {
 	ctx        context.Context
 	log        logger.ILogger
-	service    fetcher.IService
+	fetcher    fetcher.IService
+	analyzer   analyzer.IService
 	cancelFunc context.CancelFunc
 	isSyncing  bool
 }

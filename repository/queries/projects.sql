@@ -7,6 +7,9 @@ ON CONFLICT(id) DO UPDATE SET
     updated_at = EXCLUDED.updated_at
 RETURNING *;
 
+-- name: GetProject :one
+SELECT * FROM projects WHERE id = @id;
+
 -- name: ListProjectsOrderByUpdatedAtDesc :many
 SELECT * FROM projects
 WHERE (COALESCE(@name, '') = '' OR name LIKE @name)
@@ -54,13 +57,18 @@ SELECT COUNT(1) FROM projects
 WHERE (COALESCE(@name, '') = '' OR name LIKE @name)
 AND (COALESCE(@creator, '') = '' OR creator LIKE @creator);
 
--- name: GetProjectDetail :many
+-- name: GetProjectDetailByID :many
 SELECT projects.name AS project_name,
+	projects.creator AS project_creator,
+	projects.updated_at AS project_updated_at,
 	devices.name AS device_name,
 	participants.name AS participant_name,
-	winfitts_informatiON.error_times,
-	winfitts_informatiON.is_failed,
-	winfitts_informatiON.trail_number,
+	participants.serial AS participant_serial,
+	winfitts_information.id AS information_id,
+	winfitts_information.deleted,
+	winfitts_information.error_times,
+	winfitts_information.is_failed,
+	winfitts_information.trail_number,
 	winfitts_details.mark,
 	winfitts_details.timestamp
 FROM projects
@@ -70,7 +78,7 @@ INNER JOIN winfitts ON
 	projects.id = winfitts.project_id
 	AND devices.id = winfitts.device_id
 	AND participants.id = winfitts.participant_id
-INNER JOIN winfitts_informatiON ON winfitts.id = winfitts_informatiON.winfitts_id
-INNER JOIN winfitts_details ON winfitts_informatiON.id = winfitts_details.informatiON_id
+INNER JOIN winfitts_information ON winfitts.id = winfitts_information.winfitts_id
+INNER JOIN winfitts_details ON winfitts_information.id = winfitts_details.information_id
 WHERE projects.id = @project_id
 ORDER BY device_name,  participant_name, trail_number ASC
