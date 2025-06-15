@@ -5,7 +5,7 @@ export namespace models {
 	    name?: string;
 	    creator?: string;
 	    // Go type: time
-	    updatedAt?: any;
+	    updatedAt: any;
 
 	    static createFrom(source: any = {}) {
 	        return new Project(source);

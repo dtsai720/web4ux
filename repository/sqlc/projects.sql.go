@@ -9,6 +9,24 @@ import (
 	"context"
 )
 
+const countProjects = `-- name: CountProjects :one
+SELECT COUNT(1) FROM projects
+WHERE (COALESCE(?1, '') = '' OR name LIKE ?1)
+AND (COALESCE(?2, '') = '' OR creator LIKE ?2)
+`
+
+type CountProjectsParams struct {
+	Name    interface{}
+	Creator interface{}
+}
+
+func (q *Queries) CountProjects(ctx context.Context, arg CountProjectsParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countProjects, arg.Name, arg.Creator)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getProjectDetail = `-- name: GetProjectDetail :many
 SELECT projects.name AS project_name,
 	devices.name AS device_name,
@@ -74,21 +92,268 @@ func (q *Queries) GetProjectDetail(ctx context.Context, projectID string) ([]Get
 	return items, nil
 }
 
-const listProjects = `-- name: ListProjects :many
+const listProjectsOrderByCreatorAsc = `-- name: ListProjectsOrderByCreatorAsc :many
 SELECT id, name, creator, updated_at FROM projects
-WHERE (COALESCE(?1, '') = '' OR id = ?1)
-AND (COALESCE(?2, '') = '' OR name = ?2)
-AND (COALESCE(?3, '') = '' OR creator = ?3)
+WHERE (COALESCE(?1, '') = '' OR name LIKE ?1)
+AND (COALESCE(?2, '') = '' OR creator LIKE ?2)
+ORDER BY creator ASC, updated_at DESC
+LIMIT ?4 OFFSET ?3
 `
 
-type ListProjectsParams struct {
-	ID      interface{}
+type ListProjectsOrderByCreatorAscParams struct {
 	Name    interface{}
 	Creator interface{}
+	Offset  int64
+	Limit   int64
 }
 
-func (q *Queries) ListProjects(ctx context.Context, arg ListProjectsParams) ([]Project, error) {
-	rows, err := q.db.QueryContext(ctx, listProjects, arg.ID, arg.Name, arg.Creator)
+func (q *Queries) ListProjectsOrderByCreatorAsc(ctx context.Context, arg ListProjectsOrderByCreatorAscParams) ([]Project, error) {
+	rows, err := q.db.QueryContext(ctx, listProjectsOrderByCreatorAsc,
+		arg.Name,
+		arg.Creator,
+		arg.Offset,
+		arg.Limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Project
+	for rows.Next() {
+		var i Project
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Creator,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listProjectsOrderByCreatorDesc = `-- name: ListProjectsOrderByCreatorDesc :many
+SELECT id, name, creator, updated_at FROM projects
+WHERE (COALESCE(?1, '') = '' OR name LIKE ?1)
+AND (COALESCE(?2, '') = '' OR creator LIKE ?2)
+ORDER BY creator DESC, updated_at DESC
+LIMIT ?4 OFFSET ?3
+`
+
+type ListProjectsOrderByCreatorDescParams struct {
+	Name    interface{}
+	Creator interface{}
+	Offset  int64
+	Limit   int64
+}
+
+func (q *Queries) ListProjectsOrderByCreatorDesc(ctx context.Context, arg ListProjectsOrderByCreatorDescParams) ([]Project, error) {
+	rows, err := q.db.QueryContext(ctx, listProjectsOrderByCreatorDesc,
+		arg.Name,
+		arg.Creator,
+		arg.Offset,
+		arg.Limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Project
+	for rows.Next() {
+		var i Project
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Creator,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listProjectsOrderByNameAsc = `-- name: ListProjectsOrderByNameAsc :many
+SELECT id, name, creator, updated_at FROM projects
+WHERE (COALESCE(?1, '') = '' OR name LIKE ?1)
+AND (COALESCE(?2, '') = '' OR creator LIKE ?2)
+ORDER BY name ASC, updated_at DESC
+LIMIT ?4 OFFSET ?3
+`
+
+type ListProjectsOrderByNameAscParams struct {
+	Name    interface{}
+	Creator interface{}
+	Offset  int64
+	Limit   int64
+}
+
+func (q *Queries) ListProjectsOrderByNameAsc(ctx context.Context, arg ListProjectsOrderByNameAscParams) ([]Project, error) {
+	rows, err := q.db.QueryContext(ctx, listProjectsOrderByNameAsc,
+		arg.Name,
+		arg.Creator,
+		arg.Offset,
+		arg.Limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Project
+	for rows.Next() {
+		var i Project
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Creator,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listProjectsOrderByNameDesc = `-- name: ListProjectsOrderByNameDesc :many
+SELECT id, name, creator, updated_at FROM projects
+WHERE (COALESCE(?1, '') = '' OR name LIKE ?1)
+AND (COALESCE(?2, '') = '' OR creator LIKE ?2)
+ORDER BY name DESC, updated_at DESC
+LIMIT ?4 OFFSET ?3
+`
+
+type ListProjectsOrderByNameDescParams struct {
+	Name    interface{}
+	Creator interface{}
+	Offset  int64
+	Limit   int64
+}
+
+func (q *Queries) ListProjectsOrderByNameDesc(ctx context.Context, arg ListProjectsOrderByNameDescParams) ([]Project, error) {
+	rows, err := q.db.QueryContext(ctx, listProjectsOrderByNameDesc,
+		arg.Name,
+		arg.Creator,
+		arg.Offset,
+		arg.Limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Project
+	for rows.Next() {
+		var i Project
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Creator,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listProjectsOrderByUpdatedAtAsc = `-- name: ListProjectsOrderByUpdatedAtAsc :many
+SELECT id, name, creator, updated_at FROM projects
+WHERE (COALESCE(?1, '') = '' OR name LIKE ?1)
+AND (COALESCE(?2, '') = '' OR creator LIKE ?2)
+ORDER BY updated_at ASC
+LIMIT ?4 OFFSET ?3
+`
+
+type ListProjectsOrderByUpdatedAtAscParams struct {
+	Name    interface{}
+	Creator interface{}
+	Offset  int64
+	Limit   int64
+}
+
+func (q *Queries) ListProjectsOrderByUpdatedAtAsc(ctx context.Context, arg ListProjectsOrderByUpdatedAtAscParams) ([]Project, error) {
+	rows, err := q.db.QueryContext(ctx, listProjectsOrderByUpdatedAtAsc,
+		arg.Name,
+		arg.Creator,
+		arg.Offset,
+		arg.Limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Project
+	for rows.Next() {
+		var i Project
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Creator,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listProjectsOrderByUpdatedAtDesc = `-- name: ListProjectsOrderByUpdatedAtDesc :many
+SELECT id, name, creator, updated_at FROM projects
+WHERE (COALESCE(?1, '') = '' OR name LIKE ?1)
+AND (COALESCE(?2, '') = '' OR creator LIKE ?2)
+ORDER BY updated_at DESC
+LIMIT ?4 OFFSET ?3
+`
+
+type ListProjectsOrderByUpdatedAtDescParams struct {
+	Name    interface{}
+	Creator interface{}
+	Offset  int64
+	Limit   int64
+}
+
+func (q *Queries) ListProjectsOrderByUpdatedAtDesc(ctx context.Context, arg ListProjectsOrderByUpdatedAtDescParams) ([]Project, error) {
+	rows, err := q.db.QueryContext(ctx, listProjectsOrderByUpdatedAtDesc,
+		arg.Name,
+		arg.Creator,
+		arg.Offset,
+		arg.Limit,
+	)
 	if err != nil {
 		return nil, err
 	}

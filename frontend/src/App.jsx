@@ -286,7 +286,7 @@ const App = () => {
                         <strong>Status:</strong> {syncProgress.currentProject || 'Initializing...'}
                       </p>
                       <p className="text-muted small mb-3">
-                        Progress: {syncProgress.progress}% ({Math.floor(syncProgress.currentIndex? syncProgress.currentIndex: 0)}/{syncProgress.totalProjects} projects)
+                        Progress: {syncProgress.progress}% ({Math.floor(syncProgress.currentIndex ? syncProgress.currentIndex : 0)}/{syncProgress.totalProjects} projects)
                       </p>
 
                       <button
@@ -442,50 +442,6 @@ const App = () => {
     );
   };
 
-  const get_summary = async (name = '', creator = '', orderBy = 'updatedAt') => {
-    // 模擬 API 延遲
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    // 模擬數據
-    const mockData = [
-      { id: 1, name: 'Q1 Sales Report', creator: 'John Doe', updatedAt: '2024-03-15T10:30:00Z' },
-      { id: 2, name: 'Marketing Analysis', creator: 'Jane Smith', updatedAt: '2024-03-14T14:20:00Z' },
-      { id: 3, name: 'Product Roadmap', creator: 'Mike Johnson', updatedAt: '2024-03-13T09:15:00Z' },
-      { id: 4, name: 'Customer Feedback', creator: 'Sarah Wilson', updatedAt: '2024-03-12T16:45:00Z' },
-      { id: 5, name: 'Budget Planning', creator: 'David Brown', updatedAt: '2024-03-11T11:30:00Z' },
-      { id: 6, name: 'Team Performance', creator: 'Lisa Garcia', updatedAt: '2024-03-10T13:20:00Z' },
-      { id: 7, name: 'Market Research', creator: 'Tom Anderson', updatedAt: '2024-03-09T08:45:00Z' },
-      { id: 8, name: 'Risk Assessment', creator: 'Emma Davis', updatedAt: '2024-03-08T15:30:00Z' },
-    ];
-
-    // 模擬搜索過濾
-    let filteredData = mockData.filter(item => {
-      const matchName = name ? item.name.toLowerCase().includes(name.toLowerCase()) : true;
-      const matchCreator = creator ? item.creator.toLowerCase().includes(creator.toLowerCase()) : true;
-      return matchName && matchCreator;
-    });
-
-    // 模擬排序
-    filteredData.sort((a, b) => {
-      let aValue = a[orderBy];
-      let bValue = b[orderBy];
-
-      if (orderBy === 'updatedAt') {
-        aValue = new Date(aValue);
-        bValue = new Date(bValue);
-      }
-
-      if (aValue < bValue) return -1;
-      if (aValue > bValue) return 1;
-      return 0;
-    });
-
-    return {
-      data: filteredData,
-      total: filteredData.length
-    };
-  };
-
   const SummaryPage = () => {
     const [summaries, setSummaries] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -508,23 +464,13 @@ const App = () => {
       setError('');
 
       try {
-        // 調用 get_summary 函數，傳入三個參數
-        const result = await get_summary(searchName, searchCreator, orderBy);
-
-        let sortedData = [...result.data];
-
-        // 根據排序方向調整數據
-        if (orderDirection === 'desc') {
-          sortedData.reverse();
-        }
-
         // 計算分頁
-        const startIndex = (currentPageNum - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        const paginatedData = sortedData.slice(startIndex, endIndex);
+        const limit = itemsPerPage;
+        const offset = (currentPageNum - 1) * limit;
 
-        setSummaries(paginatedData);
-        setTotalItems(sortedData.length);
+        const result = await ListProjects(searchName, searchCreator, orderBy, orderDirection, offset, limit);
+        setSummaries(result.data || []);
+        setTotalItems(result.total || 0);
       } catch (err) {
         setError('Failed to load summaries: ' + err.message);
         setSummaries([]);
@@ -582,15 +528,27 @@ const App = () => {
         <span className="text-primary ms-1">↓</span>;
     };
 
-    // 格式化日期
     const formatDate = (dateString) => {
-      return new Date(dateString).toLocaleString('zh-TW', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
+      const date = new Date(dateString);
+
+      const pad = (n) => n.toString().padStart(2, '0');
+
+      const year = date.getFullYear();
+      const month = pad(date.getMonth() + 1); // 月份從 0 開始
+      const day = pad(date.getDate());
+
+      const hours = pad(date.getHours());
+      const minutes = pad(date.getMinutes());
+      const seconds = pad(date.getSeconds());
+
+      // 計算時區偏移（分鐘）
+      const offsetMinutes = date.getTimezoneOffset();
+      const offsetHours = Math.floor(Math.abs(offsetMinutes) / 60);
+      const offsetMins = Math.abs(offsetMinutes) % 60;
+      const sign = offsetMinutes <= 0 ? '+' : '-';
+      const tzOffset = `${sign}${pad(offsetHours)}:${pad(offsetMins)}`;
+
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds} ${tzOffset}`;
     };
 
     return (
@@ -828,8 +786,6 @@ const App = () => {
       </div>
     );
   };
-
-
 
   const DetailPage = () => {
     const [data, setData] = useState({});

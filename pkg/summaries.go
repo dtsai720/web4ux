@@ -1,24 +1,16 @@
 package pkg
 
 import (
-	"fmt"
-	"time"
-
 	"github.com/web4ux/models"
+	"go.uber.org/zap"
 )
 
-func (a *App) ListProjects(name, creator, orderBy, direction string, offset int) models.ProjectSummaries {
-	fmt.Println(name, creator, orderBy, direction, offset)
-
-	return models.ProjectSummaries{
-		Total: 3,
-		Data: []models.Project{
-			{
-				ID:        "222",
-				Creator:   "333",
-				Name:      "222",
-				UpdatedAt: time.Now().UTC(),
-			},
-		},
+func (a *App) ListProjects(name, creator, orderBy, direction string, offset, limit int64) models.ProjectSummaries {
+	output, err := a.service.ListProjects(a.ctx, name, creator, orderBy, direction, offset, limit)
+	if err != nil {
+		a.log.With(zap.String("error", err.Error())).Error("An error occurred while listing projects")
+		return output
 	}
+
+	return output
 }

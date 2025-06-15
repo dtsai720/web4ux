@@ -134,14 +134,15 @@ func (q *Queries) UpsertWinfittsDetail(ctx context.Context, arg UpsertWinfittsDe
 }
 
 const upsertWinfittsInformation = `-- name: UpsertWinfittsInformation :one
-INSERT INTO winfitts_information (id, winfitts_id, trail_number, width, distance, angle, is_failed, error_times, deleted, reason)
-VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)
+INSERT INTO winfitts_information (id, winfitts_id, trail_number, width, distance, angle, is_failed, error_times, deleted, reason, is_available)
+VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)
 ON CONFLICT(winfitts_id, trail_number) DO UPDATE
     SET is_failed = EXCLUDED.is_failed,
     error_times = EXCLUDED.error_times,
     deleted = EXCLUDED.deleted,
-    reason = EXCLUDED.reason
-RETURNING id, winfitts_id, trail_number, width, distance, angle, is_failed, error_times, deleted, reason
+    reason = EXCLUDED.reason,
+    is_available = EXCLUDED.is_available
+RETURNING id, winfitts_id, trail_number, width, distance, angle, is_failed, error_times, deleted, reason, is_available
 `
 
 type UpsertWinfittsInformationParams struct {
@@ -155,6 +156,7 @@ type UpsertWinfittsInformationParams struct {
 	ErrorTimes  int64
 	Deleted     bool
 	Reason      string
+	IsAvailable bool
 }
 
 func (q *Queries) UpsertWinfittsInformation(ctx context.Context, arg UpsertWinfittsInformationParams) (WinfittsInformation, error) {
@@ -169,6 +171,7 @@ func (q *Queries) UpsertWinfittsInformation(ctx context.Context, arg UpsertWinfi
 		arg.ErrorTimes,
 		arg.Deleted,
 		arg.Reason,
+		arg.IsAvailable,
 	)
 	var i WinfittsInformation
 	err := row.Scan(
@@ -182,6 +185,7 @@ func (q *Queries) UpsertWinfittsInformation(ctx context.Context, arg UpsertWinfi
 		&i.ErrorTimes,
 		&i.Deleted,
 		&i.Reason,
+		&i.IsAvailable,
 	)
 	return i, err
 }

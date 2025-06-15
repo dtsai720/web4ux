@@ -7,11 +7,52 @@ ON CONFLICT(id) DO UPDATE SET
     updated_at = EXCLUDED.updated_at
 RETURNING *;
 
--- name: ListProjects :many
+-- name: ListProjectsOrderByUpdatedAtDesc :many
 SELECT * FROM projects
-WHERE (COALESCE(@id, '') = '' OR id = @id)
-AND (COALESCE(@name, '') = '' OR name = @name)
-AND (COALESCE(@creator, '') = '' OR creator = @creator);
+WHERE (COALESCE(@name, '') = '' OR name LIKE @name)
+AND (COALESCE(@creator, '') = '' OR creator LIKE @creator)
+ORDER BY updated_at DESC
+LIMIT @limit OFFSET @offset;
+
+-- name: ListProjectsOrderByUpdatedAtAsc :many
+SELECT * FROM projects
+WHERE (COALESCE(@name, '') = '' OR name LIKE @name)
+AND (COALESCE(@creator, '') = '' OR creator LIKE @creator)
+ORDER BY updated_at ASC
+LIMIT @limit OFFSET @offset;
+
+-- name: ListProjectsOrderByNameDesc :many
+SELECT * FROM projects
+WHERE (COALESCE(@name, '') = '' OR name LIKE @name)
+AND (COALESCE(@creator, '') = '' OR creator LIKE @creator)
+ORDER BY name DESC, updated_at DESC
+LIMIT @limit OFFSET @offset;
+
+-- name: ListProjectsOrderByNameAsc :many
+SELECT * FROM projects
+WHERE (COALESCE(@name, '') = '' OR name LIKE @name)
+AND (COALESCE(@creator, '') = '' OR creator LIKE @creator)
+ORDER BY name ASC, updated_at DESC
+LIMIT @limit OFFSET @offset;
+
+-- name: ListProjectsOrderByCreatorDesc :many
+SELECT * FROM projects
+WHERE (COALESCE(@name, '') = '' OR name LIKE @name)
+AND (COALESCE(@creator, '') = '' OR creator LIKE @creator)
+ORDER BY creator DESC, updated_at DESC
+LIMIT @limit OFFSET @offset;
+
+-- name: ListProjectsOrderByCreatorAsc :many
+SELECT * FROM projects
+WHERE (COALESCE(@name, '') = '' OR name LIKE @name)
+AND (COALESCE(@creator, '') = '' OR creator LIKE @creator)
+ORDER BY creator ASC, updated_at DESC
+LIMIT @limit OFFSET @offset;
+
+-- name: CountProjects :one
+SELECT COUNT(1) FROM projects
+WHERE (COALESCE(@name, '') = '' OR name LIKE @name)
+AND (COALESCE(@creator, '') = '' OR creator LIKE @creator);
 
 -- name: GetProjectDetail :many
 SELECT projects.name AS project_name,

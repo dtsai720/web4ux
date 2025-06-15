@@ -58,4 +58,5 @@ type WinfittsInformation struct {
 	ErrorTimes  int64
 	Deleted     bool
 	Reason      string
+	IsAvailable bool
 }

@@ -18,8 +18,8 @@ export function GetSyncStatus() {
   return window['go']['pkg']['App']['GetSyncStatus']();
 }
 
-export function ListProjects(arg1, arg2, arg3, arg4, arg5) {
-  return window['go']['pkg']['App']['ListProjects'](arg1, arg2, arg3, arg4, arg5);
+export function ListProjects(arg1, arg2, arg3, arg4, arg5, arg6) {
+  return window['go']['pkg']['App']['ListProjects'](arg1, arg2, arg3, arg4, arg5, arg6);
 }
 
 export function LoginAndSync(arg1, arg2) {

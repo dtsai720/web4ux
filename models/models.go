@@ -18,15 +18,24 @@ type ProjectSummary struct {
 }
 
 type ProjectSummaries struct {
-	Total int       `json:"total,omitempty"`
+	Total int64     `json:"total,omitempty"`
 	Data  []Project `json:"data,omitempty"`
+}
+
+type ListProjectRequest struct {
+	Name    string
+	Creator string
+	OrderBy string
+	IsASC   bool
+	Offset  int64
+	Limit   int64
 }
 
 type Project struct {
 	ID        string    `json:"id,omitempty"`
 	Name      string    `json:"name,omitempty"`
 	Creator   string    `json:"creator,omitempty"`
-	UpdatedAt time.Time `json:"updatedAt,omitempty"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 type Position struct {

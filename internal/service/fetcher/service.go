@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/web4ux/models"
 	"github.com/web4ux/repository"
 	"github.com/web4ux/src/common"
 	"github.com/web4ux/src/htmlparser"
@@ -31,6 +32,11 @@ var _ IService = (*Service)(nil)
 type Service struct {
 	client request.IClient
 	db     repository.IRepository
+}
+
+// ListProjects implements IService.
+func (s *Service) ListProjects(ctx context.Context, name string, creator string, orderBy string, direction string, offset, limit int64) (models.ProjectSummaries, error) {
+	return s.db.ListProjects(ctx, name, creator, orderBy, direction, offset, limit)
 }
 
 // FetchDataAndSave implements IService.

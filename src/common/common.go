@@ -9,3 +9,19 @@ func WithOptions[T any](in *T, opts ...OptionalFn[T]) *T {
 
 	return in
 }
+
+func Must[T any](in T, err error) T {
+	if err != nil {
+		panic(err)
+	}
+
+	return in
+}
+
+func Ternary[T any](condition bool, trueValue T, falseValue T) T {
+	if condition {
+		return trueValue
+	}
+
+	return falseValue
+}

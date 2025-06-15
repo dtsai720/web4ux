@@ -11,7 +11,7 @@ export function GetProjectDetail(arg1:string):Promise<string>;
 
 export function GetSyncStatus():Promise<Record<string, any>>;
 
-export function ListProjects(arg1:string,arg2:string,arg3:string,arg4:string,arg5:number):Promise<models.ProjectSummaries>;
+export function ListProjects(arg1:string,arg2:string,arg3:string,arg4:string,arg5:number,arg6:number):Promise<models.ProjectSummaries>;
 
 export function LoginAndSync(arg1:string,arg2:string):Promise<pkg.LoginResponse>;
 
