@@ -1,18 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { GetProjectDetailByID, DeleteOrRestore } from '../../../wailsjs/go/pkg/App';
-
-function sortObjectKeys(obj) {
-  if (obj === null || typeof obj !== 'object' || Array.isArray(obj)) {
-    return obj;
-  }
-
-  return Object.entries(obj)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .reduce((acc, [key, value]) => {
-      acc[key] = sortObjectKeys(value);
-      return acc;
-    }, {});
-}
+import DetailRecordComponent from './DetailRecordComponent';
+import OutlierAnalysisComponent from './OutlierAnalysisComponent';
+import DeleteItemComponent from './DeleteItemComponent';
+import ResultAnalysisComponent from './ResultAnalysisComponent';
 
 const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
   const [data, setData] = useState({});
@@ -33,7 +24,8 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
   const [rawData, setRawData] = useState([]); // 儲存原始數據
   const [deletedTrails, setDeletedTrails] = useState({});
   const [deletedParticipants, setDeletedParticipants] = useState({});
-  const [showDeletedModal, setShowDeletedModal] = useState(false);
+  const [deleteMode, setDeleteMode] = useState(false);
+  const [resultMode, setResultMode] = useState(false);
 
   const loadData = async () => {
     if (!selectedSummaryId) {
@@ -53,8 +45,6 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
         // 處理並組織數據
         const organizedData = organizeData(result, groupBy);
 
-
-
         setData(organizedData.data);
 
         // 收集已刪除的 trails 和 participants
@@ -68,6 +58,34 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
             creator: result[0].projectCreator,
             updatedAt: result[0].projectUpdatedAt
           });
+
+          // 展開第一個 level1 項目作為預設顯示
+          if (Object.keys(organizedData.data).length > 0) {
+            const firstLevel1Key = Object.keys(organizedData.data)[0];
+            setExpandedLevel1({
+              [firstLevel1Key]: true
+            });
+
+            // 如果有 level2 項目，也展開第一個
+            if (Object.keys(organizedData.data[firstLevel1Key]).length > 0) {
+              const firstLevel2Key = Object.keys(organizedData.data[firstLevel1Key]).filter(key => key !== 'stats')[0];
+              if (firstLevel2Key) {
+                setExpandedLevel2({
+                  [`${firstLevel1Key}-${firstLevel2Key}`]: true
+                });
+
+                // 如果有 trail 項目，也展開第一個
+                if (Object.keys(organizedData.data[firstLevel1Key][firstLevel2Key]).length > 0) {
+                  const firstTrailKey = Object.keys(organizedData.data[firstLevel1Key][firstLevel2Key]).filter(key => key !== 'stats')[0];
+                  if (firstTrailKey) {
+                    setExpandedTrails({
+                      [`${firstLevel1Key}-${firstLevel2Key}-${firstTrailKey}`]: true
+                    });
+                  }
+                }
+              }
+            }
+          }
         }
       } else {
         throw new Error('Invalid data format received');
@@ -393,106 +411,18 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
   const calculateOutliers = () => {
     // 只在 by_device 分組模式下計算
     if (groupBy !== 'by_device') {
+      // 如果不是 by_device 模式，先切換到 by_device 模式
+      // 實際計算會在 useEffect 中處理，當 groupBy 變更後
       setGroupBy('by_device');
+      // 延遲設置 outlierMode，確保數據已經重新組織完成
+      setTimeout(() => {
+        setOutlierMode(true);
+      }, 50);
+      return;
     }
 
-    const outliers = {};
-
-    // 遍歷所有 devices
-    Object.keys(data).forEach(deviceKey => {
-      outliers[deviceKey] = {
-        participants: {},
-        stats: {
-          avgErrorCount: 0,
-          stdDevErrorCount: 0,
-          avgErrorTime: 0,
-          stdDevErrorTime: 0
-        }
-      };
-
-      const device = data[deviceKey];
-      const participantKeys = Object.keys(device).filter(key => key !== 'stats');
-
-      // 收集所有參與者的錯誤數據
-      const errorCounts = [];
-      const errorTimes = [];
-
-      participantKeys.forEach(participantKey => {
-        const participant = device[participantKey];
-        const trailKeys = Object.keys(participant).filter(key => key !== 'stats');
-
-        // 計算此參與者的總錯誤數和錯誤時間
-        let participantErrorCount = 0;
-        let participantErrorTime = 0;
-        let participantTrailCount = 0;
-        const errorTrails = [];
-
-        trailKeys.forEach(trailKey => {
-          const trail = participant[trailKey];
-          const trailStats = trail.stats || {};
-
-          if (trailStats.has_error) {
-            participantErrorCount++;
-            participantErrorTime += trailStats.error_time;
-            errorTrails.push(trailKey);
-          }
-          participantTrailCount++;
-        });
-
-        // 存儲參與者的錯誤數據
-        outliers[deviceKey].participants[participantKey] = {
-          errorCount: participantErrorCount,
-          errorTime: participantErrorTime,
-          trailCount: participantTrailCount,
-          errorTrails: errorTrails,
-          isOutlier: false
-        };
-
-        // 添加到設備的總體統計
-        errorCounts.push(participantErrorCount);
-        errorTimes.push(participantErrorTime);
-      });
-
-      // 計算平均值和標準差
-      if (errorCounts.length > 0) {
-        // 計算平均錯誤數
-        const avgErrorCount = errorCounts.reduce((sum, count) => sum + count, 0) / errorCounts.length;
-
-        // 計算錯誤數的標準差
-        const stdDevErrorCount = Math.sqrt(
-          errorCounts.reduce((sum, count) => sum + Math.pow(count - avgErrorCount, 2), 0) / errorCounts.length
-        );
-
-        // 計算平均錯誤時間
-        const avgErrorTime = errorTimes.reduce((sum, time) => sum + time, 0) / errorTimes.length;
-
-        // 計算錯誤時間的標準差
-        const stdDevErrorTime = Math.sqrt(
-          errorTimes.reduce((sum, time) => sum + Math.pow(time - avgErrorTime, 2), 0) / errorTimes.length
-        );
-
-        // 存儲設備的統計數據
-        outliers[deviceKey].stats = {
-          avgErrorCount,
-          stdDevErrorCount,
-          avgErrorTime,
-          stdDevErrorTime
-        };
-
-        // 標記 outliers (超過平均值 + 2 * 標準差)
-        participantKeys.forEach(participantKey => {
-          const participant = outliers[deviceKey].participants[participantKey];
-          const errorCountThreshold = avgErrorCount + 2 * stdDevErrorCount;
-          const errorTimeThreshold = avgErrorTime + 2 * stdDevErrorTime;
-
-          participant.isOutlier =
-            participant.errorCount > errorCountThreshold ||
-            participant.errorTime > errorTimeThreshold;
-        });
-      }
-    });
-
-    setOutlierData(outliers);
+    // 如果已經是 by_device 模式，直接設置 outlierMode
+    // 實際計算會在 useEffect 中處理
     setOutlierMode(true);
   };
 
@@ -522,9 +452,132 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
     setSelectedOutlierTrail(null);
   };
 
+  // 關閉 delete 模式
+  const closeDeleteMode = () => {
+    setDeleteMode(false);
+  };
+
+  // 關閉 result 模式
+  const closeResultMode = () => {
+    setResultMode(false);
+  };
+
   useEffect(() => {
     loadData();
+    // Ensure we're in detail record mode by default
+    setDeleteMode(false);
+    setOutlierMode(false);
+    setResultMode(false);
   }, [selectedSummaryId]);
+
+  // When outlierMode is activated, calculate outliers
+  useEffect(() => {
+    if (outlierMode && rawData.length > 0 && groupBy === 'by_device') {
+      // Only calculate outliers when in by_device mode and not during the initial switch
+      // Use a timeout to ensure data reorganization has completed
+      const timer = setTimeout(() => {
+        const outliers = {};
+
+        // 遍歷所有 devices
+        Object.keys(data).forEach(deviceKey => {
+          outliers[deviceKey] = {
+            participants: {},
+            stats: {
+              avgErrorCount: 0,
+              stdDevErrorCount: 0,
+              avgErrorTime: 0,
+              stdDevErrorTime: 0
+            }
+          };
+
+          const device = data[deviceKey];
+          const participantKeys = Object.keys(device).filter(key => key !== 'stats');
+
+          // 收集所有參與者的錯誤數據
+          const errorCounts = [];
+          const errorTimes = [];
+
+          participantKeys.forEach(participantKey => {
+            const participant = device[participantKey];
+            const trailKeys = Object.keys(participant).filter(key => key !== 'stats');
+
+            // 計算此參與者的總錯誤數和錯誤時間
+            let participantErrorCount = 0;
+            let participantErrorTime = 0;
+            let participantTrailCount = 0;
+            const errorTrails = [];
+
+            trailKeys.forEach(trailKey => {
+              const trail = participant[trailKey];
+              const trailStats = trail.stats || {};
+
+              if (trailStats.has_error) {
+                participantErrorCount++;
+                participantErrorTime += trailStats.error_time;
+                errorTrails.push(trailKey);
+              }
+              participantTrailCount++;
+            });
+
+            // 存儲參與者的錯誤數據
+            outliers[deviceKey].participants[participantKey] = {
+              errorCount: participantErrorCount,
+              errorTime: participantErrorTime,
+              trailCount: participantTrailCount,
+              errorTrails: errorTrails,
+              isOutlier: false
+            };
+
+            // 添加到設備的總體統計
+            errorCounts.push(participantErrorCount);
+            errorTimes.push(participantErrorTime);
+          });
+
+          // 計算平均值和標準差
+          if (errorCounts.length > 0) {
+            // 計算平均錯誤數
+            const avgErrorCount = errorCounts.reduce((sum, count) => sum + count, 0) / errorCounts.length;
+
+            // 計算錯誤數的標準差
+            const stdDevErrorCount = Math.sqrt(
+              errorCounts.reduce((sum, count) => sum + Math.pow(count - avgErrorCount, 2), 0) / errorCounts.length
+            );
+
+            // 計算平均錯誤時間
+            const avgErrorTime = errorTimes.reduce((sum, time) => sum + time, 0) / errorTimes.length;
+
+            // 計算錯誤時間的標準差
+            const stdDevErrorTime = Math.sqrt(
+              errorTimes.reduce((sum, time) => sum + Math.pow(time - avgErrorTime, 2), 0) / errorTimes.length
+            );
+
+            // 存儲設備的統計數據
+            outliers[deviceKey].stats = {
+              avgErrorCount,
+              stdDevErrorCount,
+              avgErrorTime,
+              stdDevErrorTime
+            };
+
+            // 標記 outliers (超過平均值 + 2 * 標準差)
+            participantKeys.forEach(participantKey => {
+              const participant = outliers[deviceKey].participants[participantKey];
+              const errorCountThreshold = avgErrorCount + 2 * stdDevErrorCount;
+              const errorTimeThreshold = avgErrorTime + 2 * stdDevErrorTime;
+
+              participant.isOutlier =
+                participant.errorCount > errorCountThreshold ||
+                participant.errorTime > errorTimeThreshold;
+            });
+          }
+        });
+
+        setOutlierData(outliers);
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [outlierMode, rawData, groupBy, data]);
 
   // 當 groupBy 改變時重新組織數據
   useEffect(() => {
@@ -576,7 +629,6 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
     }));
   };
 
-
   // 分組選項配置
   const groupByOptions = {
     by_device: {
@@ -602,42 +654,88 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
     <div className="container mt-5">
       <div className="row">
         <div className="col-12">
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <h2>Detail View</h2>
-            <div>
-              <button
-                className="btn btn-outline-warning me-2"
-                onClick={() => setShowDeletedModal(true)}
-              >
-                <i className="bi bi-trash"></i> Deleted Items
-              </button>
-              {!outlierMode ? (
-                <button
-                  className="btn btn-outline-info me-2"
-                  onClick={calculateOutliers}
-                >
-                  <i className="bi bi-graph-up"></i> Analyze Outliers
-                </button>
-              ) : (
+          <div className="mb-4">
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h2>Detail View</h2>
+              <div className="d-flex">
                 <button
                   className="btn btn-outline-secondary me-2"
-                  onClick={closeOutlierMode}
+                  onClick={() => setCurrentPage('summary')}
                 >
-                  <i className="bi bi-x-circle"></i> Close Outlier Analysis
+                  <i className="bi bi-arrow-left"></i> Back
                 </button>
-              )}
-              <button
-                className="btn btn-outline-secondary me-2"
-                onClick={() => setCurrentPage('summary')}
-              >
-                <i className="bi bi-arrow-left"></i> Back to Summary
-              </button>
-              <button
-                className="btn btn-secondary"
-                onClick={() => setCurrentPage('home')}
-              >
-                <i className="bi bi-house"></i> Home
-              </button>
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setCurrentPage('home')}
+                >
+                  <i className="bi bi-house"></i> Home
+                </button>
+              </div>
+            </div>
+
+            <div className="btn-toolbar" role="toolbar">
+              <div className="btn-group me-2 mb-2" role="group">
+                <button
+                  className={`btn ${!deleteMode && !outlierMode && !resultMode ? 'btn-primary' : 'btn-outline-primary'}`}
+                  onClick={() => {
+                    setDeleteMode(false);
+                    setOutlierMode(false);
+                    setResultMode(false);
+                  }}
+                >
+                  <i className="bi bi-list-ul"></i> Detail Record
+                </button>
+                <button
+                  className={`btn ${deleteMode ? 'btn-warning' : 'btn-outline-warning'}`}
+                  onClick={() => {
+                    setDeleteMode(true);
+                    setOutlierMode(false);
+                    setResultMode(false);
+                  }}
+                >
+                  <i className="bi bi-trash"></i> Deleted Items
+                </button>
+              </div>
+
+              <div className="btn-group me-2 mb-2" role="group">
+                {!outlierMode ? (
+                  <button
+                    className="btn btn-outline-info"
+                    onClick={calculateOutliers}
+                  >
+                    <i className="bi bi-graph-up"></i> Analyze Outliers
+                  </button>
+                ) : (
+                  <button
+                    className="btn btn-info"
+                    onClick={closeOutlierMode}
+                  >
+                    <i className="bi bi-x-circle"></i> Close Outlier Analysis
+                  </button>
+                )}
+              </div>
+
+              <div className="btn-group mb-2" role="group">
+                {!resultMode ? (
+                  <button
+                    className="btn btn-outline-success"
+                    onClick={() => {
+                      setResultMode(true);
+                      setDeleteMode(false);
+                      setOutlierMode(false);
+                    }}
+                  >
+                    <i className="bi bi-bar-chart-line"></i> Result Analysis
+                  </button>
+                ) : (
+                  <button
+                    className="btn btn-success"
+                    onClick={closeResultMode}
+                  >
+                    <i className="bi bi-x-circle"></i> Close Result Analysis
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -684,688 +782,58 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
             </div>
           )}
 
-          {/* 改良的分組選項 */}
-          <div className="card mb-4 border-info">
-            <div className="card-header bg-light">
-              <h6 className="mb-0">
-                <i className="bi bi-diagram-3 me-2"></i>
-                Data Organization
-              </h6>
-            </div>
-            <div className="card-body">
-              <div className="row">
-                {Object.entries(groupByOptions).map(([key, option]) => (
-                  <div key={key} className="col-md-6 mb-3">
-                    <div
-                      className={`card h-100 cursor-pointer border-2 ${groupBy === key ? 'border-primary bg-primary bg-opacity-10' : 'border-light'}`}
-                      onClick={() => handleGroupByChange(key)}
-                      style={{ cursor: 'pointer', transition: 'all 0.2s' }}
-                    >
-                      <div className="card-body text-center">
-                        <div className="fs-2 mb-2">{option.icon}</div>
-                        <h6 className={`card-title ${groupBy === key ? 'text-primary' : ''}`}>
-                          {option.label}
-                        </h6>
-                        <p className="card-text text-muted small mb-2">
-                          {option.description}
-                        </p>
-                        <div className={`badge ${groupBy === key ? 'bg-primary' : 'bg-secondary'}`}>
-                          {option.structure}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="text-center mt-3">
-                <small className="text-muted">
-                  <i className="bi bi-lightbulb me-1"></i>
-                  Click on a card to change the data organization view
-                </small>
-              </div>
-            </div>
-          </div>
-
-          {/* Outlier Analysis */}
-          {outlierMode && (
-            <div className="card mb-4 border-info">
-              <div className="card-header bg-info text-white">
-                <h5 className="mb-0">
-                  <i className="bi bi-graph-up me-2"></i>
-                  Outlier Analysis
-                </h5>
-              </div>
-              <div className="card-body">
-                {selectedOutlierDevice ? (
-                  <div>
-                    <div className="d-flex align-items-center mb-3">
-                      <button
-                        className="btn btn-sm btn-outline-secondary me-2"
-                        onClick={() => setSelectedOutlierDevice(null)}
-                      >
-                        <i className="bi bi-arrow-left"></i> Back to Devices
-                      </button>
-                      <h5 className="mb-0">Device: {selectedOutlierDevice}</h5>
-                    </div>
-
-                    {selectedOutlierParticipant ? (
-                      <div>
-                        <div className="d-flex align-items-center mb-3">
-                          <button
-                            className="btn btn-sm btn-outline-secondary me-2"
-                            onClick={() => setSelectedOutlierParticipant(null)}
-                          >
-                            <i className="bi bi-arrow-left"></i> Back to Participants
-                          </button>
-                          <h6 className="mb-0">Participant: {selectedOutlierParticipant}</h6>
-                        </div>
-
-                        {selectedOutlierTrail ? (
-                          <div>
-                            <div className="d-flex align-items-center mb-3">
-                              <button
-                                className="btn btn-sm btn-outline-secondary me-2"
-                                onClick={() => setSelectedOutlierTrail(null)}
-                              >
-                                <i className="bi bi-arrow-left"></i> Back to Trails
-                              </button>
-                              <h6 className="mb-0">Trail: {selectedOutlierTrail}</h6>
-                            </div>
-
-                            {/* Trail Details */}
-                            <div className="card">
-                              <div className="card-header bg-light">
-                                <h6 className="mb-0">Trail Details</h6>
-                              </div>
-                              <div className="card-body">
-                                <div className="table-responsive">
-                                  <table className="table table-sm table-striped">
-                                    <thead className="table-dark">
-                                      <tr>
-                                        <th><i className="bi bi-tag me-1"></i>Mark</th>
-                                        <th><i className="bi bi-calendar me-1"></i>DateTime</th>
-                                        <th><i className="bi bi-clock me-1"></i>Timestamp</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {data[selectedOutlierDevice]?.[selectedOutlierParticipant]?.[selectedOutlierTrail]?.map((record, idx) => (
-                                        <tr key={idx}>
-                                          <td>
-                                            <span className={`badge ${record.mark === 'start' ? 'bg-primary' : record.mark === 'target' ? 'bg-success' : 'bg-secondary'}`}>
-                                              {record.mark}
-                                            </span>
-                                          </td>
-                                          <td>
-                                            <small>{formatDateTime(record.timestamp)}</small>
-                                          </td>
-                                          <td>
-                                            <small>{record.timestamp}</small>
-                                          </td>
-                                        </tr>
-                                      ))}
-                                    </tbody>
-                                  </table>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <div>
-                            <h6 className="border-bottom pb-2 mb-3">Error Trails</h6>
-                            <div className="table-responsive">
-                              <table className="table table-hover">
-                                <thead className="table-light">
-                                  <tr>
-                                    <th>Trail</th>
-                                    <th>Error Time</th>
-                                    <th>Event Time</th>
-                                    <th>Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {outlierData[selectedOutlierDevice]?.participants[selectedOutlierParticipant]?.errorTrails?.map(trailKey => (
-                                    <tr key={trailKey}>
-                                      <td>Trail {trailKey}</td>
-                                      <td>{data[selectedOutlierDevice]?.[selectedOutlierParticipant]?.[trailKey]?.stats?.error_time || 0}</td>
-                                      <td>{data[selectedOutlierDevice]?.[selectedOutlierParticipant]?.[trailKey]?.stats?.event_time || 0}ms</td>
-                                      <td>
-                                        <button
-                                          className="btn btn-sm btn-primary me-2"
-                                          onClick={() => handleSelectOutlierTrail(trailKey)}
-                                        >
-                                          <i className="bi bi-eye me-1"></i> View
-                                        </button>
-                                        <button
-                                          className="btn btn-sm btn-danger"
-                                          onClick={() => toggleTrailDelete(selectedOutlierDevice, selectedOutlierParticipant, trailKey, true)}
-                                        >
-                                          <i className="bi bi-trash me-1"></i> Delete
-                                        </button>
-                                      </td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div>
-                        <div className="card mb-4">
-                          <div className="card-header bg-light">
-                            <h6 className="mb-0">Device Statistics</h6>
-                          </div>
-                          <div className="card-body">
-                            <div className="row">
-                              <div className="col-md-3">
-                                <div className="card bg-light">
-                                  <div className="card-body text-center">
-                                    <h6 className="text-muted">Avg Error Count</h6>
-                                    <h4>{outlierData[selectedOutlierDevice]?.stats?.avgErrorCount?.toFixed(2) || '0.00'}</h4>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="col-md-3">
-                                <div className="card bg-light">
-                                  <div className="card-body text-center">
-                                    <h6 className="text-muted">StdDev Error Count</h6>
-                                    <h4>{outlierData[selectedOutlierDevice]?.stats?.stdDevErrorCount?.toFixed(2) || '0.00'}</h4>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="col-md-3">
-                                <div className="card bg-light">
-                                  <div className="card-body text-center">
-                                    <h6 className="text-muted">Avg Error Time</h6>
-                                    <h4>{outlierData[selectedOutlierDevice]?.stats?.avgErrorTime?.toFixed(2) || '0.00'}</h4>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="col-md-3">
-                                <div className="card bg-light">
-                                  <div className="card-body text-center">
-                                    <h6 className="text-muted">StdDev Error Time</h6>
-                                    <h4>{outlierData[selectedOutlierDevice]?.stats?.stdDevErrorTime?.toFixed(2) || '0.00'}</h4>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <h6 className="border-bottom pb-2 mb-3">Participants</h6>
-                        <div className="table-responsive">
-                          <table className="table table-hover">
-                            <thead className="table-light">
-                              <tr>
-                                <th>Participant</th>
-                                <th>Error Count</th>
-                                <th>Error Time</th>
-                                <th>Trail Count</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {Object.entries(outlierData[selectedOutlierDevice]?.participants || {}).map(([participantKey, participantData]) => (
-                                <tr key={participantKey} className={participantData.isOutlier ? 'table-danger' : ''}>
-                                  <td>{participantKey}</td>
-                                  <td>{participantData.errorCount}</td>
-                                  <td>{participantData.errorTime}</td>
-                                  <td>{participantData.trailCount}</td>
-                                  <td>
-                                    {participantData.isOutlier ? (
-                                      <span className="badge bg-danger">Outlier</span>
-                                    ) : (
-                                      <span className="badge bg-success">Normal</span>
-                                    )}
-                                  </td>
-                                  <td>
-                                    <div>
-                                      <button
-                                        className="btn btn-sm btn-primary me-2"
-                                        onClick={() => handleSelectOutlierParticipant(participantKey)}
-                                      >
-                                        <i className="bi bi-eye me-1"></i> View
-                                      </button>
-                                      {participantData.isOutlier && (
-                                        <button
-                                          className="btn btn-sm btn-danger"
-                                          onClick={() => toggleParticipantDelete(selectedOutlierDevice, participantKey, true)}
-                                        >
-                                          <i className="bi bi-trash me-1"></i> Delete
-                                        </button>
-                                      )}
-                                    </div>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                    <div>
-                      <h6 className="border-bottom pb-2 mb-3">Select a Device to Analyze</h6>
-                      <div className="row">
-                        {Object.keys(outlierData).map(deviceKey => (
-                          <div key={deviceKey} className="col-md-4 mb-3">
-                            <div className="card h-100">
-                              <div className="card-body">
-                                <h5 className="card-title">{deviceKey}</h5>
-                                <p className="card-text">
-                                  <small className="text-muted">
-                                    <i className="bi bi-people me-1"></i>
-                                    {Object.keys(outlierData[deviceKey]?.participants || {}).length} participants
-                                  </small>
-                                </p>
-                                <p className="card-text">
-                                  <small className="text-muted">
-                                    <i className="bi bi-exclamation-triangle me-1"></i>
-                                    {Object.values(outlierData[deviceKey]?.participants || {}).filter(p => p?.isOutlier).length} outliers detected
-                                  </small>
-                                </p>
-                                <button
-                                  className="btn btn-sm btn-primary"
-                                  onClick={() => handleSelectOutlierDevice(deviceKey)}
-                                >
-                                  <i className="bi bi-graph-up me-1"></i> Analyze
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* 載入狀態 */}
-          {loading && (
-            <div className="text-center mb-4">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
-              </div>
-              <div className="mt-2 text-muted">Loading detail data...</div>
-            </div>
-          )}
-
-          {/* 錯誤訊息 */}
-          {error && (
-            <div className="alert alert-danger d-flex align-items-center" role="alert">
-              <i className="bi bi-exclamation-triangle me-2"></i>
-              <div>{error}</div>
-            </div>
-          )}
-
-          {/* 分組資料 */}
-          {!loading && !error && (
-            <div className="card border-success">
-              <div className="card-header bg-success text-white">
-                <h5 className="mb-0">
-                  <i className="bi bi-table me-2"></i>
-                  Detail Records - {groupByOptions[groupBy].label}
-                </h5>
-                <small className="opacity-75">{groupByOptions[groupBy].structure}</small>
-              </div>
-              <div className="card-body">
-                {Object.keys(data).length > 0 ? (
-                  <div className="accordion" id="detailAccordion">
-                    {/* 第一層 */}
-                    {Object.entries(data).map(([level1Key, level2Data]) => (
-                      <div key={level1Key} className="accordion-item mb-3 border-2">
-                        <h2 className="accordion-header">
-                          <button
-                            className="accordion-button collapsed fw-bold"
-                            type="button"
-                            onClick={() => toggleExpandLevel1(level1Key)}
-                            aria-expanded={expandedLevel1[level1Key] || false}
-                          >
-                            <div className="d-flex align-items-center">
-                              <span className="me-2">
-                                {groupBy === 'by_device' ? '🖥️' : '👤'}
-                              </span>
-                              <span className="text-primary">{level1Key}</span>
-                              <span className="badge bg-info ms-3">
-                                {Object.keys(level2Data).filter(key => key !== 'stats').length} items
-                              </span>
-                              {level2Data.stats && (
-                                <>
-                                  <span className="badge bg-danger ms-2">
-                                    <i className="bi bi-exclamation-circle me-1"></i>
-                                    {level2Data.stats.trailsWithErrors} errors
-                                  </span>
-                                  <span className="badge bg-success ms-2">
-                                    <i className="bi bi-check-circle me-1"></i>
-                                    {level2Data.stats.availableTrails}/{level2Data.stats.totalTrails} available
-                                  </span>
-                                  <span className="badge bg-info ms-2">
-                                    <i className="bi bi-clock me-1"></i>
-                                    Total: {level2Data.stats.totalEventTime}ms / Avg: {level2Data.stats.avgEventTime}ms
-                                  </span>
-                                </>
-                              )}
-                            </div>
-                          </button>
-                        </h2>
-                        {(expandedLevel1[level1Key] || false) && (
-                          <div className="accordion-collapse collapse show">
-                            <div className="accordion-body bg-light">
-
-                              {/* 第二層 */}
-                              <div className="accordion" id={`level2-${level1Key}`}>
-                                {Object.entries(level2Data).map(([level2Key, trailsData]) => {
-                                  if (level2Key === 'stats') return ;
-
-                                  // 使用已計算好的統計數據
-                                  const stats = trailsData.stats || {
-                                    totalTrails: 0,
-                                    availableTrails: 0,
-                                    trailsWithErrors: 0,
-                                    avgEventTime: 0
-                                  };
-
-                                  return (
-                                    <div key={`${level1Key}-${level2Key}`} className="accordion-item mb-2 border">
-                                      <h2 className="accordion-header">
-                                        <div className="d-flex justify-content-between align-items-center w-100">
-                                          <button
-                                            className="accordion-button collapsed flex-grow-1"
-                                            type="button"
-                                            onClick={() => toggleExpandLevel2(level1Key, level2Key)}
-                                            aria-expanded={expandedLevel2[`${level1Key}-${level2Key}`] || false}
-                                          >
-                                            <div className="d-flex align-items-center flex-wrap">
-                                              <span className="me-2">
-                                                {groupBy === 'by_device' ? '👤' : '🖥️'}
-                                              </span>
-                                              <strong className="text-success me-3">{level2Key}</strong>
-                                              <span className="badge bg-primary me-2">
-                                                <i className="bi bi-signpost-split me-1"></i>
-                                                {stats.totalTrails} trails
-                                              </span>
-                                              <span className="badge bg-danger me-2">
-                                                <i className="bi bi-exclamation-triangle me-1"></i>
-                                                {stats.trailsWithErrors} with errors
-                                              </span>
-                                              <span className="badge bg-success me-2">
-                                                <i className="bi bi-check-circle me-1"></i>
-                                                {stats.availableTrails} available
-                                              </span>
-                                              <span className="badge bg-info me-2">
-                                                <i className="bi bi-clock me-1"></i>
-                                                Avg {stats.avgEventTime}ms
-                                              </span>
-                                              <span className="badge bg-secondary me-2">
-                                                <i className="bi bi-clock-history me-1"></i>
-                                                Total {stats.totalEventTime}ms
-                                              </span>
-                                            </div>
-                                          </button>
-
-                                        </div>
-                                      </h2>
-                                      {(expandedLevel2[`${level1Key}-${level2Key}`] || false) && (
-                                        <div className="accordion-collapse collapse show">
-                                          <div className="accordion-body bg-white">
-
-                                            {/* 第三層 - Trail 列表 */}
-                                            <div className="row mb-3">
-                                              <div className="col-12">
-                                                <h6 className="border-bottom pb-2">
-                                                  <i className="bi bi-list-ul me-2"></i>
-                                                  Trails ({Object.keys(trailsData).length})
-                                                </h6>
-
-                                                {/* 顯示 Trails */}
-                                                {Object.entries(trailsData).filter(([key]) => key !== 'stats').map(([trailKey, records]) => {
-                                                  const trailStats = records.stats || {};
-                                                  const combinedKey = `${level1Key}-${level2Key}-${trailKey}`;
-                                                  const isExpanded = expandedTrails[combinedKey] || false;
-
-                                                  return (
-                                                    <div key={combinedKey} className="card mb-2 border-start border-4 border-primary">
-                                                      <div className="card-body py-2">
-                                                        <div className="row align-items-center">
-                                                          <div className="col-md-8">
-                                                            <div
-                                                              className="d-flex align-items-center flex-wrap"
-                                                              style={{ cursor: 'pointer' }}
-                                                              onClick={() => toggleExpandTrail(level1Key, level2Key, trailKey)}
-                                                            >
-                                                              <span className="me-2">
-                                                                <i className={`bi ${isExpanded ? 'bi-chevron-down' : 'bi-chevron-right'}`}></i>
-                                                              </span>
-                                                              <strong className="me-3">Trail {trailKey}</strong>
-                                                              <span className="me-3">
-                                                                <i className="bi bi-exclamation-circle text-warning me-1"></i>
-                                                                <strong>Errors:</strong> {trailStats.error_time || 0}
-                                                              </span>
-                                                              <span className="me-3">
-                                                                <i className="bi bi-clock text-info me-1"></i>
-                                                                <strong>Event Time:</strong> {trailStats.event_time || 0}ms
-                                                              </span>
-                                                              <span className={`badge me-2 ${trailStats.available ? 'bg-success' : 'bg-secondary'}`}>
-                                                                <i className={`bi ${trailStats.available ? 'bi-check-circle' : 'bi-x-circle'} me-1`}></i>
-                                                                {trailStats.available ? 'Available' : 'Unavailable'}
-                                                              </span>
-                                                            </div>
-                                                          </div>
-                                                          <div className="col-md-4 text-end">
-                                                            {/* Delete button removed */}
-                                                          </div>
-                                                        </div>
-
-                                                        {/* 展開後顯示 Trail 內的記錄 */}
-                                                        {isExpanded && (
-                                                          <div className="mt-3 border-top pt-3">
-                                                            <h6 className="text-muted mb-3">Records in Trail {trailKey}</h6>
-                                                            <div className="table-responsive">
-                                                              <table className="table table-sm table-striped">
-                                                                <thead className="table-dark">
-                                                                  <tr>
-                                                                    <th><i className="bi bi-tag me-1"></i>Mark</th>
-                                                                    <th><i className="bi bi-calendar me-1"></i>DateTime</th>
-                                                                    <th><i className="bi bi-clock me-1"></i>Timestamp</th>
-                                                                  </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                  {records.map((record, idx) => (
-                                                                    <tr key={idx}>
-                                                                      <td>
-                                                                        <span className={`badge ${record.mark === 'start' ? 'bg-primary' : record.mark === 'target' ? 'bg-success' : 'bg-secondary'}`}>
-                                                                          {record.mark}
-                                                                        </span>
-                                                                      </td>
-                                                                      <td>
-                                                                        <small>{formatDateTime(record.timestamp)}</small>
-                                                                      </td>
-                                                                      <td>
-                                                                        <small>{record.timestamp}</small>
-                                                                      </td>
-                                                                    </tr>
-                                                                  ))}
-                                                                </tbody>
-                                                              </table>
-                                                            </div>
-                                                          </div>
-                                                        )}
-                                                      </div>
-                                                    </div>
-                                                  );
-                                                })}
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center p-4">
-                    <i className="bi bi-inbox fs-1 text-muted"></i>
-                    <h5 className="mt-3">No Detail Records Found</h5>
-                    <p className="text-muted">This summary has no associated detail records</p>
-                  </div>
-                )}
-              </div>
-            </div>
+          {/* Render the appropriate component based on mode */}
+          {outlierMode ? (
+            <OutlierAnalysisComponent
+              outlierData={outlierData}
+              selectedOutlierDevice={selectedOutlierDevice}
+              selectedOutlierParticipant={selectedOutlierParticipant}
+              selectedOutlierTrail={selectedOutlierTrail}
+              handleSelectOutlierDevice={handleSelectOutlierDevice}
+              handleSelectOutlierParticipant={handleSelectOutlierParticipant}
+              handleSelectOutlierTrail={handleSelectOutlierTrail}
+              closeOutlierMode={closeOutlierMode}
+              data={data}
+              formatDateTime={formatDateTime}
+              toggleTrailDelete={toggleTrailDelete}
+              toggleParticipantDelete={toggleParticipantDelete}
+            />
+          ) : deleteMode ? (
+            <DeleteItemComponent
+              deletedTrails={deletedTrails}
+              deletedParticipants={deletedParticipants}
+              toggleTrailDelete={toggleTrailDelete}
+              toggleParticipantDelete={toggleParticipantDelete}
+              closeDeleteMode={closeDeleteMode}
+            />
+          ) : resultMode ? (
+            <ResultAnalysisComponent
+              rawData={rawData}
+              closeResultMode={closeResultMode}
+            />
+          ) : (
+            <DetailRecordComponent
+              data={data}
+              loading={loading}
+              error={error}
+              summaryInfo={summaryInfo}
+              groupBy={groupBy}
+              groupByOptions={groupByOptions}
+              handleGroupByChange={handleGroupByChange}
+              expandedLevel1={expandedLevel1}
+              toggleExpandLevel1={toggleExpandLevel1}
+              expandedLevel2={expandedLevel2}
+              toggleExpandLevel2={toggleExpandLevel2}
+              expandedTrails={expandedTrails}
+              toggleExpandTrail={toggleExpandTrail}
+              formatDateTime={formatDateTime}
+              toggleTrailDelete={toggleTrailDelete}
+              toggleParticipantDelete={toggleParticipantDelete}
+              setCurrentPage={setCurrentPage}
+            />
           )}
         </div>
       </div>
-
-      {/* 已刪除記錄 Modal */}
-      {showDeletedModal && (
-        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-lg">
-            <div className="modal-content">
-              <div className="modal-header bg-warning text-dark">
-                <h5 className="modal-title">
-                  <i className="bi bi-trash me-2"></i>
-                  Deleted Items
-                </h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setShowDeletedModal(false)}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <ul className="nav nav-tabs mb-3" id="deletedTabs" role="tablist">
-                  <li className="nav-item" role="presentation">
-                    <button
-                      className="nav-link active"
-                      id="trails-tab"
-                      data-bs-toggle="tab"
-                      data-bs-target="#trails"
-                      type="button"
-                      role="tab"
-                      aria-controls="trails"
-                      aria-selected="true"
-                    >
-                      <i className="bi bi-signpost-split me-1"></i>
-                      Deleted Trails ({Object.keys(deletedTrails).length})
-                    </button>
-                  </li>
-                  <li className="nav-item" role="presentation">
-                    <button
-                      className="nav-link"
-                      id="participants-tab"
-                      data-bs-toggle="tab"
-                      data-bs-target="#participants"
-                      type="button"
-                      role="tab"
-                      aria-controls="participants"
-                      aria-selected="false"
-                    >
-                      <i className="bi bi-people me-1"></i>
-                      Deleted Participants ({Object.keys(deletedParticipants).length})
-                    </button>
-                  </li>
-                </ul>
-                <div className="tab-content" id="deletedTabsContent">
-                  <div className="tab-pane fade show active" id="trails" role="tabpanel" aria-labelledby="trails-tab">
-                    {Object.keys(deletedTrails).length > 0 ? (
-                      <div className="list-group">
-                        {Object.entries(deletedTrails).map(([key, trail]) => (
-                          <div key={key} className="list-group-item list-group-item-action">
-                            <div className="d-flex w-100 justify-content-between align-items-center">
-                              <div>
-                                <h6 className="mb-1">
-                                  <i className="bi bi-display me-1 text-primary"></i>
-                                  {trail.device} /
-                                  <i className="bi bi-person me-1 ms-2 text-success"></i>
-                                  {trail.participant} /
-                                  <i className="bi bi-signpost-split me-1 ms-2 text-info"></i>
-                                  Trail {trail.trail}
-                                </h6>
-                                <small className="text-muted">
-                                  {trail.records.length} records deleted
-                                </small>
-                              </div>
-                              <button
-                                className="btn btn-sm btn-outline-success"
-                                onClick={() => toggleTrailDelete(trail.device, trail.participant, trail.trail, false)}
-                              >
-                                <i className="bi bi-arrow-clockwise me-1"></i>
-                                Restore
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-4">
-                        <i className="bi bi-check-circle fs-1 text-success"></i>
-                        <p className="text-center text-muted mt-3">No deleted trails found.</p>
-                      </div>
-                    )}
-                  </div>
-                  <div className="tab-pane fade" id="participants" role="tabpanel" aria-labelledby="participants-tab">
-                    {Object.keys(deletedParticipants).length > 0 ? (
-                      <div className="list-group">
-                        {Object.entries(deletedParticipants).map(([key, participant]) => (
-                          <div key={key} className="list-group-item list-group-item-action">
-                            <div className="d-flex w-100 justify-content-between align-items-center">
-                              <div>
-                                <h6 className="mb-1">
-                                  <i className="bi bi-display me-1 text-primary"></i>
-                                  {participant.device} /
-                                  <i className="bi bi-person me-1 ms-2 text-success"></i>
-                                  {participant.participant} ({participant.participantName})
-                                </h6>
-                                <small className="text-muted">
-                                  {participant.trailCount} trails / {participant.recordCount} records deleted
-                                </small>
-                              </div>
-                              <button
-                                className="btn btn-sm btn-outline-success"
-                                onClick={() => toggleParticipantDelete(participant.device, participant.participant, false)}
-                              >
-                                <i className="bi bi-arrow-clockwise me-1"></i>
-                                Restore
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-4">
-                        <i className="bi bi-check-circle fs-1 text-success"></i>
-                        <p className="text-center text-muted mt-3">No deleted participants found.</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setShowDeletedModal(false)}
-                >
-                  <i className="bi bi-x me-1"></i>
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
     </div>
   );
 };

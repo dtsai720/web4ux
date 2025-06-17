@@ -53,6 +53,8 @@ export namespace models {
 	    timestamp: number;
 	    width: number;
 	    distance: number;
+	    x: number;
+	    y: number;
 
 	    static createFrom(source: any = {}) {
 	        return new ProjectDetail(source);
@@ -75,6 +77,8 @@ export namespace models {
 	        this.timestamp = source["timestamp"];
 	        this.width = source["width"];
 	        this.distance = source["distance"];
+	        this.x = source["x"];
+	        this.y = source["y"];
 	    }
 	}
 	export class ProjectSummaries {
