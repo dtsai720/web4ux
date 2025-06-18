@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { LoginAndSync, StartSync, CancelSync, GetSyncStatus } from '../../../wailsjs/go/pkg/App';
 import { EventsOn, EventsOff } from '../../../wailsjs/runtime/runtime';
+import {
+  checkSyncStatus,
+  handleLogin as loginUtil,
+  handleStartSync as startSyncUtil,
+  handleCancelSync as cancelSyncUtil,
+  getInitialSyncProgress,
+  formatSyncData
+} from '../../utils/sync';
+import {
+  SyncCard,
+  BackToHomeButton
+} from '../../components/sync';
 
 const SyncPage = ({ setCurrentPage }) => {
   const [email, setEmail] = useState('');
@@ -8,14 +19,7 @@ const SyncPage = ({ setCurrentPage }) => {
   const [loading, setLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [syncProgress, setSyncProgress] = useState({
-    currentProject: '',
-    currentIndex: 0,
-    progress: 0,
-    totalProjects: 0,
-    isCompleted: false,
-    isCancelled: false
-  });
+  const [syncProgress, setSyncProgress] = useState(getInitialSyncProgress());
   const [loginError, setLoginError] = useState('');
   const [syncData, setSyncData] = useState(null);
 
@@ -27,17 +31,14 @@ const SyncPage = ({ setCurrentPage }) => {
 
       if (progress.isCompleted) {
         setIsSyncing(false);
-        setSyncData({
-          totalRecords: progress.totalProjects,
-          lastSync: new Date().toISOString()
-        });
+        setSyncData(formatSyncData(progress.totalProjects));
       } else if (progress.isCancelled) {
         setIsSyncing(false);
       }
     });
 
     // 檢查同步狀態
-    checkSyncStatus();
+    checkSyncStatusAndUpdate();
 
     // 清理函數
     return () => {
@@ -45,9 +46,9 @@ const SyncPage = ({ setCurrentPage }) => {
     };
   }, []);
 
-  const checkSyncStatus = async () => {
+  const checkSyncStatusAndUpdate = async () => {
     try {
-      const status = await GetSyncStatus();
+      const status = await checkSyncStatus();
       setIsSyncing(status.isSyncing);
     } catch (error) {
       console.error('Failed to get sync status:', error);
@@ -60,7 +61,7 @@ const SyncPage = ({ setCurrentPage }) => {
       setLoginError('');
 
       try {
-        const response = await LoginAndSync(email, password);
+        const response = await loginUtil(email, password);
         if (response.success) {
           setIsLoggedIn(true);
           // 登入成功後立即開始同步
@@ -87,7 +88,7 @@ const SyncPage = ({ setCurrentPage }) => {
         isCompleted: false,
         isCancelled: false
       });
-      await StartSync();
+      await startSyncUtil();
     } catch (error) {
       console.error("Failed to start sync:", error);
       setIsSyncing(false);
@@ -96,7 +97,7 @@ const SyncPage = ({ setCurrentPage }) => {
 
   const handleCancelSync = async () => {
     try {
-      await CancelSync();
+      await cancelSyncUtil();
       setIsSyncing(false);
       setSyncProgress(prev => ({
         ...prev,
@@ -111,13 +112,7 @@ const SyncPage = ({ setCurrentPage }) => {
     setIsLoggedIn(false);
     setIsSyncing(false);
     setSyncData(null);
-    setSyncProgress({
-      currentProject: '',
-      progress: 0,
-      totalProjects: 0,
-      isCompleted: false,
-      isCancelled: false
-    });
+    setSyncProgress(getInitialSyncProgress());
     setEmail('');
     setPassword('');
     setLoginError('');
@@ -127,143 +122,30 @@ const SyncPage = ({ setCurrentPage }) => {
     <div className="container mt-5">
       <div className="row justify-content-center">
         <div className="col-md-6">
-          <div className="card shadow">
-            <div className="card-header bg-primary text-white">
-              <h3 className="mb-0">Data Synchronization</h3>
-            </div>
-            <div className="card-body">
-              {!isLoggedIn ? (
-                <div>
-                  <div className="mb-3">
-                    <label htmlFor="email" className="form-label">Email</label>
-                    <input
-                      type="email"
-                      className="form-control"
-                      id="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="admin@example.com"
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label htmlFor="password" className="form-label">Password</label>
-                    <input
-                      type="password"
-                      className="form-control"
-                      id="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="password123"
-                    />
-                  </div>
-
-                  {loginError && (
-                    <div className="alert alert-danger" role="alert">
-                      {loginError}
-                    </div>
-                  )}
-
-                  <button
-                    onClick={handleLogin}
-                    className="btn btn-primary w-100"
-                    disabled={loading || !email || !password}
-                  >
-                    {loading ? 'Logging in...' : 'Login & Start Sync'}
-                  </button>
-                </div>
-              ) : (
-                <div>
-                  {syncProgress.isCompleted && !isSyncing ? (
-                    <div className="text-center">
-                      <div className="alert alert-success">
-                        <h5>✅ Sync Completed!</h5>
-                        <p>Successfully synchronized {syncData?.totalRecords} projects</p>
-                        <small>Last sync: {new Date(syncData?.lastSync).toLocaleString()}</small>
-                      </div>
-                      <button
-                        onClick={resetSync}
-                        className="btn btn-info me-2"
-                      >
-                        Start New Sync
-                      </button>
-                    </div>
-                  ) : syncProgress.isCancelled ? (
-                    <div className="text-center">
-                      <div className="alert alert-warning">
-                        <h5>⚠️ Sync Cancelled</h5>
-                        <p>Synchronization was cancelled during: <strong>{syncProgress.currentProject}</strong></p>
-                      </div>
-                      <button
-                        onClick={handleStartSync}
-                        className="btn btn-primary me-2"
-                      >
-                        Restart Sync
-                      </button>
-                      <button
-                        onClick={resetSync}
-                        className="btn btn-secondary"
-                      >
-                        New Login
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="text-center">
-                      <div className="alert alert-info">
-                        <h5>📊 Synchronization in Progress</h5>
-                        {syncProgress.currentProject && (
-                          <p className="mb-2">
-                            Currently syncing: <strong>{syncProgress.currentProject}</strong>
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {isSyncing && (
-                <div className="mt-3">
-                  <div className="progress mb-3">
-                    <div
-                      className="progress-bar progress-bar-striped progress-bar-animated bg-success"
-                      role="progressbar"
-                      style={{ width: `${syncProgress.progress}%` }}
-                    >
-                      {syncProgress.progress}%
-                    </div>
-                  </div>
-
-                  <div className="text-center">
-                    <p className="mb-2">
-                      <strong>Status:</strong> {syncProgress.currentProject || 'Initializing...'}
-                    </p>
-                    <p className="text-muted small mb-3">
-                      Progress: {syncProgress.progress}% ({Math.floor(syncProgress.currentIndex ? syncProgress.currentIndex : 0)}/{syncProgress.totalProjects} projects)
-                    </p>
-
-                    <button
-                      onClick={handleCancelSync}
-                      className="btn btn-danger btn-sm"
-                    >
-                      🛑 Cancel Sync
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+          <SyncCard
+            isLoggedIn={isLoggedIn}
+            email={email}
+            setEmail={setEmail}
+            password={password}
+            setPassword={setPassword}
+            loginError={loginError}
+            loading={loading}
+            onLogin={handleLogin}
+            syncProgress={syncProgress}
+            isSyncing={isSyncing}
+            syncData={syncData}
+            onCancelSync={handleCancelSync}
+            onNewSync={resetSync}
+            onRestartSync={handleStartSync}
+            onNewLogin={resetSync}
+          />
         </div>
       </div>
 
-      <div className="text-center mt-4">
-        <button
-          className="btn btn-secondary"
-          onClick={() => setCurrentPage('home')}
-          disabled={isSyncing}
-        >
-          Back to Home
-        </button>
-      </div>
+      <BackToHomeButton
+        onBackToHome={() => setCurrentPage('home')}
+        disabled={isSyncing}
+      />
     </div>
   );
 };
