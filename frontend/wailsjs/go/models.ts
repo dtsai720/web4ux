@@ -38,6 +38,7 @@ export namespace models {
 		}
 	}
 	export class ProjectDetail {
+	    projectId: string;
 	    projectName: string;
 	    projectCreator: string;
 	    projectUpdatedAt: string;
@@ -62,6 +63,7 @@ export namespace models {
 
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.projectId = source["projectId"];
 	        this.projectName = source["projectName"];
 	        this.projectCreator = source["projectCreator"];
 	        this.projectUpdatedAt = source["projectUpdatedAt"];
@@ -130,22 +132,6 @@ export namespace pkg {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.success = source["success"];
 	        this.message = source["message"];
-	    }
-	}
-	export class Request {
-	    Device: string;
-	    Participant: string;
-	    Trail: number;
-
-	    static createFrom(source: any = {}) {
-	        return new Request(source);
-	    }
-
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.Device = source["Device"];
-	        this.Participant = source["Participant"];
-	        this.Trail = source["Trail"];
 	    }
 	}
 

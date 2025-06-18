@@ -177,6 +177,7 @@ func (w *WinfittsRawData) Load(slice []string) error {
 }
 
 type ProjectDetail struct {
+	ProjectID         string `json:"projectId"`
 	ProjectName       string `json:"projectName"`
 	ProjectCreator    string `json:"projectCreator"`
 	ProjectUpdatedAt  string `json:"projectUpdatedAt"`

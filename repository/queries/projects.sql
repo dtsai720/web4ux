@@ -59,6 +59,7 @@ AND (COALESCE(@creator, '') = '' OR creator LIKE @creator);
 
 -- name: GetProjectDetailByID :many
 SELECT projects.name AS project_name,
+	projects.id AS project_id,
 	projects.creator AS project_creator,
 	projects.updated_at AS project_updated_at,
 	devices.name AS device_name,

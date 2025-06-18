@@ -126,6 +126,7 @@ func (r *Repository) GetProjectDetailByID(ctx context.Context, projectID string)
 
 	return sliceutils.Map(result, func(in sqlc.GetProjectDetailByIDRow) models.ProjectDetail {
 		return models.ProjectDetail{
+			ProjectID:         in.ProjectID,
 			ProjectName:       in.ProjectName,
 			ProjectCreator:    in.ProjectCreator,
 			ProjectUpdatedAt:  in.ProjectUpdatedAt,

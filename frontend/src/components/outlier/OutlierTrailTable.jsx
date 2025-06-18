@@ -15,7 +15,7 @@ const OutlierTrailTable = ({
         <table className="table table-hover">
           <thead className="table-light">
             <tr>
-              <th>Trail</th>
+              <th>Trail Number</th>
               <th>Error Time</th>
               <th>Event Time</th>
               <th>Actions</th>
@@ -24,7 +24,7 @@ const OutlierTrailTable = ({
           <tbody>
             {errorTrails?.map(trailKey => (
               <tr key={trailKey}>
-                <td>Trail {trailKey}</td>
+                <td>{trailKey}</td>
                 <td>{data[deviceKey]?.[participantKey]?.[trailKey]?.stats?.error_time || 0}</td>
                 <td>{data[deviceKey]?.[participantKey]?.[trailKey]?.stats?.event_time || 0}ms</td>
                 <td>

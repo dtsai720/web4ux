@@ -26,6 +26,7 @@ type Command interface {
 	UpsertWinfittsDetail(ctx context.Context, arg sqlc.UpsertWinfittsDetailParams) (sqlc.WinfittsDetail, error)
 	UpsertWinfittsInformation(ctx context.Context, arg sqlc.UpsertWinfittsInformationParams) (sqlc.WinfittsInformation, error)
 	CreateUser(ctx context.Context, arg sqlc.CreateUserParams) (string, error)
+	DeleteWinfittsInformation(ctx context.Context, arg sqlc.DeleteWinfittsInformationParams) error
 }
 
 type Queries interface {
@@ -43,6 +44,7 @@ type IDatabase interface {
 
 type CommandRepository interface {
 	UpsertExtractWinfittsDetails(ctx context.Context, in models.ProjectSummary, rows []models.WinfittsRawData) error
+	DeleteOrRestoreWinfittsInformation(ctx context.Context, arg sqlc.DeleteWinfittsInformationParams) error
 }
 
 type QueryRepository interface {

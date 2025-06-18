@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 	_ "embed"
 
@@ -16,6 +17,14 @@ var _ IRepository = (*Repository)(nil)
 type Repository struct {
 	db      *sql.DB
 	queries IDatabase
+}
+
+// DeleteWinfittsInformation implements IRepository.
+func (r *Repository) DeleteOrRestoreWinfittsInformation(ctx context.Context, arg sqlc.DeleteWinfittsInformationParams) error {
+	return r.queries.DeleteWinfittsInformation(ctx, sqlc.DeleteWinfittsInformationParams{
+		Deleted:       arg.Deleted,
+		InformationID: arg.InformationID,
+	})
 }
 
 func New(db *sql.DB) (*Repository, error) {

@@ -15,6 +15,7 @@ const WidthDistanceTable = ({ selectedDevice, resultData }) => {
         <table className="table table-hover">
           <thead className="table-light">
             <tr>
+              <th>ID</th>
               <th>Width</th>
               <th>Distance</th>
               <th>Total Trails</th>
@@ -25,18 +26,19 @@ const WidthDistanceTable = ({ selectedDevice, resultData }) => {
             </tr>
           </thead>
           <tbody>
-            {Object.keys(resultData[selectedDevice].widths).flatMap(width =>
-              Object.keys(resultData[selectedDevice].widths[width].distances).map(distance => {
+            {Object.keys(resultData[selectedDevice].widths).sort((a, b) => b - a).map(width =>
+              Object.keys(resultData[selectedDevice].widths[width].distances).sort((a, b) => a - b).map(distance => {
                 const distanceData = resultData[selectedDevice].widths[width].distances[distance];
                 return (
                   <tr key={`${width}-${distance}`}>
+                    <td>{Math.log2(distance/width + 1).toFixed(1)}</td>
                     <td>{width}</td>
                     <td>{distance}</td>
                     <td>{distanceData.totalTrails}</td>
                     <td>{distanceData.availableTrails}</td>
                     <td>{distanceData.failedTrails}</td>
                     <td>{formatPercentage(distanceData.errorRate)}</td>
-                    <td>{formatNumber(distanceData.avgEventTime)}ms</td>
+                    <td>{formatNumber(distanceData.avgEventTime)} ms</td>
                   </tr>
                 );
               })

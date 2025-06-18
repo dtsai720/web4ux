@@ -45,6 +45,7 @@ func (q *Queries) GetProject(ctx context.Context, id string) (Project, error) {
 
 const getProjectDetailByID = `-- name: GetProjectDetailByID :many
 SELECT projects.name AS project_name,
+	projects.id AS project_id,
 	projects.creator AS project_creator,
 	projects.updated_at AS project_updated_at,
 	devices.name AS device_name,
@@ -76,6 +77,7 @@ ORDER BY device_name,  participant_name, trail_number ASC
 
 type GetProjectDetailByIDRow struct {
 	ProjectName       string
+	ProjectID         string
 	ProjectCreator    string
 	ProjectUpdatedAt  string
 	DeviceName        string
@@ -105,6 +107,7 @@ func (q *Queries) GetProjectDetailByID(ctx context.Context, projectID string) ([
 		var i GetProjectDetailByIDRow
 		if err := rows.Scan(
 			&i.ProjectName,
+			&i.ProjectID,
 			&i.ProjectCreator,
 			&i.ProjectUpdatedAt,
 			&i.DeviceName,

@@ -117,7 +117,7 @@ export const calculateResults = (data) => {
  * @returns {string} Formatted number with 2 decimal places
  */
 export const formatNumber = (num) => {
-  return Number(num).toFixed(2);
+  return Number(num).toFixed(3);
 };
 
 /**
@@ -126,5 +126,5 @@ export const formatNumber = (num) => {
  * @returns {string} Formatted percentage string
  */
 export const formatPercentage = (value) => {
-  return `${(value * 100).toFixed(2)}%`;
+  return `${(value * 100).toFixed(2)} %`;
 };

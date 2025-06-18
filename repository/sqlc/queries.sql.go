@@ -9,6 +9,20 @@ import (
 	"context"
 )
 
+const deleteWinfittsInformation = `-- name: DeleteWinfittsInformation :exec
+UPDATE winfitts_information SET deleted = ?1 WHERE id = ?2
+`
+
+type DeleteWinfittsInformationParams struct {
+	Deleted       bool
+	InformationID string
+}
+
+func (q *Queries) DeleteWinfittsInformation(ctx context.Context, arg DeleteWinfittsInformationParams) error {
+	_, err := q.db.ExecContext(ctx, deleteWinfittsInformation, arg.Deleted, arg.InformationID)
+	return err
+}
+
 const upsertDevices = `-- name: UpsertDevices :one
 INSERT INTO devices (id, name, project_id)
 VALUES (?1, ?2, ?3)

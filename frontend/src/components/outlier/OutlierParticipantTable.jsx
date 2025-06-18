@@ -14,7 +14,7 @@ const OutlierParticipantTable = ({
           <thead className="table-light">
             <tr>
               <th>Participant</th>
-              <th>Error Count</th>
+              <th>Error Trail Count</th>
               <th>Error Time</th>
               <th>Trail Count</th>
               <th>Status</th>
@@ -22,14 +22,14 @@ const OutlierParticipantTable = ({
             </tr>
           </thead>
           <tbody>
-            {Object.entries(participants || {}).map(([participantKey, participantData]) => (
-              <tr key={participantKey} className={participantData.isOutlier ? 'table-danger' : ''}>
+            {Object.keys(participants || []).sort().map(participantKey => (
+              <tr key={participantKey} className={participants[participantKey].isOutlier ? 'table-danger' : ''}>
                 <td>{participantKey}</td>
-                <td>{participantData.errorCount}</td>
-                <td>{participantData.errorTime}</td>
-                <td>{participantData.trailCount}</td>
+                <td>{participants[participantKey].errorCount}</td>
+                <td>{participants[participantKey].errorTime}</td>
+                <td>{participants[participantKey].trailCount}</td>
                 <td>
-                  {participantData.isOutlier ? (
+                  {participants[participantKey].isOutlier ? (
                     <span className="badge bg-danger">Outlier</span>
                   ) : (
                     <span className="badge bg-success">Normal</span>
@@ -43,7 +43,7 @@ const OutlierParticipantTable = ({
                     >
                       <i className="bi bi-eye me-1"></i> View
                     </button>
-                    {participantData.isOutlier && (
+                    {(participants[participantKey].isOutlier || true) && (
                       <button
                         className="btn btn-sm btn-danger"
                         onClick={() => onToggleParticipantDelete(deviceKey, participantKey, true)}

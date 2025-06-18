@@ -36,3 +36,6 @@ VALUES (@id, @information_id, @mark, @x, @y, @timestamp)
 ON CONFLICT(information_id, timestamp) DO UPDATE
     SET timestamp = EXCLUDED.timestamp
 RETURNING *;
+
+-- name: DeleteWinfittsInformation :exec
+UPDATE winfitts_information SET deleted = @deleted WHERE id = @information_id;

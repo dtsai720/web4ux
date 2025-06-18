@@ -3,6 +3,14 @@
  */
 import { GetProjectDetailByID, DeleteOrRestore } from '../../../wailsjs/go/pkg/App';
 
+const removeDuplicates = (data) => {
+  const unique = data.filter((item, index, self) =>
+    index === self.findIndex(obj => obj.projectId === item.projectId && obj.informationId === item.informationId)
+  );
+
+  return unique;
+};
+
 /**
  * Loads project detail data by ID
  * @param {String} selectedSummaryId - The ID of the selected summary
@@ -64,8 +72,8 @@ export const toggleParticipantDelete = async (deviceKey, participantKey, rawData
     }
 
     // Call delete/restore API
-    for (const record of recordsToUpdate) {
-      await DeleteOrRestore(record.informationId, isDelete);
+    for (const record of removeDuplicates(recordsToUpdate)) {
+      await DeleteOrRestore(record.projectId, record.informationId, isDelete);
       console.log(`${isDelete ? 'Deleted' : 'Restored'} participant record: ${record.informationId}`);
     }
 
@@ -91,8 +99,8 @@ export const toggleTrailDelete = async (deviceKey, participantKey, trailKey, raw
     const recordsToUpdate = rawData.filter(record =>
       record.deviceName === deviceKey &&
       record.participantSerial === participantKey &&
-      record.trailNumber === trailKey &&
-      record.deleted !== isDelete
+      record.trailNumber === parseInt(trailKey) &&
+      record.deleted ^ isDelete
     );
 
     if (recordsToUpdate.length === 0) {
@@ -101,8 +109,8 @@ export const toggleTrailDelete = async (deviceKey, participantKey, trailKey, raw
     }
 
     // Call delete/restore API
-    for (const record of recordsToUpdate) {
-      await DeleteOrRestore(record.informationId, isDelete);
+    for (const record of removeDuplicates(recordsToUpdate)) {
+      await DeleteOrRestore(record.projectId, record.informationId, isDelete);
       console.log(`${isDelete ? 'Deleted' : 'Restored'} trail record: ${record.informationId}`);
     }
 

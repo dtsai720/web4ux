@@ -6,8 +6,8 @@ export function CancelSync() {
   return window['go']['pkg']['App']['CancelSync']();
 }
 
-export function DeleteOrRestore(arg1, arg2) {
-  return window['go']['pkg']['App']['DeleteOrRestore'](arg1, arg2);
+export function DeleteOrRestore(arg1, arg2, arg3) {
+  return window['go']['pkg']['App']['DeleteOrRestore'](arg1, arg2, arg3);
 }
 
 export function GetProjectDetailByID(arg1) {

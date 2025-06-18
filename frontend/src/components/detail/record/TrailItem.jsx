@@ -30,7 +30,7 @@ const TrailItem = ({
   const combinedKey = `${level1Key}-${level2Key}-${trailKey}`;
 
   return (
-    <div className="card mb-2 border-start border-4 border-primary">
+    <div className="card mb-2 border-start border-4 border-light">
       <div className="card-body py-2">
         <div className="row align-items-center">
           <div className="col-md-8">
