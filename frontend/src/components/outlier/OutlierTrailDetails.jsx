@@ -14,6 +14,7 @@ const OutlierTrailDetails = ({ data, deviceKey, participantKey, trailKey, format
                 <th><i className="bi bi-tag me-1"></i>Mark</th>
                 <th><i className="bi bi-calendar me-1"></i>DateTime</th>
                 <th><i className="bi bi-clock me-1"></i>Timestamp</th>
+                <th><i className="bi bi-clock me-1"></i>Position</th>
               </tr>
             </thead>
             <tbody>
@@ -29,6 +30,9 @@ const OutlierTrailDetails = ({ data, deviceKey, participantKey, trailKey, format
                   </td>
                   <td>
                     <small>{record.timestamp}</small>
+                  </td>
+                  <td>
+                    <small>({record.x}, {record.y})</small>
                   </td>
                 </tr>
               ))}

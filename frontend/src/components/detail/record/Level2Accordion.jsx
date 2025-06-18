@@ -66,6 +66,12 @@ const Level2Accordion = ({
                 <i className="bi bi-check-circle me-1"></i>
                 {stats.availableTrails} available
               </span>
+              {stats.totalTrails - stats.availableTrails > 0 && (
+                <span className="badge bg-warning me-2">
+                  <i className="bi bi-exclamation-triangle-fill me-1"></i>
+                  {stats.totalTrails - stats.availableTrails} unavailable
+                </span>
+              )}
               <span className="badge bg-info me-2">
                 <i className="bi bi-clock me-1"></i>
                 Avg {stats.avgEventTime}ms

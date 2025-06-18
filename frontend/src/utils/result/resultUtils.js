@@ -1,5 +1,6 @@
 /**
  * Utility functions for result analysis
+ * Note: All calculations only consider available and not deleted trails.
  */
 
 /**

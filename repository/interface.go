@@ -25,13 +25,11 @@ type Command interface {
 	UpsertWinfitts(ctx context.Context, arg sqlc.UpsertWinfittsParams) (sqlc.Winfitt, error)
 	UpsertWinfittsDetail(ctx context.Context, arg sqlc.UpsertWinfittsDetailParams) (sqlc.WinfittsDetail, error)
 	UpsertWinfittsInformation(ctx context.Context, arg sqlc.UpsertWinfittsInformationParams) (sqlc.WinfittsInformation, error)
-	CreateUser(ctx context.Context, arg sqlc.CreateUserParams) (string, error)
 	DeleteWinfittsInformation(ctx context.Context, arg sqlc.DeleteWinfittsInformationParams) error
 }
 
 type Queries interface {
 	ListProject
-	ListUsers(ctx context.Context, uid string) ([]sqlc.User, error)
 	GetProject(ctx context.Context, id string) (sqlc.Project, error)
 	GetProjectDetailByID(ctx context.Context, projectID string) ([]sqlc.GetProjectDetailByIDRow, error)
 }

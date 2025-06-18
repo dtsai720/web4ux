@@ -57,7 +57,6 @@ func (r *Repository) UpsertExtractWinfittsDetails(ctx context.Context, project m
 		}
 
 		for _, item := range row.Items {
-			trail := CalculateTrails(item.Details)
 			information, err := q.UpsertWinfittsInformation(ctx, sqlc.UpsertWinfittsInformationParams{
 				ID:          uuid.NewString(),
 				WinfittsID:  winfitts.ID,
@@ -68,7 +67,6 @@ func (r *Repository) UpsertExtractWinfittsDetails(ctx context.Context, project m
 				IsFailed:    item.IsFailed,
 				ErrorTimes:  int64(item.ErrorTimes),
 				Deleted:     false,
-				IsAvailable: trail.IsAvailable,
 			})
 			if err != nil {
 				return tx.Rollback()

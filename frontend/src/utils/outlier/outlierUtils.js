@@ -1,5 +1,7 @@
 /**
  * Utility functions for outlier analysis
+ * Note: All calculations only consider available and not deleted trails.
+ * Outlier detection is based on mean + 2 standard deviations.
  */
 
 /**
@@ -23,7 +25,7 @@ export const formatDateTime = (timestamp) => {
 export const isOutlier = (participantData, deviceStats) => {
   if (!participantData || !deviceStats) return false;
 
-  // Example outlier detection logic (can be customized)
+  // Outlier detection logic: mean + 2 standard deviations
   const errorCountThreshold = deviceStats.avgErrorCount + 2 * deviceStats.stdDevErrorCount;
   const errorTimeThreshold = deviceStats.avgErrorTime + 2 * deviceStats.stdDevErrorTime;
 

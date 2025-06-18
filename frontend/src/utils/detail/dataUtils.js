@@ -316,12 +316,15 @@ export const calculateOutlierData = (data, rawData) => {
         const trail = participant[trailKey];
         const trailStats = trail.stats || {};
 
-        if (trailStats.has_error) {
-          participantErrorCount++;
-          participantErrorTime += trailStats.error_time;
-          errorTrails.push(trailKey);
+        // Only include available trails in calculations
+        if (trailStats.available) {
+          if (trailStats.has_error) {
+            participantErrorCount++;
+            participantErrorTime += trailStats.error_time;
+            errorTrails.push(trailKey);
+          }
+          participantTrailCount++;
         }
-        participantTrailCount++;
       });
 
       // 存儲參與者的錯誤數據

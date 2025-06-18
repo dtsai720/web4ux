@@ -27,6 +27,9 @@ const OutlierAnalysis = ({
           <i className="bi bi-graph-up me-2"></i>
           Outlier Analysis
         </h5>
+        <small className="text-white">
+          Note: All calculations only consider available and not deleted trails. Outlier detection is based on mean + 2 standard deviations.
+        </small>
       </div>
       <div className="card-body">
         {selectedOutlierDevice ? (

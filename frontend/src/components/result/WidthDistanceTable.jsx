@@ -49,7 +49,7 @@ const WidthDistanceTable = ({ selectedDevice, resultData }) => {
 
       <div className="alert alert-info mt-3">
         <i className="bi bi-info-circle me-2"></i>
-        <strong>Note:</strong> Failed trails are defined as trails where there are other marks between the start and target marks.
+        <strong>Note:</strong> All calculations only consider available and not deleted trails. Failed trails are defined as trails where there are other marks between the start and target marks.
         Error rate is calculated as the number of failed trails divided by the number of available trails.
       </div>
     </div>

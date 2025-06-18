@@ -20,14 +20,12 @@ ON CONFLICT(project_id, device_id, participant_id) DO UPDATE
 RETURNING *;
 
 -- name: UpsertWinfittsInformation :one
-INSERT INTO winfitts_information (id, winfitts_id, trail_number, width, distance, angle, is_failed, error_times, deleted, reason, is_available)
-VALUES (@id, @winfitts_id, @trail_number, @width, @distance, @angle, @is_failed, @error_times, @deleted, @reason, @is_available)
+INSERT INTO winfitts_information (id, winfitts_id, trail_number, width, distance, angle, is_failed, error_times, deleted)
+VALUES (@id, @winfitts_id, @trail_number, @width, @distance, @angle, @is_failed, @error_times, @deleted)
 ON CONFLICT(winfitts_id, trail_number) DO UPDATE
     SET is_failed = EXCLUDED.is_failed,
     error_times = EXCLUDED.error_times,
-    deleted = EXCLUDED.deleted,
-    reason = EXCLUDED.reason,
-    is_available = EXCLUDED.is_available
+    deleted = EXCLUDED.deleted
 RETURNING *;
 
 -- name: UpsertWinfittsDetail :one

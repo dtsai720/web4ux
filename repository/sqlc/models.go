@@ -24,12 +24,6 @@ type Project struct {
 	UpdatedAt string
 }
 
-type User struct {
-	ID       string
-	Email    string
-	Password string
-}
-
 type Winfitt struct {
 	ID            string
 	ProjectID     string
@@ -57,6 +51,4 @@ type WinfittsInformation struct {
 	IsFailed    bool
 	ErrorTimes  int64
 	Deleted     bool
-	Reason      string
-	IsAvailable bool
 }
