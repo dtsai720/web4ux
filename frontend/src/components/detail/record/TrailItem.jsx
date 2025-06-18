@@ -51,9 +51,16 @@ const TrailItem = ({
                 <i className="bi bi-clock text-info me-1"></i>
                 <strong>Event Time:</strong> {trailStats.event_time || 0}ms
               </span>
-              <span className={`badge me-2 ${trailStats.available ? 'bg-success' : 'bg-warning'}`}>
-                <i className={`bi ${trailStats.available ? 'bi-check-circle' : 'bi-exclamation-triangle-fill'} me-1`}></i>
-                {trailStats.available ? 'Available' : 'Unavailable'}
+              <span className={`badge me-2 ${
+                trailStats.availableStatus === 1 ? 'bg-success' :
+                trailStats.availableStatus === 2 ? 'bg-primary' : 'bg-warning'
+              }`}>
+                <i className={`bi ${
+                  trailStats.availableStatus === 1 ? 'bi-check-circle' :
+                  trailStats.availableStatus === 2 ? 'bi-calculator' : 'bi-exclamation-triangle-fill'
+                } me-1`}></i>
+                {trailStats.availableStatus === 1 ? 'Available' :
+                 trailStats.availableStatus === 2 ? 'Calculable' : 'Unavailable'}
               </span>
             </div>
           </div>

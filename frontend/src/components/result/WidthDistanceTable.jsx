@@ -19,7 +19,7 @@ const WidthDistanceTable = ({ selectedDevice, resultData }) => {
               <th>Width</th>
               <th>Distance</th>
               <th>Total Trails</th>
-              <th>Available Trails</th>
+              <th>Available/Calculable Trails</th>
               <th>Failed Trails</th>
               <th>Error Rate</th>
               <th>Avg Event Time</th>

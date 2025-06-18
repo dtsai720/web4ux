@@ -39,6 +39,8 @@ const Level2Accordion = ({
   };
 
   const isExpanded = expandedLevel2[`${level1Key}-${level2Key}`] || false;
+  console.log({stats})
+
   return (
     <div className="accordion-item mb-2 border">
       <h2 className="accordion-header">
@@ -66,10 +68,16 @@ const Level2Accordion = ({
                 <i className="bi bi-check-circle me-1"></i>
                 {stats.availableTrails} available
               </span>
-              {stats.totalTrails - stats.availableTrails > 0 && (
+              {stats.unavailableTrails > 0 && (
                 <span className="badge bg-warning me-2">
                   <i className="bi bi-exclamation-triangle-fill me-1"></i>
-                  {stats.totalTrails - stats.availableTrails} unavailable
+                  {stats.unavailableTrails} unavailable
+                </span>
+              )}
+              {stats.calculableTrails > 0 && (
+                <span className="badge bg-primary me-2">
+                  <i className="bi bi-exclamation-triangle-fill me-1"></i>
+                  {stats.calculableTrails} calculable
                 </span>
               )}
               <span className="badge bg-info me-2">

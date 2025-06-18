@@ -60,10 +60,16 @@ const Level1Accordion = ({
                   <i className="bi bi-check-circle me-1"></i>
                   {level2Data.stats.availableTrails}/{level2Data.stats.totalTrails} available
                 </span>
-                {level2Data.stats.totalTrails - level2Data.stats.availableTrails > 0 && (
+                {level2Data.stats.unavailableTrails > 0 && (
                   <span className="badge bg-warning ms-2">
                     <i className="bi bi-exclamation-triangle-fill me-1"></i>
-                    {level2Data.stats.totalTrails - level2Data.stats.availableTrails} unavailable
+                    {level2Data.stats.unavailableTrails} unavailable
+                  </span>
+                )}
+                {level2Data.stats.calculableTrails > 0 && (
+                  <span className="badge bg-primary ms-2">
+                    <i className="bi bi-exclamation-triangle-fill me-1"></i>
+                    {level2Data.stats.calculableTrails} calculable
                   </span>
                 )}
                 <span className="badge bg-info ms-2">

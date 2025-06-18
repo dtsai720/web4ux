@@ -16,6 +16,9 @@ const ResultHeader = ({ onDoubleClick }) => {
         <i className="bi bi-bar-chart-line me-2"></i>
         Result Analysis
       </h5>
+      <small className="text-white">
+        Note: All calculations consider both available and calculable trails that are not deleted.
+      </small>
     </div>
   );
 };

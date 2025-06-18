@@ -106,11 +106,29 @@ export const calculateTrailStats = (organizedData, groupByType) => {
 
         // 尋找 start 和 target 標記
         const startRecord = records.find(r => r.mark === 'start');
-        const targetRecord = records.find(r => r.mark === 'target');
+        const defaultTargetRecord = records.find(r => r.mark === 'target');
 
-        // 計算 available
-        const available = startRecord && targetRecord &&
-                         startRecord.timestamp < targetRecord.timestamp;
+        const targetRecord = records.findLast(r => r.mark === 'target');
+
+        // 檢查是否為同一個 trail 中最大的 timestamp 是 target 且前面有 start
+        const isMaxTimestampTarget = targetRecord &&
+                                    Math.max(...records.map(r => r.timestamp)) === targetRecord.timestamp;
+        const hasStartBeforeTarget = startRecord && targetRecord &&
+                                    startRecord.timestamp < targetRecord.timestamp;
+
+        // 計算 available 狀態 (3種狀態)
+        // 1. available: 有 start 和 target，且 start 在 target 之前
+        // 2. unavailable: 沒有 start 或 target，或 start 不在 target 之前
+        // 3. unavailable but able to calculate: 同一個 trail 中最大的 timestamp 是 target 且前面有 start
+        let availableStatus = 0; // 0: unavailable, 1: available, 2: unavailable but able to calculate
+
+        if (startRecord && defaultTargetRecord && startRecord.timestamp < defaultTargetRecord.timestamp) {
+          availableStatus = 1; // available
+        } else if (isMaxTimestampTarget && hasStartBeforeTarget) {
+          availableStatus = 2; // unavailable but able to calculate
+        } else {
+          availableStatus = 0; // unavailable
+        }
 
         // 計算 error_time (start 和 target 之間的非 start 與 target 的數量)
         let errorTime = 0;
@@ -135,7 +153,8 @@ export const calculateTrailStats = (organizedData, groupByType) => {
 
         // 將統計數據添加到 trail 對象
         organizedData[level1Key][level2Key][trailKey].stats = {
-          available: available,
+          available: availableStatus === 1,
+          availableStatus: availableStatus, // 0: unavailable, 1: available, 2: unavailable but able to calculate
           error_time: errorTime,
           event_time: eventTime,
           has_error: hasError,
@@ -147,6 +166,8 @@ export const calculateTrailStats = (organizedData, groupByType) => {
       const level2Stats = {
         totalTrails: 0,
         availableTrails: 0,
+        unavailableTrails: 0,
+        calculableTrails: 0,
         trailsWithErrors: 0,
         totalEventTime: 0,
         avgEventTime: 0
@@ -156,8 +177,14 @@ export const calculateTrailStats = (organizedData, groupByType) => {
         const trailStats = organizedData[level1Key][level2Key][trailKey].stats;
         level2Stats.totalTrails++;
 
-        if (trailStats.available) {
+        if (trailStats.availableStatus === 0) {
+          level2Stats.unavailableTrails++;
+        }
+        if (trailStats.availableStatus === 1) {
           level2Stats.availableTrails++;
+        }
+        if (trailStats.availableStatus === 2) {
+          level2Stats.calculableTrails++;
         }
 
         if (trailStats.has_error) {
@@ -181,6 +208,8 @@ export const calculateTrailStats = (organizedData, groupByType) => {
       totalLevel2: 0,
       totalTrails: 0,
       availableTrails: 0,
+      unavailableTrails: 0,
+      calculableTrails: 0,
       trailsWithErrors: 0,
       totalEventTime: 0,
       avgEventTime: 0
@@ -191,6 +220,8 @@ export const calculateTrailStats = (organizedData, groupByType) => {
       level1Stats.totalLevel2++;
       level1Stats.totalTrails += level2Stats.totalTrails;
       level1Stats.availableTrails += level2Stats.availableTrails;
+      level1Stats.unavailableTrails += level2Stats.unavailableTrails;
+      level1Stats.calculableTrails += level2Stats.calculableTrails;
       level1Stats.trailsWithErrors += level2Stats.trailsWithErrors;
       level1Stats.totalEventTime += level2Stats.totalEventTime;
     });
@@ -316,8 +347,8 @@ export const calculateOutlierData = (data, rawData) => {
         const trail = participant[trailKey];
         const trailStats = trail.stats || {};
 
-        // Only include available trails in calculations
-        if (trailStats.available) {
+        // Include both available and calculable trails in calculations
+        if (trailStats.available || trailStats.availableStatus === 2) {
           if (trailStats.has_error) {
             participantErrorCount++;
             participantErrorTime += trailStats.error_time;

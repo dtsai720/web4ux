@@ -62,12 +62,22 @@ export const calculateResults = (data) => {
 
             // Find start and target marks
             const startRecord = trail.find(r => r.mark === 'start');
-            const targetRecord = trail.find(r => r.mark === 'target');
 
-            // Check if trail is available (has both start and target, and start comes before target)
+            // Use calculable
+            const targetRecord = trail.findLast(r => r.mark === 'target');
+
+            // Check if trail is available or calculable
+            // Available: has both start and target, and start comes before target
+            // Calculable: target is the last timestamp in the trail and start comes before target
             const isAvailable = startRecord && targetRecord && startRecord.timestamp < targetRecord.timestamp;
+            const isMaxTimestampTarget = targetRecord &&
+                                        Math.max(...trail.map(r => r.timestamp)) === targetRecord.timestamp;
+            const hasStartBeforeTarget = startRecord && targetRecord &&
+                                        startRecord.timestamp < targetRecord.timestamp;
+            const isCalculable = isMaxTimestampTarget && hasStartBeforeTarget;
 
-            if (isAvailable) {
+            // Include both available and calculable trails in result calculations
+            if (isAvailable || isCalculable) {
               availableTrails++;
 
               // Calculate event time (time from start to target)

@@ -96,6 +96,14 @@ const GuideAccordion = () => {
           <li><strong>Statistical Metrics:</strong> Various statistical measurements of the data</li>
         </ul>
         <div className="alert alert-info">
+          <strong>Trail Availability Status:</strong>
+          <ul className="mb-0 mt-2">
+            <li><strong>Available (Green):</strong> Trail has both start and target marks, with start occurring before target.</li>
+            <li><strong>Calculable (Blue):</strong> Trail has target as the last timestamp and start occurs before target, but may have other format concerns. Despite these concerns, these trails are still calculable and included in calculations.</li>
+            <li><strong>Unavailable (Yellow):</strong> Trail is missing start or target marks, or has other critical issues that prevent calculation.</li>
+          </ul>
+        </div>
+        <div className="alert alert-info">
           <strong>Tip:</strong> Use the accordion interface to expand and collapse sections for better readability.
         </div>
       </AccordionItem>
@@ -121,7 +129,15 @@ const GuideAccordion = () => {
           <li><strong>Export Options:</strong> Export your results for external use</li>
         </ul>
         <div className="alert alert-info">
-          <strong>Important:</strong> Results calculations only include data that is both available and not deleted. This ensures that your analysis is based on valid, current data.
+          <strong>Important:</strong> Results calculations include data that is either fully available or calculable (but not fully available), and not deleted. This ensures that your analysis is based on valid, current data.
+        </div>
+        <div className="alert alert-info">
+          <strong>Trail Availability Status:</strong>
+          <ul className="mb-0 mt-2">
+            <li><strong>Available (Green):</strong> Trail has both start and target marks, with start occurring before target.</li>
+            <li><strong>Calculable (Blue):</strong> Trail has target as the last timestamp and start occurs before target, but may have other format concerns. Despite these concerns, these trails are still calculable and included in calculations.</li>
+            <li><strong>Unavailable (Yellow):</strong> Trail is missing start or target marks, or has other critical issues that prevent calculation.</li>
+          </ul>
         </div>
         <div className="alert alert-success">
           <strong>Pro Tip:</strong> Focus on the key metrics that are most relevant to your research or analysis goals.
@@ -152,7 +168,15 @@ const GuideAccordion = () => {
           <strong>Definition:</strong> In this application, outliers are defined as data points that are more than 2 standard deviations from the mean. This statistical threshold helps identify values that significantly deviate from normal patterns.
         </div>
         <div className="alert alert-info">
-          <strong>Data Inclusion:</strong> Outlier calculations only include data that is both available and not deleted, ensuring accurate anomaly detection based on your current dataset.
+          <strong>Data Inclusion:</strong> Outlier calculations include data that is either fully available or calculable (but not fully available), and not deleted, ensuring accurate anomaly detection based on your current dataset.
+        </div>
+        <div className="alert alert-info">
+          <strong>Trail Availability Status:</strong>
+          <ul className="mb-0 mt-2">
+            <li><strong>Available (Green):</strong> Trail has both start and target marks, with start occurring before target.</li>
+            <li><strong>Calculable (Blue):</strong> Trail has target as the last timestamp and start occurs before target, but may have other format concerns. Despite these concerns, these trails are still calculable and included in calculations.</li>
+            <li><strong>Unavailable (Yellow):</strong> Trail is missing start or target marks, or has other critical issues that prevent calculation.</li>
+          </ul>
         </div>
         <div className="alert alert-warning">
           <strong>Important:</strong> Deletion of data is only available in the Outlier page to prevent accidental data loss.

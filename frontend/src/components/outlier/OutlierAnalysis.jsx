@@ -28,7 +28,7 @@ const OutlierAnalysis = ({
           Outlier Analysis
         </h5>
         <small className="text-white">
-          Note: All calculations only consider available and not deleted trails. Outlier detection is based on mean + 2 standard deviations.
+          Note: All calculations consider both available and calculable trails that are not deleted. Outlier detection is based on mean + 2 standard deviations.
         </small>
       </div>
       <div className="card-body">
