@@ -1,19 +1,15 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 /**
  * BackToHomeButton component for the guide page
- * @param {Object} props - Component props
- * @param {Function} props.setCurrentPage - Function to set the current page
  */
-const BackToHomeButton = ({ setCurrentPage }) => {
+const BackToHomeButton = () => {
   return (
     <div className="text-center mt-4">
-      <button
-        className="btn btn-secondary"
-        onClick={() => setCurrentPage('home')}
-      >
+      <Link to="/" className="btn btn-secondary">
         Back to Home
-      </button>
+      </Link>
     </div>
   );
 };

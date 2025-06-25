@@ -18,7 +18,7 @@ import EmptyState from './EmptyState';
  * @param {Function} props.toggleExpandTrail - Function to toggle trail expansion
  * @param {Function} props.toggleTrailDelete - Function to toggle trail deletion
  * @param {Function} props.formatDateTime - Function to format timestamp
- * @param {Function} props.setCurrentPage - Function to set the current page
+ * @param {Function} props.navigate - Function to navigate to a different page
  * @returns {JSX.Element} Detail record content
  */
 const DetailRecordContent = ({
@@ -33,13 +33,13 @@ const DetailRecordContent = ({
   toggleExpandTrail,
   toggleTrailDelete,
   formatDateTime,
-  setCurrentPage
+  navigate
 }) => {
   return (
     <div className="card border-success">
       <div
         className="card-header bg-success text-white"
-        onDoubleClick={handleDoubleClick(setCurrentPage)}
+        onDoubleClick={() => navigate('/summary')}
         style={{ cursor: 'pointer' }}
         title="Double-click to go back to summary"
       >

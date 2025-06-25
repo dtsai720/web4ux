@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Import page components
@@ -9,27 +10,33 @@ import SummaryPage from './pages/Summary/SummaryPage';
 import DetailPage from './pages/Detail/DetailPage';
 
 const App = () => {
-  const [currentPage, setCurrentPage] = useState('home');
   const [selectedSummaryId, setSelectedSummaryId] = useState(null);
+  const navigate = useNavigate();
 
-  const renderCurrentPage = () => {
-    switch (currentPage) {
-      case 'sync':
-        return <SyncPage setCurrentPage={setCurrentPage} />;
-      case 'summary':
-        return <SummaryPage setCurrentPage={setCurrentPage} setSelectedSummaryId={setSelectedSummaryId} />;
-      case 'guide':
-        return <GuidePage setCurrentPage={setCurrentPage} />;
-      case 'detail':
-        return <DetailPage setCurrentPage={setCurrentPage} selectedSummaryId={selectedSummaryId} />;
-      default:
-        return <HomePage setCurrentPage={setCurrentPage} />;
-    }
+  const handleNavigate = (path) => {
+    navigate(path);
+  };
+
+  const handleSummarySelection = (id) => {
+    setSelectedSummaryId(id);
+    navigate(`/detail/${id}`);
   };
 
   return (
     <div className="App">
-      {renderCurrentPage()}
+      <Routes>
+        <Route path="/" element={<HomePage navigate={handleNavigate} />} />
+        <Route path="/sync" element={<SyncPage navigate={handleNavigate} />} />
+        <Route path="/guide" element={<GuidePage navigate={handleNavigate} />} />
+        <Route
+          path="/summary"
+          element={<SummaryPage onSummarySelect={handleSummarySelection} navigate={handleNavigate} />}
+        />
+        <Route
+          path="/detail/:id"
+          element={<DetailPage selectedSummaryId={selectedSummaryId} navigate={handleNavigate} />}
+        />
+      </Routes>
     </div>
   );
 };

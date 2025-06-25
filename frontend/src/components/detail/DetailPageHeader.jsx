@@ -5,7 +5,7 @@ import ModeSelectionButtons from './ModeSelectionButtons';
 /**
  * Header component for the detail page
  * @param {Object} props - Component props
- * @param {Function} props.setCurrentPage - Function to set the current page
+ * @param {Function} props.navigate - Function to navigate to a different page
  * @param {Boolean} props.deleteMode - Whether delete mode is active
  * @param {Boolean} props.outlierMode - Whether outlier mode is active
  * @param {Boolean} props.resultMode - Whether result mode is active
@@ -17,7 +17,7 @@ import ModeSelectionButtons from './ModeSelectionButtons';
  * @param {Function} props.closeResultMode - Function to close result mode
  */
 const DetailPageHeader = ({
-  setCurrentPage,
+  navigate,
   deleteMode,
   outlierMode,
   resultMode,
@@ -32,7 +32,7 @@ const DetailPageHeader = ({
     <div className="mb-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2>Detail View</h2>
-        <NavigationButtons setCurrentPage={setCurrentPage} />
+        <NavigationButtons navigate={navigate} />
       </div>
 
       <ModeSelectionButtons

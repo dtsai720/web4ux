@@ -13,7 +13,7 @@ import {
   BackToHomeButton
 } from '../../components/sync';
 
-const SyncPage = ({ setCurrentPage }) => {
+const SyncPage = ({ navigate }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -143,7 +143,7 @@ const SyncPage = ({ setCurrentPage }) => {
       </div>
 
       <BackToHomeButton
-        onBackToHome={() => setCurrentPage('home')}
+        onBackToHome={() => navigate('/')}
         disabled={isSyncing}
       />
     </div>

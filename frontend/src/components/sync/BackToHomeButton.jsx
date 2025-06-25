@@ -1,15 +1,12 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
-const BackToHomeButton = ({ onBackToHome, disabled }) => {
+const BackToHomeButton = ({ disabled }) => {
   return (
     <div className="text-center mt-4">
-      <button
-        className="btn btn-secondary"
-        onClick={onBackToHome}
-        disabled={disabled}
-      >
+      <Link to="/" className={`btn btn-secondary ${disabled ? 'disabled' : ''}`}>
         Back to Home
-      </button>
+      </Link>
     </div>
   );
 };

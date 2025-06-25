@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import DetailRecordComponent from './DetailRecordComponent';
 import OutlierAnalysisComponent from './OutlierAnalysisComponent';
 import DeleteItemComponent from './DeleteItemComponent';
@@ -22,7 +23,8 @@ import { GROUP_BY_OPTIONS, DEFAULT_STATE } from '../../utils/detail/constants';
 import SummaryInfoCard from '../../components/detail/SummaryInfoCard';
 import DetailPageHeader from '../../components/detail/DetailPageHeader';
 
-const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
+const DetailPage = ({ navigate }) => {
+  const { id: selectedSummaryId } = useParams();
   // State management
   const [data, setData] = useState(DEFAULT_STATE.data);
   const [loading, setLoading] = useState(DEFAULT_STATE.loading);
@@ -266,7 +268,7 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
       <div className="row">
         <div className="col-12">
           <DetailPageHeader
-            setCurrentPage={setCurrentPage}
+            navigate={navigate}
             deleteMode={deleteMode}
             outlierMode={outlierMode}
             resultMode={resultMode}
@@ -328,7 +330,7 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
               formatDateTime={formatDateTime}
               toggleTrailDelete={handleToggleTrailDelete}
               toggleParticipantDelete={handleToggleParticipantDelete}
-              setCurrentPage={setCurrentPage}
+              navigate={navigate}
             />
           )}
         </div>

@@ -11,7 +11,7 @@ import {
   SummaryTable
 } from '../../components/summary';
 
-const SummaryPage = ({ setCurrentPage, setSelectedSummaryId }) => {
+const SummaryPage = ({ onSummarySelect, navigate }) => {
   const [summaries, setSummaries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -71,8 +71,7 @@ const SummaryPage = ({ setCurrentPage, setSelectedSummaryId }) => {
 
   // 處理點擊項目
   const handleItemClick = (summaryId) => {
-    setSelectedSummaryId(summaryId);
-    setCurrentPage('detail');
+    onSummarySelect(summaryId);
   };
 
   return (
@@ -118,7 +117,7 @@ const SummaryPage = ({ setCurrentPage, setSelectedSummaryId }) => {
         )}
 
         {/* 返回按鈕 */}
-        <BackToHomeButton setCurrentPage={setCurrentPage} />
+        <BackToHomeButton />
       </div>
     </div>
   );

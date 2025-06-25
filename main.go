@@ -7,6 +7,7 @@ import (
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"github.com/web4ux/config"
 	"github.com/web4ux/internal/service/analyzer"
 	"github.com/web4ux/internal/service/fetcher"
 	"github.com/web4ux/pkg"
@@ -22,6 +23,11 @@ var assets embed.FS
 const dbPath string = "local.db?_foreign_keys=on&_journal_mode=WAL&_synchronous=NORMAL"
 
 func main() {
+	// Load configuration
+	if err := config.LoadConfig("."); err != nil {
+		zap.L().Sugar().Panicln("An error occurred while loading config", "error", err)
+	}
+
 	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		zap.L().Sugar().Panicln("An error occurred while opening database connection", "error", err)

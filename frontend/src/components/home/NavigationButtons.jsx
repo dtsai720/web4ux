@@ -1,25 +1,25 @@
 import React from 'react';
 import NavigationButton from './NavigationButton';
 
-const NavigationButtons = ({ setCurrentPage }) => {
+const NavigationButtons = ({ navigate }) => {
   const buttons = [
     {
       icon: 'arrow-repeat',
       label: 'Sync',
       color: 'primary',
-      page: 'sync'
+      path: '/sync'
     },
     {
       icon: 'bar-chart',
       label: 'Summary',
       color: 'success',
-      page: 'summary'
+      path: '/summary'
     },
     {
       icon: 'book',
       label: 'Guide',
       color: 'info',
-      page: 'guide'
+      path: '/guide'
     }
   ];
 
@@ -31,7 +31,7 @@ const NavigationButtons = ({ setCurrentPage }) => {
           icon={button.icon}
           label={button.label}
           color={button.color}
-          onClick={() => setCurrentPage(button.page)}
+          onClick={() => navigate(button.path)}
         />
       ))}
     </div>

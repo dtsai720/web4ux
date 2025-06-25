@@ -1,25 +1,18 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 /**
  * Component for navigation buttons
- * @param {Object} props - Component props
- * @param {Function} props.setCurrentPage - Function to set the current page
  */
-const NavigationButtons = ({ setCurrentPage }) => {
+const NavigationButtons = () => {
   return (
     <div className="d-flex">
-      <button
-        className="btn btn-outline-secondary me-2"
-        onClick={() => setCurrentPage('summary')}
-      >
+      <Link to="/summary" className="btn btn-outline-secondary me-2">
         <i className="bi bi-arrow-left"></i> Back
-      </button>
-      <button
-        className="btn btn-secondary"
-        onClick={() => setCurrentPage('home')}
-      >
+      </Link>
+      <Link to="/" className="btn btn-secondary">
         <i className="bi bi-house"></i> Home
-      </button>
+      </Link>
     </div>
   );
 };

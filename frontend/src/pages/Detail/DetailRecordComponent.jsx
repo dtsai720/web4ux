@@ -26,7 +26,7 @@ import {
  * @param {Function} props.formatDateTime - Function to format timestamp
  * @param {Function} props.toggleTrailDelete - Function to toggle trail deletion
  * @param {Function} props.toggleParticipantDelete - Function to toggle participant deletion
- * @param {Function} props.setCurrentPage - Function to set the current page
+ * @param {Function} props.navigate - Function to navigate to a different page
  * @returns {JSX.Element} Detail record component
  */
 const DetailRecordComponent = ({
@@ -46,7 +46,7 @@ const DetailRecordComponent = ({
   formatDateTime,
   toggleTrailDelete,
   toggleParticipantDelete,
-  setCurrentPage
+  navigate
 }) => {
   return (
     <>
@@ -77,7 +77,7 @@ const DetailRecordComponent = ({
           toggleExpandTrail={toggleExpandTrail}
           toggleTrailDelete={toggleTrailDelete}
           formatDateTime={formatDateTime}
-          setCurrentPage={setCurrentPage}
+          navigate={navigate}
         />
       )}
     </>
