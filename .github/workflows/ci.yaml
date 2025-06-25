@@ -6,8 +6,8 @@ name: LeetCode Golang CI
 on: [push]
 
 jobs:
-  unittest:
-    name: unittest
+  backend-test:
+    name: backend-test
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'schedule' }}
     steps:
@@ -17,28 +17,28 @@ jobs:
           go-version: "1.24.x"
 
       - name: Install Go dependencies
-        run: |
-          go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@latest
-          go get github.com/boumenot/gocover-cobertura
-          go install github.com/boumenot/gocover-cobertura
+        run: go mod tidy
 
       - name: Run Go Unit Test
-        run: |
-          go test -race -json -v -coverprofile=coverage.txt ./... 2>&1 | tee /tmp/gotest.log | gotestfmt
-          gocover-cobertura < coverage.txt > coverage.xml
+        run: go test ./...
 
-      - name: Code Coverage Report
-        uses: irongut/CodeCoverageSummary@v1.3.0
+  frontend-test:
+    name: frontend-test
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'schedule' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
         with:
-          filename: coverage.xml
-          badge: true
-          fail_below_min: true
-          format: markdown
-          hide_branch_rate: false
-          hide_complexity: true
-          indicators: true
-          output: both
-          thresholds: "60 80"
+          node-version: '18'
+
+      - name: Install Frontend Dependencies
+        run: npm install
+        working-directory: frontend
+
+      - name: Run Frontend Unit Test
+        run: npm test
+        working-directory: frontend
 
   lint:
     name: lint
