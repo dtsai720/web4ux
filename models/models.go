@@ -143,18 +143,9 @@ func (w *WinfittsRawData) Load(slice []string) error {
 	slice = append(slice, "<div class=\"data2-pack \">")
 	for _, line := range slice {
 		if strings.Contains(line, "<div class=\"data-pack\">") {
-			matches := spanRegex.FindAllStringSubmatch(builder.String(), -1)
-			if len(matches) != 2 || len(matches[0]) != 2 || len(matches[1]) != 2 {
-				return errs.ErrRegexMismatch
+			if err := w.parseParticipantAndDevice(builder.String()); err != nil {
+				return err
 			}
-			w.ParticipantSerial = matches[0][1]
-			w.Participant = matches[1][1]
-
-			matches = deviceRegex.FindAllStringSubmatch(builder.String(), -1)
-			if len(matches) != 2 || len(matches[1]) != 2 {
-				return errs.ErrRegexMismatch
-			}
-			w.DeviceName = matches[1][1]
 			builder.Reset()
 		}
 
@@ -172,6 +163,23 @@ func (w *WinfittsRawData) Load(slice []string) error {
 		contexts = append(contexts, line)
 	}
 	w.Items = w.Items[1:]
+
+	return nil
+}
+
+func (w *WinfittsRawData) parseParticipantAndDevice(data string) error {
+	matches := spanRegex.FindAllStringSubmatch(data, -1)
+	if len(matches) != 2 || len(matches[0]) != 2 || len(matches[1]) != 2 {
+		return errs.ErrRegexMismatch
+	}
+	w.ParticipantSerial = matches[0][1]
+	w.Participant = matches[1][1]
+
+	matches = deviceRegex.FindAllStringSubmatch(data, -1)
+	if len(matches) != 2 || len(matches[1]) != 2 {
+		return errs.ErrRegexMismatch
+	}
+	w.DeviceName = matches[1][1]
 
 	return nil
 }
