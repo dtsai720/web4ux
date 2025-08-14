@@ -3,6 +3,7 @@ import DetailRecordComponent from './DetailRecordComponent';
 import OutlierAnalysisComponent from './OutlierAnalysisComponent';
 import DeleteItemComponent from './DeleteItemComponent';
 import ResultAnalysisComponent from './ResultAnalysisComponent';
+import MovementTimeMatrixComponent from './MoveTimeAnalysisComponent';
 
 // Import utility functions
 import {
@@ -44,6 +45,7 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
   const [deletedParticipants, setDeletedParticipants] = useState(DEFAULT_STATE.deletedParticipants);
   const [deleteMode, setDeleteMode] = useState(DEFAULT_STATE.deleteMode);
   const [resultMode, setResultMode] = useState(DEFAULT_STATE.resultMode);
+  const [movementTimeMatrixMode, setMovementTimeMatrixMode] = useState(DEFAULT_STATE.movementTimeMatrixMode || false);
 
   // Load data from API
   const loadData = async () => {
@@ -188,6 +190,11 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
     setResultMode(false);
   };
 
+  // Close movement time matrix mode
+  const closeMovementTimeMatrixMode = () => {
+    setMovementTimeMatrixMode(false);
+  };
+
   // Toggle expand level1
   const toggleExpandLevel1 = (key) => {
     setExpandedLevel1(prev => ({
@@ -226,6 +233,7 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
     setDeleteMode(false);
     setOutlierMode(false);
     setResultMode(false);
+    setMovementTimeMatrixMode(false);
   }, [selectedSummaryId]);
 
   // Calculate outliers when outlierMode is activated
@@ -270,12 +278,15 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
             deleteMode={deleteMode}
             outlierMode={outlierMode}
             resultMode={resultMode}
+            movementTimeMatrixMode={movementTimeMatrixMode}
             setDeleteMode={setDeleteMode}
             setOutlierMode={setOutlierMode}
             setResultMode={setResultMode}
+            setMovementTimeMatrixMode={setMovementTimeMatrixMode}
             calculateOutliers={calculateOutliers}
             closeOutlierMode={closeOutlierMode}
             closeResultMode={closeResultMode}
+            closeMovementTimeMatrixMode={closeMovementTimeMatrixMode}
           />
 
           {/* Summary Information */}
@@ -309,6 +320,11 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
             <ResultAnalysisComponent
               rawData={rawData}
               closeResultMode={closeResultMode}
+            />
+          ) : movementTimeMatrixMode ? (
+            <MovementTimeMatrixComponent
+              rawData={rawData}
+              closeMovementTimeMatrixMode={closeMovementTimeMatrixMode}
             />
           ) : (
             <DetailRecordComponent
