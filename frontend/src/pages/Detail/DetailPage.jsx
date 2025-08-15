@@ -4,6 +4,7 @@ import OutlierAnalysisComponent from './OutlierAnalysisComponent';
 import DeleteItemComponent from './DeleteItemComponent';
 import ResultAnalysisComponent from './ResultAnalysisComponent';
 import MovementTimeMatrixComponent from './MoveTimeAnalysisComponent';
+import ErrorTrailAnalysisComponent from './ErrorTrailAnalysisComponent';
 
 // Import utility functions
 import {
@@ -46,6 +47,7 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
   const [deleteMode, setDeleteMode] = useState(DEFAULT_STATE.deleteMode);
   const [resultMode, setResultMode] = useState(DEFAULT_STATE.resultMode);
   const [movementTimeMatrixMode, setMovementTimeMatrixMode] = useState(DEFAULT_STATE.movementTimeMatrixMode || false);
+  const [errorTrailMode, setErrorTrailMode] = useState(DEFAULT_STATE.errorTrailMode || false);
 
   // Load data from API
   const loadData = async () => {
@@ -195,6 +197,11 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
     setMovementTimeMatrixMode(false);
   };
 
+  // Close error trail mode
+  const closeErrorTrailMode = () => {
+    setErrorTrailMode(false);
+  };
+
   // Toggle expand level1
   const toggleExpandLevel1 = (key) => {
     setExpandedLevel1(prev => ({
@@ -234,6 +241,7 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
     setOutlierMode(false);
     setResultMode(false);
     setMovementTimeMatrixMode(false);
+    setErrorTrailMode(false);
   }, [selectedSummaryId]);
 
   // Calculate outliers when outlierMode is activated
@@ -279,14 +287,17 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
             outlierMode={outlierMode}
             resultMode={resultMode}
             movementTimeMatrixMode={movementTimeMatrixMode}
+            errorTrailMode={errorTrailMode}
             setDeleteMode={setDeleteMode}
             setOutlierMode={setOutlierMode}
             setResultMode={setResultMode}
             setMovementTimeMatrixMode={setMovementTimeMatrixMode}
+            setErrorTrailMode={setErrorTrailMode}
             calculateOutliers={calculateOutliers}
             closeOutlierMode={closeOutlierMode}
             closeResultMode={closeResultMode}
             closeMovementTimeMatrixMode={closeMovementTimeMatrixMode}
+            closeErrorTrailMode={closeErrorTrailMode}
           />
 
           {/* Summary Information */}
@@ -325,6 +336,11 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
             <MovementTimeMatrixComponent
               rawData={rawData}
               closeMovementTimeMatrixMode={closeMovementTimeMatrixMode}
+            />
+          ) : errorTrailMode ? (
+            <ErrorTrailAnalysisComponent
+              rawData={rawData}
+              closeErrorTrailMode={closeErrorTrailMode}
             />
           ) : (
             <DetailRecordComponent

@@ -31,17 +31,15 @@ const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
               </th>
               {difficulties.map(difficulty => (
                 <th key={difficulty} className="text-center" style={{ minWidth: '120px' }}>
-                  <div className="fw-bold">ID {difficulty}</div>
-                  <small className="text-muted">
-                    {analysisData.difficultyGroups[difficulty] &&
-                      `W:${analysisData.difficultyGroups[difficulty].width} D:${analysisData.difficultyGroups[difficulty].distance}`
-                    }
-                  </small>
+                  <div className="fw-bold">
+                    <span className="badge bg-primary text-white me-1">ID</span>
+                    {difficulty}
+                  </div>
                 </th>
               ))}
               <th className="text-center bg-info text-white" style={{ minWidth: '120px' }}>
-                <i className="bi bi-plus-circle me-1"></i>
-                Total
+                <i className="bi bi-calculator me-1"></i>
+                Average
               </th>
             </tr>
           </thead>
@@ -59,7 +57,7 @@ const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
                     return (
                       <td key={`${participant}-${difficulty}`} className="text-center">
                         {moveTime !== null ? (
-                          <span className="badge bg-light text-dark">
+                          <span className="badge bg-secondary text-white">
                             {formatMoveTime(moveTime)}
                           </span>
                         ) : (
@@ -92,7 +90,7 @@ const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
             <ul className="mb-0 mt-2">
               <li><strong>ID</strong>: Index of Difficulty calculated using Fitts' Law</li>
               <li><strong>W</strong>: Target Width, <strong>D</strong>: Target Distance</li>
-              <li><strong>Total</strong>: Average move time across all difficulty levels</li>
+              <li><strong>Average</strong>: Average move time across all difficulty levels</li>
             </ul>
           </div>
         </div>

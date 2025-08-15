@@ -53,5 +53,7 @@ export const DEFAULT_STATE = {
   deletedTrails: {},
   deletedParticipants: {},
   deleteMode: false,
-  resultMode: false
+  resultMode: false,
+  movementTimeMatrixMode: false,
+  errorTrailMode: false
 };

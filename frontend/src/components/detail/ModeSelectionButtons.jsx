@@ -7,28 +7,34 @@ import React from 'react';
  * @param {Boolean} props.outlierMode - Whether outlier mode is active
  * @param {Boolean} props.resultMode - Whether result mode is active
  * @param {Boolean} props.movementTimeMatrixMode - Whether movement time matrix mode is active
+ * @param {Boolean} props.errorTrailMode - Whether error trail mode is active
  * @param {Function} props.setDeleteMode - Function to set delete mode
  * @param {Function} props.setOutlierMode - Function to set outlier mode
  * @param {Function} props.setResultMode - Function to set result mode
  * @param {Function} props.setMovementTimeMatrixMode - Function to set movement time matrix mode
+ * @param {Function} props.setErrorTrailMode - Function to set error trail mode
  * @param {Function} props.calculateOutliers - Function to calculate outliers
  * @param {Function} props.closeOutlierMode - Function to close outlier mode
  * @param {Function} props.closeResultMode - Function to close result mode
  * @param {Function} props.closeMovementTimeMatrixMode - Function to close movement time matrix mode
+ * @param {Function} props.closeErrorTrailMode - Function to close error trail mode
  */
 const ModeSelectionButtons = ({
   deleteMode,
   outlierMode,
   resultMode,
   movementTimeMatrixMode,
+  errorTrailMode,
   setDeleteMode,
   setOutlierMode,
   setResultMode,
   setMovementTimeMatrixMode,
+  setErrorTrailMode,
   calculateOutliers,
   closeOutlierMode,
   closeResultMode,
-  closeMovementTimeMatrixMode
+  closeMovementTimeMatrixMode,
+  closeErrorTrailMode
 }) => {
   // Handler for detail record mode
   const handleDetailRecordMode = () => {
@@ -36,6 +42,7 @@ const ModeSelectionButtons = ({
     setOutlierMode(false);
     setResultMode(false);
     setMovementTimeMatrixMode(false);
+    setErrorTrailMode(false);
   };
 
   // Handler for delete mode
@@ -44,6 +51,7 @@ const ModeSelectionButtons = ({
     setOutlierMode(false);
     setResultMode(false);
     setMovementTimeMatrixMode(false);
+    setErrorTrailMode(false);
   };
 
   // Handler for result mode
@@ -52,6 +60,7 @@ const ModeSelectionButtons = ({
     setDeleteMode(false);
     setOutlierMode(false);
     setMovementTimeMatrixMode(false);
+    setErrorTrailMode(false);
   };
 
   // Handler for movement time matrix mode
@@ -60,13 +69,23 @@ const ModeSelectionButtons = ({
     setDeleteMode(false);
     setOutlierMode(false);
     setResultMode(false);
+    setErrorTrailMode(false);
+  };
+
+  // Handler for error trail mode
+  const handleErrorTrailMode = () => {
+    setErrorTrailMode(true);
+    setDeleteMode(false);
+    setOutlierMode(false);
+    setResultMode(false);
+    setMovementTimeMatrixMode(false);
   };
 
   return (
     <div className="btn-toolbar" role="toolbar">
       <div className="btn-group me-2 mb-2" role="group">
         <button
-          className={`btn ${!deleteMode && !outlierMode && !resultMode && !movementTimeMatrixMode ? 'btn-primary' : 'btn-outline-primary'}`}
+          className={`btn ${!deleteMode && !outlierMode && !resultMode && !movementTimeMatrixMode && !errorTrailMode ? 'btn-primary' : 'btn-outline-primary'}`}
           onClick={handleDetailRecordMode}
         >
           <i className="bi bi-list-ul"></i> Detail Record
@@ -115,7 +134,7 @@ const ModeSelectionButtons = ({
         )}
       </div>
 
-      <div className="btn-group mb-2" role="group">
+      <div className="btn-group me-2 mb-2" role="group">
         {!movementTimeMatrixMode ? (
           <button
             className="btn btn-outline-secondary"
@@ -129,6 +148,24 @@ const ModeSelectionButtons = ({
             onClick={closeMovementTimeMatrixMode}
           >
             <i className="bi bi-x-circle"></i> Close Movement Time Matrix
+          </button>
+        )}
+      </div>
+
+      <div className="btn-group mb-2" role="group">
+        {!errorTrailMode ? (
+          <button
+            className="btn btn-outline-danger"
+            onClick={handleErrorTrailMode}
+          >
+            <i className="bi bi-exclamation-triangle"></i> Error Trail Analysis
+          </button>
+        ) : (
+          <button
+            className="btn btn-danger"
+            onClick={closeErrorTrailMode}
+          >
+            <i className="bi bi-x-circle"></i> Close Error Trail Analysis
           </button>
         )}
       </div>

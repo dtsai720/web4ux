@@ -5,3 +5,4 @@ frontend/dist
 .vscode/
 build/
 local.db*
+CLAUDE.md
