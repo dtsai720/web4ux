@@ -5,34 +5,28 @@ import React from 'react';
  * @param {Object} props - Component props
  * @param {Boolean} props.deleteMode - Whether delete mode is active
  * @param {Boolean} props.outlierMode - Whether outlier mode is active
- * @param {Boolean} props.resultMode - Whether result mode is active
  * @param {Boolean} props.movementTimeMatrixMode - Whether movement time matrix mode is active
  * @param {Boolean} props.errorTrailMode - Whether error trail mode is active
  * @param {Function} props.setDeleteMode - Function to set delete mode
  * @param {Function} props.setOutlierMode - Function to set outlier mode
- * @param {Function} props.setResultMode - Function to set result mode
  * @param {Function} props.setMovementTimeMatrixMode - Function to set movement time matrix mode
  * @param {Function} props.setErrorTrailMode - Function to set error trail mode
  * @param {Function} props.calculateOutliers - Function to calculate outliers
  * @param {Function} props.closeOutlierMode - Function to close outlier mode
- * @param {Function} props.closeResultMode - Function to close result mode
  * @param {Function} props.closeMovementTimeMatrixMode - Function to close movement time matrix mode
  * @param {Function} props.closeErrorTrailMode - Function to close error trail mode
  */
 const ModeSelectionButtons = ({
   deleteMode,
   outlierMode,
-  resultMode,
   movementTimeMatrixMode,
   errorTrailMode,
   setDeleteMode,
   setOutlierMode,
-  setResultMode,
   setMovementTimeMatrixMode,
   setErrorTrailMode,
   calculateOutliers,
   closeOutlierMode,
-  closeResultMode,
   closeMovementTimeMatrixMode,
   closeErrorTrailMode
 }) => {
@@ -40,7 +34,6 @@ const ModeSelectionButtons = ({
   const handleDetailRecordMode = () => {
     setDeleteMode(false);
     setOutlierMode(false);
-    setResultMode(false);
     setMovementTimeMatrixMode(false);
     setErrorTrailMode(false);
   };
@@ -48,16 +41,6 @@ const ModeSelectionButtons = ({
   // Handler for delete mode
   const handleDeleteMode = () => {
     setDeleteMode(true);
-    setOutlierMode(false);
-    setResultMode(false);
-    setMovementTimeMatrixMode(false);
-    setErrorTrailMode(false);
-  };
-
-  // Handler for result mode
-  const handleResultMode = () => {
-    setResultMode(true);
-    setDeleteMode(false);
     setOutlierMode(false);
     setMovementTimeMatrixMode(false);
     setErrorTrailMode(false);
@@ -68,7 +51,6 @@ const ModeSelectionButtons = ({
     setMovementTimeMatrixMode(true);
     setDeleteMode(false);
     setOutlierMode(false);
-    setResultMode(false);
     setErrorTrailMode(false);
   };
 
@@ -77,7 +59,6 @@ const ModeSelectionButtons = ({
     setErrorTrailMode(true);
     setDeleteMode(false);
     setOutlierMode(false);
-    setResultMode(false);
     setMovementTimeMatrixMode(false);
   };
 
@@ -85,7 +66,7 @@ const ModeSelectionButtons = ({
     <div className="btn-toolbar" role="toolbar">
       <div className="btn-group me-2 mb-2" role="group">
         <button
-          className={`btn ${!deleteMode && !outlierMode && !resultMode && !movementTimeMatrixMode && !errorTrailMode ? 'btn-primary' : 'btn-outline-primary'}`}
+          className={`btn ${!deleteMode && !outlierMode && !movementTimeMatrixMode && !errorTrailMode ? 'btn-primary' : 'btn-outline-primary'}`}
           onClick={handleDetailRecordMode}
         >
           <i className="bi bi-list-ul"></i> Detail Record
@@ -116,23 +97,6 @@ const ModeSelectionButtons = ({
         )}
       </div>
 
-      <div className="btn-group me-2 mb-2" role="group">
-        {!resultMode ? (
-          <button
-            className="btn btn-outline-success"
-            onClick={handleResultMode}
-          >
-            <i className="bi bi-bar-chart-line"></i> Result Analysis
-          </button>
-        ) : (
-          <button
-            className="btn btn-success"
-            onClick={closeResultMode}
-          >
-            <i className="bi bi-x-circle"></i> Close Result Analysis
-          </button>
-        )}
-      </div>
 
       <div className="btn-group me-2 mb-2" role="group">
         {!movementTimeMatrixMode ? (

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import DetailRecordComponent from './DetailRecordComponent';
 import OutlierAnalysisComponent from './OutlierAnalysisComponent';
 import DeleteItemComponent from './DeleteItemComponent';
-import ResultAnalysisComponent from './ResultAnalysisComponent';
 import MovementTimeMatrixComponent from './MoveTimeAnalysisComponent';
 import ErrorTrailAnalysisComponent from './ErrorTrailAnalysisComponent';
 
@@ -45,7 +44,6 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
   const [deletedTrails, setDeletedTrails] = useState(DEFAULT_STATE.deletedTrails);
   const [deletedParticipants, setDeletedParticipants] = useState(DEFAULT_STATE.deletedParticipants);
   const [deleteMode, setDeleteMode] = useState(DEFAULT_STATE.deleteMode);
-  const [resultMode, setResultMode] = useState(DEFAULT_STATE.resultMode);
   const [movementTimeMatrixMode, setMovementTimeMatrixMode] = useState(DEFAULT_STATE.movementTimeMatrixMode || false);
   const [errorTrailMode, setErrorTrailMode] = useState(DEFAULT_STATE.errorTrailMode || false);
 
@@ -187,11 +185,6 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
     setDeleteMode(false);
   };
 
-  // Close result mode
-  const closeResultMode = () => {
-    setResultMode(false);
-  };
-
   // Close movement time matrix mode
   const closeMovementTimeMatrixMode = () => {
     setMovementTimeMatrixMode(false);
@@ -239,7 +232,6 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
     // Ensure we're in detail record mode by default
     setDeleteMode(false);
     setOutlierMode(false);
-    setResultMode(false);
     setMovementTimeMatrixMode(false);
     setErrorTrailMode(false);
   }, [selectedSummaryId]);
@@ -285,17 +277,14 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
             setCurrentPage={setCurrentPage}
             deleteMode={deleteMode}
             outlierMode={outlierMode}
-            resultMode={resultMode}
             movementTimeMatrixMode={movementTimeMatrixMode}
             errorTrailMode={errorTrailMode}
             setDeleteMode={setDeleteMode}
             setOutlierMode={setOutlierMode}
-            setResultMode={setResultMode}
             setMovementTimeMatrixMode={setMovementTimeMatrixMode}
             setErrorTrailMode={setErrorTrailMode}
             calculateOutliers={calculateOutliers}
             closeOutlierMode={closeOutlierMode}
-            closeResultMode={closeResultMode}
             closeMovementTimeMatrixMode={closeMovementTimeMatrixMode}
             closeErrorTrailMode={closeErrorTrailMode}
           />
@@ -321,16 +310,9 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
             />
           ) : deleteMode ? (
             <DeleteItemComponent
-              deletedTrails={deletedTrails}
               deletedParticipants={deletedParticipants}
-              toggleTrailDelete={handleToggleTrailDelete}
               toggleParticipantDelete={handleToggleParticipantDelete}
               closeDeleteMode={closeDeleteMode}
-            />
-          ) : resultMode ? (
-            <ResultAnalysisComponent
-              rawData={rawData}
-              closeResultMode={closeResultMode}
             />
           ) : movementTimeMatrixMode ? (
             <MovementTimeMatrixComponent

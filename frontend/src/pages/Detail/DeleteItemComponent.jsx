@@ -6,17 +6,13 @@ import { DeletedItemsContainer } from '../../components/delete';
  * This component now uses the extracted DeletedItemsContainer component
  */
 const DeleteItemComponent = ({
-  deletedTrails,
   deletedParticipants,
-  toggleTrailDelete,
   toggleParticipantDelete,
   closeDeleteMode
 }) => {
   return (
     <DeletedItemsContainer
-      deletedTrails={deletedTrails}
       deletedParticipants={deletedParticipants}
-      toggleTrailDelete={toggleTrailDelete}
       toggleParticipantDelete={toggleParticipantDelete}
       closeDeleteMode={closeDeleteMode}
     />

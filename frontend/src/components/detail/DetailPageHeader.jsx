@@ -8,17 +8,14 @@ import ModeSelectionButtons from './ModeSelectionButtons';
  * @param {Function} props.setCurrentPage - Function to set the current page
  * @param {Boolean} props.deleteMode - Whether delete mode is active
  * @param {Boolean} props.outlierMode - Whether outlier mode is active
- * @param {Boolean} props.resultMode - Whether result mode is active
  * @param {Boolean} props.movementTimeMatrixMode - Whether movement time matrix mode is active
  * @param {Boolean} props.errorTrailMode - Whether error trail mode is active
  * @param {Function} props.setDeleteMode - Function to set delete mode
  * @param {Function} props.setOutlierMode - Function to set outlier mode
- * @param {Function} props.setResultMode - Function to set result mode
  * @param {Function} props.setMovementTimeMatrixMode - Function to set movement time matrix mode
  * @param {Function} props.setErrorTrailMode - Function to set error trail mode
  * @param {Function} props.calculateOutliers - Function to calculate outliers
  * @param {Function} props.closeOutlierMode - Function to close outlier mode
- * @param {Function} props.closeResultMode - Function to close result mode
  * @param {Function} props.closeMovementTimeMatrixMode - Function to close movement time matrix mode
  * @param {Function} props.closeErrorTrailMode - Function to close error trail mode
  */
@@ -26,17 +23,14 @@ const DetailPageHeader = ({
   setCurrentPage,
   deleteMode,
   outlierMode,
-  resultMode,
   movementTimeMatrixMode,
   errorTrailMode,
   setDeleteMode,
   setOutlierMode,
-  setResultMode,
   setMovementTimeMatrixMode,
   setErrorTrailMode,
   calculateOutliers,
   closeOutlierMode,
-  closeResultMode,
   closeMovementTimeMatrixMode,
   closeErrorTrailMode
 }) => {
@@ -50,17 +44,14 @@ const DetailPageHeader = ({
       <ModeSelectionButtons
         deleteMode={deleteMode}
         outlierMode={outlierMode}
-        resultMode={resultMode}
         movementTimeMatrixMode={movementTimeMatrixMode}
         errorTrailMode={errorTrailMode}
         setDeleteMode={setDeleteMode}
         setOutlierMode={setOutlierMode}
-        setResultMode={setResultMode}
         setMovementTimeMatrixMode={setMovementTimeMatrixMode}
         setErrorTrailMode={setErrorTrailMode}
         calculateOutliers={calculateOutliers}
         closeOutlierMode={closeOutlierMode}
-        closeResultMode={closeResultMode}
         closeMovementTimeMatrixMode={closeMovementTimeMatrixMode}
         closeErrorTrailMode={closeErrorTrailMode}
       />

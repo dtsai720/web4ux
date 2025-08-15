@@ -25,7 +25,6 @@ const GuideAccordion = () => {
           <li><strong>Sync Data:</strong> First, synchronize your data from the server</li>
           <li><strong>View Summary:</strong> Check the summary page for an overview of your data</li>
           <li><strong>Detail Records:</strong> Explore detailed records for specific information</li>
-          <li><strong>Results Analysis:</strong> View analysis results of your data</li>
           <li><strong>Outlier Management:</strong> Identify and manage outliers in your data</li>
         </ol>
         <div className="alert alert-primary">
@@ -108,41 +107,6 @@ const GuideAccordion = () => {
         </div>
       </AccordionItem>
 
-      <AccordionItem
-        id="results-guide"
-        title="Viewing Results"
-        activeAccordion={activeAccordion}
-        toggleAccordion={handleToggleAccordion}
-      >
-        <p>The Results section provides analytical insights into your data:</p>
-        <ol>
-          <li>Navigate to the Results tab from the Detail page</li>
-          <li>Select the devices you want to include in the analysis using the Device Selection Table</li>
-          <li>View the Width/Distance Table for detailed measurements</li>
-          <li>Analyze the statistical data presented in various formats</li>
-        </ol>
-        <p>Key features of the Results view:</p>
-        <ul>
-          <li><strong>Device Comparison:</strong> Compare data across different devices</li>
-          <li><strong>Statistical Analysis:</strong> View statistical breakdowns of your data</li>
-          <li><strong>Data Visualization:</strong> Visual representations of key metrics</li>
-          <li><strong>Export Options:</strong> Export your results for external use</li>
-        </ul>
-        <div className="alert alert-info">
-          <strong>Important:</strong> Results calculations include data that is either fully available or calculable (but not fully available), and not deleted. This ensures that your analysis is based on valid, current data.
-        </div>
-        <div className="alert alert-info">
-          <strong>Trail Availability Status:</strong>
-          <ul className="mb-0 mt-2">
-            <li><strong>Available (Green):</strong> Trail has both start and target marks, with start occurring before target.</li>
-            <li><strong>Calculable (Blue):</strong> Trail has target as the last timestamp and start occurs before target, but may have other format concerns. Despite these concerns, these trails are still calculable and included in calculations.</li>
-            <li><strong>Unavailable (Yellow):</strong> Trail is missing start or target marks, or has other critical issues that prevent calculation.</li>
-          </ul>
-        </div>
-        <div className="alert alert-success">
-          <strong>Pro Tip:</strong> Focus on the key metrics that are most relevant to your research or analysis goals.
-        </div>
-      </AccordionItem>
 
       <AccordionItem
         id="outlier-guide"

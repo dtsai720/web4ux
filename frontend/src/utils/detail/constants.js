@@ -26,8 +26,7 @@ export const GROUP_BY_OPTIONS = {
 export const MODE_TYPES = {
   DETAIL_RECORD: 'detail_record',
   DELETED_ITEMS: 'deleted_items',
-  OUTLIER_ANALYSIS: 'outlier_analysis',
-  RESULT_ANALYSIS: 'result_analysis'
+  OUTLIER_ANALYSIS: 'outlier_analysis'
 };
 
 /**
@@ -53,7 +52,6 @@ export const DEFAULT_STATE = {
   deletedTrails: {},
   deletedParticipants: {},
   deleteMode: false,
-  resultMode: false,
   movementTimeMatrixMode: false,
   errorTrailMode: false
 };
