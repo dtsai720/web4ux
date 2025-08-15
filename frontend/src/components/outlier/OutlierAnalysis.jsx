@@ -1,6 +1,6 @@
 import React from 'react';
 import OutlierDeviceCard from './OutlierDeviceCard';
-import OutlierDeviceStats from './OutlierDeviceStats';
+import OutlierDeviceDifficultyTable from './OutlierDeviceDifficultyTable';
 import OutlierParticipantTable from './OutlierParticipantTable';
 import OutlierTrailTable from './OutlierTrailTable';
 import OutlierTrailDetails from './OutlierTrailDetails';
@@ -32,6 +32,11 @@ const OutlierAnalysis = ({
         </small>
       </div>
       <div className="card-body">
+        <OutlierDeviceDifficultyTable
+          outlierData={outlierData}
+          data={data}
+        />
+
         {selectedOutlierDevice ? (
           <div>
             <OutlierNavigation
@@ -66,10 +71,6 @@ const OutlierAnalysis = ({
               </div>
             ) : (
               <div>
-                <OutlierDeviceStats
-                  deviceStats={outlierData[selectedOutlierDevice]?.stats}
-                />
-
                 <OutlierParticipantTable
                   participants={outlierData[selectedOutlierDevice]?.participants}
                   onSelectParticipant={handleSelectOutlierParticipant}
