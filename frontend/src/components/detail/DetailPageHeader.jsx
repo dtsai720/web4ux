@@ -17,6 +17,7 @@ import ModeSelectionButtons from './ModeSelectionButtons';
  * @param {Function} props.calculateOutliers - Function to calculate outliers
  * @param {Function} props.closeOutlierMode - Function to close outlier mode
  * @param {Function} props.closeMovementTimeMatrixMode - Function to close movement time matrix mode
+ * @param {Function} props.closeDeleteMode - Function to close delete mode
  * @param {Function} props.closeErrorTrailMode - Function to close error trail mode
  */
 const DetailPageHeader = ({
@@ -31,6 +32,7 @@ const DetailPageHeader = ({
   setErrorTrailMode,
   calculateOutliers,
   closeOutlierMode,
+  closeDeleteMode,
   closeMovementTimeMatrixMode,
   closeErrorTrailMode
 }) => {
@@ -52,6 +54,7 @@ const DetailPageHeader = ({
         setErrorTrailMode={setErrorTrailMode}
         calculateOutliers={calculateOutliers}
         closeOutlierMode={closeOutlierMode}
+        closeDeleteMode={closeDeleteMode}
         closeMovementTimeMatrixMode={closeMovementTimeMatrixMode}
         closeErrorTrailMode={closeErrorTrailMode}
       />

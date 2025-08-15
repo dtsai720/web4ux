@@ -24,7 +24,7 @@ const GuideAccordion = () => {
         <ol>
           <li><strong>Sync Data:</strong> First, synchronize your data from the server</li>
           <li><strong>View Summary:</strong> Check the summary page for an overview of your data</li>
-          <li><strong>Detail Records:</strong> Explore detailed records for specific information</li>
+          <li><strong>Analysis Tools:</strong> Use various analysis tools like outlier detection and movement time matrix</li>
           <li><strong>Outlier Management:</strong> Identify and manage outliers in your data</li>
         </ol>
         <div className="alert alert-primary">
@@ -75,24 +75,23 @@ const GuideAccordion = () => {
       </AccordionItem>
 
       <AccordionItem
-        id="detail-record-guide"
-        title="Using Detail Records"
+        id="analysis-tools-guide"
+        title="Using Analysis Tools"
         activeAccordion={activeAccordion}
         toggleAccordion={handleToggleAccordion}
       >
-        <p>Detail Records provide comprehensive information about specific data points:</p>
+        <p>The analysis section provides comprehensive tools for analyzing UX/UI testing data:</p>
         <ol>
-          <li>Access Detail Records from the Summary page by clicking on a specific project</li>
-          <li>Use the navigation buttons to move between different sections</li>
-          <li>Toggle between different view modes using the mode selection buttons</li>
-          <li>Use the Group By selector to organize data in different ways</li>
+          <li>Access analysis tools from the Summary page by clicking on a specific project</li>
+          <li>Use the mode selection buttons to switch between different analysis modes</li>
+          <li>Each analysis mode provides different insights into your data</li>
         </ol>
-        <p>The Detail Record view includes:</p>
+        <p>Available analysis modes:</p>
         <ul>
-          <li><strong>Project Information:</strong> Overview of the selected project</li>
-          <li><strong>Participant Data:</strong> Information about participants in the project</li>
-          <li><strong>Trial Information:</strong> Detailed data about individual trials</li>
-          <li><strong>Statistical Metrics:</strong> Various statistical measurements of the data</li>
+          <li><strong>Outlier Analysis:</strong> Identify and analyze outliers in movement data (Default mode)</li>
+          <li><strong>Movement Time Matrix:</strong> View movement time data in matrix format</li>
+          <li><strong>Error Trail Analysis:</strong> Analyze trails with errors or intermediate actions</li>
+          <li><strong>Delete Items:</strong> Manage deleted participants and restore if needed</li>
         </ul>
         <div className="alert alert-info">
           <strong>Trail Availability Status:</strong>
@@ -102,8 +101,8 @@ const GuideAccordion = () => {
             <li><strong>Unavailable (Yellow):</strong> Trail is missing start or target marks, or has other critical issues that prevent calculation.</li>
           </ul>
         </div>
-        <div className="alert alert-info">
-          <strong>Tip:</strong> Use the accordion interface to expand and collapse sections for better readability.
+        <div className="alert alert-success">
+          <strong>Note:</strong> The application automatically opens in Outlier Analysis mode when entering a project for efficient data analysis.
         </div>
       </AccordionItem>
 

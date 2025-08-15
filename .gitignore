@@ -6,3 +6,4 @@ frontend/dist
 build/
 local.db*
 CLAUDE.md
+*.md

@@ -13,6 +13,7 @@ import React from 'react';
  * @param {Function} props.setErrorTrailMode - Function to set error trail mode
  * @param {Function} props.calculateOutliers - Function to calculate outliers
  * @param {Function} props.closeOutlierMode - Function to close outlier mode
+ * @param {Function} props.closeDeleteMode - Function to close delete mode
  * @param {Function} props.closeMovementTimeMatrixMode - Function to close movement time matrix mode
  * @param {Function} props.closeErrorTrailMode - Function to close error trail mode
  */
@@ -27,16 +28,10 @@ const ModeSelectionButtons = ({
   setErrorTrailMode,
   calculateOutliers,
   closeOutlierMode,
+  closeDeleteMode,
   closeMovementTimeMatrixMode,
   closeErrorTrailMode
 }) => {
-  // Handler for detail record mode
-  const handleDetailRecordMode = () => {
-    setDeleteMode(false);
-    setOutlierMode(false);
-    setMovementTimeMatrixMode(false);
-    setErrorTrailMode(false);
-  };
 
   // Handler for delete mode
   const handleDeleteMode = () => {
@@ -66,37 +61,12 @@ const ModeSelectionButtons = ({
     <div className="btn-toolbar" role="toolbar">
       <div className="btn-group me-2 mb-2" role="group">
         <button
-          className={`btn ${!deleteMode && !outlierMode && !movementTimeMatrixMode && !errorTrailMode ? 'btn-primary' : 'btn-outline-primary'}`}
-          onClick={handleDetailRecordMode}
+          className={`btn ${!deleteMode && !movementTimeMatrixMode && !errorTrailMode ? 'btn-info' : 'btn-outline-info'}`}
+          onClick={calculateOutliers}
         >
-          <i className="bi bi-list-ul"></i> Detail Record
-        </button>
-        <button
-          className={`btn ${deleteMode ? 'btn-warning' : 'btn-outline-warning'}`}
-          onClick={handleDeleteMode}
-        >
-          <i className="bi bi-trash"></i> Deleted Items
+          <i className="bi bi-graph-up"></i> Outlier Analysis
         </button>
       </div>
-
-      <div className="btn-group me-2 mb-2" role="group">
-        {!outlierMode ? (
-          <button
-            className="btn btn-outline-info"
-            onClick={calculateOutliers}
-          >
-            <i className="bi bi-graph-up"></i> Analyze Outliers
-          </button>
-        ) : (
-          <button
-            className="btn btn-info"
-            onClick={closeOutlierMode}
-          >
-            <i className="bi bi-x-circle"></i> Close Outlier Analysis
-          </button>
-        )}
-      </div>
-
 
       <div className="btn-group me-2 mb-2" role="group">
         {!movementTimeMatrixMode ? (
@@ -116,7 +86,7 @@ const ModeSelectionButtons = ({
         )}
       </div>
 
-      <div className="btn-group mb-2" role="group">
+      <div className="btn-group me-2 mb-2" role="group">
         {!errorTrailMode ? (
           <button
             className="btn btn-outline-danger"
@@ -130,6 +100,24 @@ const ModeSelectionButtons = ({
             onClick={closeErrorTrailMode}
           >
             <i className="bi bi-x-circle"></i> Close Error Trail Analysis
+          </button>
+        )}
+      </div>
+
+      <div className="btn-group mb-2" role="group">
+        {!deleteMode ? (
+          <button
+            className="btn btn-outline-warning"
+            onClick={handleDeleteMode}
+          >
+            <i className="bi bi-trash"></i> Deleted Items
+          </button>
+        ) : (
+          <button
+            className="btn btn-warning"
+            onClick={closeDeleteMode}
+          >
+            <i className="bi bi-x-circle"></i> Close Deleted Items
           </button>
         )}
       </div>
