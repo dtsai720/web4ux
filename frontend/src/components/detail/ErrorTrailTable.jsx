@@ -134,11 +134,11 @@ const ErrorTrailTable = ({ errorTrails, selectedDevice, selectedDifficulty }) =>
                       )}
                       <td>
                         <span className={`badge ${
-                          record.action === 'start' ? 'bg-primary' :
-                          record.action === 'target' ? 'bg-success' :
+                          record.mark === 'start' ? 'bg-primary' :
+                          record.mark === 'target' ? 'bg-success' :
                           'bg-warning text-dark'
                         }`}>
-                          {record.action}
+                          {record.mark}
                         </span>
                       </td>
                       <td>
@@ -165,7 +165,7 @@ const ErrorTrailTable = ({ errorTrails, selectedDevice, selectedDifficulty }) =>
             <div className="d-flex flex-wrap gap-2">
               <span className="badge bg-primary">start</span>
               <span className="badge bg-success">target</span>
-              <span className="badge bg-warning text-dark">else (intermediate)</span>
+              <span className="badge bg-warning text-dark">others (intermediate)</span>
             </div>
           </div>
           <div className="col-md-6">
