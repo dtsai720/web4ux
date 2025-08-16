@@ -10,16 +10,31 @@ import React from 'react';
  * @returns {JSX.Element} Error trail table
  */
 const ErrorTrailTable = ({ errorTrails, selectedDevice, selectedDifficulty }) => {
-  // Format timestamp to readable format
+  // Get current timezone
+  const getCurrentTimezone = () => {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const date = new Date();
+    const offset = date.getTimezoneOffset();
+    const hours = Math.floor(Math.abs(offset) / 60);
+    const minutes = Math.abs(offset) % 60;
+    const sign = offset <= 0 ? '+' : '-';
+    const offsetStr = `UTC${sign}${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+
+    return `${timezone} (${offsetStr})`;
+  };
+
+  // Format timestamp to YYYY/MM/dd HH:mm:SS.SSS format
   const formatTimestamp = (timestamp) => {
     const date = new Date(timestamp);
-    return date.toLocaleTimeString('en-US', {
-      hour12: false,
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      fractionalSecondDigits: 3
-    });
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    const milliseconds = String(date.getMilliseconds()).padStart(3, '0');
+
+    return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
   };
 
   if (!errorTrails || errorTrails.length === 0) {
@@ -77,7 +92,7 @@ const ErrorTrailTable = ({ errorTrails, selectedDevice, selectedDifficulty }) =>
               <th style={{ width: '120px' }}>
                 <i className="bi bi-geo me-1"></i>Coordinate
               </th>
-              <th>
+              <th style={{ width: '180px' }}>
                 <i className="bi bi-clock me-1"></i>Timestamp
               </th>
             </tr>
@@ -157,6 +172,8 @@ const ErrorTrailTable = ({ errorTrails, selectedDevice, selectedDifficulty }) =>
             <div className="small text-muted">
               <strong>Error Definition:</strong> Trails with actions between start and target<br/>
               <strong>Difficulty (ID):</strong> Calculated using Fitts' Law: log₂(distance/width + 1)<br/>
+              <strong>Timestamp Format:</strong> YYYY/MM/dd HH:mm:SS.SSS<br/>
+              <strong>Timezone:</strong> {getCurrentTimezone()}<br/>
               <strong>Sorting:</strong> Participant → Trail Number
             </div>
           </div>

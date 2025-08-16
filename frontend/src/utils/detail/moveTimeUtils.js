@@ -180,7 +180,7 @@ export const formatMoveTime = (moveTime) => {
   if (moveTime === null || moveTime === undefined || isNaN(moveTime)) {
     return 'N/A';
   }
-  return `${Math.round(moveTime)}ms`;
+  return `${Math.round(moveTime)} ms`;
 };
 
 /**

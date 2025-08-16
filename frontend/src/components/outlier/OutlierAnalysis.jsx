@@ -32,11 +32,6 @@ const OutlierAnalysis = ({
         </small>
       </div>
       <div className="card-body">
-        <OutlierDeviceDifficultyTable
-          outlierData={outlierData}
-          data={data}
-        />
-
         {selectedOutlierDevice ? (
           <div>
             <OutlierNavigation
@@ -71,6 +66,13 @@ const OutlierAnalysis = ({
               </div>
             ) : (
               <div>
+                <OutlierDeviceDifficultyTable
+                  outlierData={outlierData}
+                  data={data}
+                  selectedDevice={selectedOutlierDevice}
+                  showParticipantView={true}
+                />
+
                 <OutlierParticipantTable
                   participants={outlierData[selectedOutlierDevice]?.participants}
                   onSelectParticipant={handleSelectOutlierParticipant}
@@ -82,6 +84,11 @@ const OutlierAnalysis = ({
           </div>
         ) : (
           <div>
+            <OutlierDeviceDifficultyTable
+              outlierData={outlierData}
+              data={data}
+            />
+
             <h6 className="border-bottom pb-2 mb-3">Select a Device to Analyze</h6>
             <div className="row">
               {Object.keys(outlierData).map(deviceKey => (

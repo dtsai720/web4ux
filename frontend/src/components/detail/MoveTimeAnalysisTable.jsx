@@ -57,7 +57,7 @@ const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
                     return (
                       <td key={`${participant}-${difficulty}`} className="text-center">
                         {moveTime !== null ? (
-                          <span className="badge bg-secondary text-white">
+                          <span className="fw-normal" style={{ fontFamily: 'monospace' }}>
                             {formatMoveTime(moveTime)}
                           </span>
                         ) : (
@@ -68,7 +68,7 @@ const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
                   })}
                   <td className="text-center bg-light">
                     {totalMoveTime !== null ? (
-                      <span className="badge bg-info">
+                      <span className="fw-normal" style={{ fontFamily: 'monospace' }}>
                         {formatMoveTime(totalMoveTime)}
                       </span>
                     ) : (
