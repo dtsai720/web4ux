@@ -25,7 +25,7 @@ const SummaryTable = ({
     <div className="card shadow-sm">
       {/* 表格標題和計數 */}
       <div className="card-header bg-light d-flex justify-content-between align-items-center">
-        <h5 className="card-title mb-0">Results ({totalItems} items)</h5>
+        <h5 className="card-title mb-0">Projects ({totalItems} items)</h5>
       </div>
 
       <div className="card-body p-0">

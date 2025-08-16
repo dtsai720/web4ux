@@ -16,9 +16,9 @@ const DeletedItemsContainer = ({
 }) => {
 
   return (
-    <div className="card mb-4 border-warning">
+    <div className="card mb-4 border-danger">
       <div
-        className="card-header bg-warning text-dark"
+        className="card-header bg-danger text-white"
         onDoubleClick={handleDoubleClick(closeDeleteMode)}
         style={{ cursor: 'pointer' }}
         title="Double-click to go back"

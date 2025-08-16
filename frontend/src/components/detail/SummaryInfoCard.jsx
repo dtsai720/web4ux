@@ -13,7 +13,7 @@ const SummaryInfoCard = ({ summaryInfo }) => {
       <div className="card-header bg-primary text-white">
         <h5 className="mb-0">
           <i className="bi bi-info-circle me-2"></i>
-          Summary Information
+          Project Overview
         </h5>
       </div>
       <div className="card-body">

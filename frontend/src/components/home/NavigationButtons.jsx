@@ -11,7 +11,7 @@ const NavigationButtons = ({ setCurrentPage }) => {
     },
     {
       icon: 'bar-chart',
-      label: 'Summary',
+      label: 'Projects',
       color: 'success',
       page: 'summary'
     },

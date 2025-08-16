@@ -39,7 +39,7 @@ const DetailPageHeader = ({
   return (
     <div className="mb-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2>Detail View</h2>
+        <h2>Project Analysis</h2>
         <NavigationButtons setCurrentPage={setCurrentPage} />
       </div>
 

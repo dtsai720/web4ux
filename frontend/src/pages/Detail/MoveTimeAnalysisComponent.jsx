@@ -40,9 +40,9 @@ const MovementTimeMatrixComponent = ({
   };
 
   return (
-    <div className="card mb-4 border-info">
+    <div className="card mb-4 border-success">
       <div
-        className="card-header bg-info text-white"
+        className="card-header bg-success text-white"
         onDoubleClick={handleDoubleClick}
         style={{ cursor: 'pointer' }}
       >
@@ -76,7 +76,7 @@ const MovementTimeMatrixComponent = ({
 
         {loading ? (
           <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '200px' }}>
-            <div className="spinner-border text-info" role="status">
+            <div className="spinner-border text-success" role="status">
               <span className="visually-hidden">Calculating analysis...</span>
             </div>
             <span className="ms-3">Calculating movement time matrix...</span>

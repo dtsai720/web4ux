@@ -71,14 +71,14 @@ const ModeSelectionButtons = ({
       <div className="btn-group me-2 mb-2" role="group">
         {!movementTimeMatrixMode ? (
           <button
-            className="btn btn-outline-secondary"
+            className="btn btn-outline-success"
             onClick={handleMovementTimeMatrixMode}
           >
             <i className="bi bi-grid-3x3"></i> Movement Time Matrix
           </button>
         ) : (
           <button
-            className="btn btn-secondary"
+            className="btn btn-success"
             onClick={closeMovementTimeMatrixMode}
           >
             <i className="bi bi-x-circle"></i> Close Movement Time Matrix
@@ -89,14 +89,14 @@ const ModeSelectionButtons = ({
       <div className="btn-group me-2 mb-2" role="group">
         {!errorTrailMode ? (
           <button
-            className="btn btn-outline-danger"
+            className="btn btn-outline-warning"
             onClick={handleErrorTrailMode}
           >
             <i className="bi bi-exclamation-triangle"></i> Error Trail Analysis
           </button>
         ) : (
           <button
-            className="btn btn-danger"
+            className="btn btn-warning"
             onClick={closeErrorTrailMode}
           >
             <i className="bi bi-x-circle"></i> Close Error Trail Analysis
@@ -107,14 +107,14 @@ const ModeSelectionButtons = ({
       <div className="btn-group mb-2" role="group">
         {!deleteMode ? (
           <button
-            className="btn btn-outline-warning"
+            className="btn btn-outline-danger"
             onClick={handleDeleteMode}
           >
             <i className="bi bi-trash"></i> Deleted Items
           </button>
         ) : (
           <button
-            className="btn btn-warning"
+            className="btn btn-danger"
             onClick={closeDeleteMode}
           >
             <i className="bi bi-x-circle"></i> Close Deleted Items
