@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { calculateDifficulty } from '../../utils/detail/moveTimeUtils';
 
-const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, showParticipantView = false }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, deviceStats, showParticipantView = false }) => {
 
   // Extract devices or participants based on view mode
   const getRowKeys = () => {
@@ -159,7 +158,7 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, showP
     return totalErrors;
   };
 
-  // Helper function to detect if a trail has intermediate actions
+  // Helper function to detect if a trail has extra clicks
   const isErrorTrail = (trailRecords) => {
     let startFound = false;
     let targetFound = false;
@@ -205,29 +204,43 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, showP
 
   return (
     <div className="card mb-4">
-      <div
-        className={`card-header bg-light ${showParticipantView ? 'cursor-pointer' : ''}`}
-        onClick={showParticipantView ? () => setIsExpanded(!isExpanded) : undefined}
-        style={showParticipantView ? { cursor: 'pointer' } : {}}
-      >
-        <div className="d-flex justify-content-between align-items-center">
+      <div className="card-header bg-light">
+        <div className="d-flex justify-content-between align-items-start">
           <div>
             <h6 className="mb-0">
               {showParticipantView ? 'Participant vs Difficulty Analysis' : 'Device vs Difficulty Analysis'}
             </h6>
             <small className="text-muted">
-              {showParticipantView ? 'Error Count per Participant' : 'Error Count / Total Trails (Percentage)'}
+              {showParticipantView ? 'Error Count per Participant' : 'Error Count / Valid Trails (Percentage)'}
             </small>
           </div>
-          {showParticipantView && (
-            <div className="text-muted">
-              <i className={`bi ${isExpanded ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
+          {showParticipantView && deviceStats && (
+            <div className="text-end">
+              <div className="card border-info bg-light" style={{ minWidth: '200px' }}>
+                <div className="card-body py-2 px-3">
+                  <h6 className="card-title text-info mb-2 text-center">
+                    <i className="bi bi-graph-up me-1"></i>
+                    Error Count Statistics
+                  </h6>
+                  <div className="row text-center">
+                    <div className="col-6">
+                      <div className="border-end">
+                        <small className="text-muted d-block mb-1">Average</small>
+                        <span className="badge bg-primary fs-6 px-2 py-1">{deviceStats?.avgErrorCount?.toFixed(2) || '0.00'}</span>
+                      </div>
+                    </div>
+                    <div className="col-6">
+                      <small className="text-muted d-block mb-1">Std Dev</small>
+                      <span className="badge bg-warning text-dark fs-6 px-2 py-1">{deviceStats?.stdDevErrorCount?.toFixed(2) || '0.00'}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>
       </div>
-      {isExpanded && (
-        <div className="card-body">
+      <div className="card-body">
           <div className="table-responsive">
             <table className="table table-bordered table-sm">
               <thead>
@@ -289,7 +302,6 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, showP
             </table>
           </div>
         </div>
-      )}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, Fragment } from 'react';
 
 /**
  * Component to display error trails in a table format
@@ -10,6 +10,19 @@ import React from 'react';
  * @returns {JSX.Element} Error trail table
  */
 const ErrorTrailTable = ({ errorTrails, selectedDevice, selectedDifficulty }) => {
+  const [expandedTrails, setExpandedTrails] = useState(new Set());
+
+  // Toggle trail expansion
+  const toggleTrailExpansion = (trailId) => {
+    const newExpandedTrails = new Set(expandedTrails);
+    if (newExpandedTrails.has(trailId)) {
+      newExpandedTrails.delete(trailId);
+    } else {
+      newExpandedTrails.add(trailId);
+    }
+    setExpandedTrails(newExpandedTrails);
+  };
+
   // Get current timezone
   const getCurrentTimezone = () => {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -43,7 +56,7 @@ const ErrorTrailTable = ({ errorTrails, selectedDevice, selectedDifficulty }) =>
         <i className="bi bi-info-circle me-2"></i>
         No error trails found for Device: <strong>{selectedDevice}</strong> and Difficulty: <strong>{selectedDifficulty}</strong>
         <div className="mt-2 small text-muted">
-          Error trails are defined as trails where intermediate actions occur between start and target actions.
+          Error trails are defined as trails where extra clicks occur between start and target actions.
         </div>
       </div>
     );
@@ -77,6 +90,7 @@ const ErrorTrailTable = ({ errorTrails, selectedDevice, selectedDifficulty }) =>
         <table className="table table-sm table-striped table-hover">
           <thead className="table-dark">
             <tr>
+              <th style={{ width: '40px' }}></th>
               <th style={{ width: '120px' }}>
                 <i className="bi bi-person me-1"></i>Participant
               </th>
@@ -87,13 +101,10 @@ const ErrorTrailTable = ({ errorTrails, selectedDevice, selectedDifficulty }) =>
                 <i className="bi bi-calculator me-1"></i>ID (W/D)
               </th>
               <th style={{ width: '100px' }}>
-                <i className="bi bi-play-circle me-1"></i>Action
+                <i className="bi bi-exclamation-circle me-1"></i>Error Count
               </th>
               <th style={{ width: '120px' }}>
-                <i className="bi bi-geo me-1"></i>Coordinate
-              </th>
-              <th style={{ width: '180px' }}>
-                <i className="bi bi-clock me-1"></i>Timestamp
+                <i className="bi bi-clock me-1"></i>Event Time
               </th>
             </tr>
           </thead>
@@ -101,57 +112,148 @@ const ErrorTrailTable = ({ errorTrails, selectedDevice, selectedDifficulty }) =>
             {sortedParticipants.map(participantSerial => {
               const participantTrails = trailsByParticipant[participantSerial];
 
-              return participantTrails.map((trail, trailIndex) => {
-                return trail.records.map((record, recordIndex) => {
-                  const isFirstRecordOfTrail = recordIndex === 0;
-                  const isFirstTrailOfParticipant = trailIndex === 0 && recordIndex === 0;
-                  const participantRowSpan = isFirstTrailOfParticipant ?
-                    participantTrails.reduce((sum, t) => sum + t.records.length, 0) : null;
+              return participantTrails.map((trail) => {
+                const trailId = `${trail.participantSerial}-${trail.trailNumber}`;
+                const isExpanded = expandedTrails.has(trailId);
+                const errorCount = trail.records.filter(r => r.mark !== 'start' && r.mark !== 'target').length;
 
-                  return (
-                    <tr key={`${trail.participantSerial}-${trail.trailNumber}-${recordIndex}`}>
-                      {isFirstTrailOfParticipant && (
-                        <td rowSpan={participantRowSpan} className="table-info fw-bold align-middle">
-                          {participantSerial}
-                        </td>
-                      )}
-                      {isFirstRecordOfTrail && (
-                        <>
-                          <td rowSpan={trail.records.length} className="align-middle">
-                            <span className="badge bg-secondary">
-                              {trail.trailNumber}
-                            </span>
-                          </td>
-                          <td rowSpan={trail.records.length} className="align-middle">
-                            <div className="small">
-                              <strong>{trail.difficulty}</strong>
-                            </div>
-                            <div className="text-muted" style={{ fontSize: '0.75rem' }}>
-                              ({trail.width}/{trail.distance})
-                            </div>
-                          </td>
-                        </>
-                      )}
+                return (
+                  <React.Fragment key={trailId}>
+                    <tr
+                      onClick={() => toggleTrailExpansion(trailId)}
+                      style={{ cursor: 'pointer' }}
+                      className="table-warning"
+                      title={isExpanded ? "Click to collapse details" : "Click to expand details"}
+                    >
                       <td>
-                        <span className={`badge ${
-                          record.mark === 'start' ? 'bg-primary' :
-                          record.mark === 'target' ? 'bg-success' :
-                          'bg-warning text-dark'
-                        }`}>
-                          {record.mark}
+                        <i className={`bi ${isExpanded ? 'bi-chevron-down' : 'bi-chevron-right'}`}></i>
+                      </td>
+                      <td className="fw-bold">
+                        {trail.participantSerial}
+                      </td>
+                      <td>
+                        <span className="badge bg-secondary">
+                          {trail.trailNumber}
                         </span>
                       </td>
                       <td>
-                        <code className="small">({record.x}, {record.y})</code>
+                        <div className="small">
+                          <strong>{trail.difficulty}</strong>
+                        </div>
+                        <div className="text-muted" style={{ fontSize: '0.75rem' }}>
+                          ({trail.width}/{trail.distance})
+                        </div>
+                      </td>
+                      <td>
+                        <span className="badge bg-danger">
+                          {errorCount}
+                        </span>
                       </td>
                       <td>
                         <small className="font-monospace">
-                          {formatTimestamp(record.timestamp)}
+                          {(trail.records.find(r => r.mark === 'target')?.timestamp -
+                            trail.records.find(r => r.mark === 'start')?.timestamp) || 0}ms
                         </small>
                       </td>
                     </tr>
-                  );
-                });
+                    {isExpanded && (
+                      <tr>
+                        <td colSpan="6" className="p-0">
+                          <div className="bg-light p-3 border-top">
+                            <h6 className="mb-3">
+                              <i className="bi bi-list-ul text-primary me-2"></i>
+                              Trail {trail.trailNumber} Details
+                            </h6>
+                            <div className="table-responsive">
+                              <table className="table table-sm table-striped table-hover">
+                                <thead className="table-dark">
+                                  <tr>
+                                    <th style={{ width: '120px' }}>
+                                      <i className="bi bi-person me-1"></i>Participant
+                                    </th>
+                                    <th style={{ width: '100px' }}>
+                                      <i className="bi bi-list-ol me-1"></i>Trail No
+                                    </th>
+                                    <th style={{ width: '120px' }}>
+                                      <i className="bi bi-calculator me-1"></i>ID (W/D)
+                                    </th>
+                                    <th style={{ width: '100px' }}>
+                                      <i className="bi bi-play-circle me-1"></i>Action
+                                    </th>
+                                    <th style={{ width: '120px' }}>
+                                      <i className="bi bi-cursor-fill me-1"></i>Double Click
+                                    </th>
+                                    <th style={{ width: '120px' }}>
+                                      <i className="bi bi-geo me-1"></i>Coordinate
+                                    </th>
+                                    <th style={{ width: '140px' }}>
+                                      <i className="bi bi-clock me-1"></i>Timestamp
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {trail.records.map((record, recordIndex) => (
+                                    <tr key={`${trailId}-record-${recordIndex}`}>
+                                      {recordIndex === 0 && (
+                                        <td rowSpan={trail.records.length} className="table-info fw-bold align-middle">
+                                          {trail.participantSerial}
+                                        </td>
+                                      )}
+                                      {recordIndex === 0 && (
+                                        <td rowSpan={trail.records.length} className="align-middle">
+                                          <span className="badge bg-secondary">
+                                            {trail.trailNumber}
+                                          </span>
+                                        </td>
+                                      )}
+                                      {recordIndex === 0 && (
+                                        <td rowSpan={trail.records.length} className="align-middle">
+                                          <div className="small">
+                                            <strong>{trail.difficulty}</strong>
+                                          </div>
+                                          <div className="text-muted" style={{ fontSize: '0.75rem' }}>
+                                            ({trail.width}/{trail.distance})
+                                          </div>
+                                        </td>
+                                      )}
+                                      <td>
+                                        <span className={`badge ${
+                                          record.mark === 'start' ? 'bg-primary' :
+                                          record.mark === 'target' ? 'bg-success' :
+                                          'bg-warning text-dark'
+                                        }`}>
+                                          {record.mark}
+                                        </span>
+                                      </td>
+                                      <td>
+                                        {record.mark === 'start-else' ? (
+                                          <span className="badge bg-warning text-dark">
+                                            <i className="bi bi-cursor-fill me-1"></i>
+                                            Double Click
+                                          </span>
+                                        ) : (
+                                          <span className="text-muted">-</span>
+                                        )}
+                                      </td>
+                                      <td>
+                                        <code className="small">({record.x}, {record.y})</code>
+                                      </td>
+                                      <td>
+                                        <small className="font-monospace">
+                                          {formatTimestamp(record.timestamp)}
+                                        </small>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                );
               });
             })}
           </tbody>
@@ -162,15 +264,18 @@ const ErrorTrailTable = ({ errorTrails, selectedDevice, selectedDifficulty }) =>
         <div className="row">
           <div className="col-md-6">
             <h6 className="text-muted">Legend:</h6>
-            <div className="d-flex flex-wrap gap-2">
+            <div className="d-flex flex-wrap gap-2 mb-2">
               <span className="badge bg-primary">start</span>
               <span className="badge bg-success">target</span>
-              <span className="badge bg-warning text-dark">others (intermediate)</span>
+              <span className="badge bg-warning text-dark">others (extra clicks)</span>
+            </div>
+            <div className="small text-muted">
+              <strong>Usage:</strong> Click any trail row to expand/collapse detailed records
             </div>
           </div>
           <div className="col-md-6">
             <div className="small text-muted">
-              <strong>Error Definition:</strong> Trails with actions between start and target<br/>
+              <strong>Error Definition:</strong> Trails with extra clicks between start and target<br/>
               <strong>Difficulty (ID):</strong> Calculated using Fitts' Law: log₂(distance/width + 1)<br/>
               <strong>Timestamp Format:</strong> YYYY/MM/dd HH:mm:SS.SSS<br/>
               <strong>Timezone:</strong> {getCurrentTimezone()}<br/>

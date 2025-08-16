@@ -99,7 +99,7 @@ const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
             <i className="bi bi-exclamation-triangle me-2"></i>
             <strong>Note:</strong>
             <ul className="mb-0 mt-2">
-              <li>Only available and calculable trails are included</li>
+              <li>Only valid trails (available + calculable) are included</li>
               <li>Move time is calculated from start to target timestamp</li>
               <li>"-" indicates no data available for that difficulty level</li>
             </ul>

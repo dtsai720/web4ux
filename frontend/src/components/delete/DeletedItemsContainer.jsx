@@ -26,6 +26,10 @@ const DeletedItemsContainer = ({
         <h5 className="mb-0">
           <i className="bi bi-trash me-2"></i>
           Deleted Participants
+          <small className="float-end">
+            <i className="bi bi-info-circle me-1"></i>
+            Double click to return
+          </small>
         </h5>
       </div>
       <div className="card-body">

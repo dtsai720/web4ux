@@ -3,12 +3,12 @@ import OutlierTrailTable from './OutlierTrailTable';
 
 const OutlierParticipantTable = ({
   participants,
+  deviceStats,
   onSelectParticipant,
   onToggleParticipantDelete,
   deviceKey,
   data
 }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
   const [showOutliersOnly, setShowOutliersOnly] = useState(false);
   const [showDoubleClickOnly, setShowDoubleClickOnly] = useState(false);
   const [expandedParticipants, setExpandedParticipants] = useState(new Set());
@@ -41,21 +41,35 @@ const OutlierParticipantTable = ({
   return (
     <div className="card mb-4">
       <div className="card-header bg-light">
-        <div className="d-flex justify-content-between align-items-center">
+        <div className="d-flex justify-content-between align-items-start">
           <div>
             <h6 className="mb-0">Participants</h6>
             <small className="text-muted">Participant details and outlier status</small>
           </div>
-          <button
-            className="btn btn-sm btn-outline-secondary"
-            onClick={() => setIsExpanded(!isExpanded)}
-            title={isExpanded ? "Collapse participants" : "Expand participants"}
-          >
-            <i className={`bi ${isExpanded ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
-          </button>
+          <div className="text-end">
+            <div className="card border-info bg-light" style={{ minWidth: '200px' }}>
+              <div className="card-body py-2 px-3">
+                <h6 className="card-title text-info mb-2 text-center">
+                  <i className="bi bi-graph-up me-1"></i>
+                  Error Count Statistics
+                </h6>
+                <div className="row text-center">
+                  <div className="col-6">
+                    <div className="border-end">
+                      <small className="text-muted d-block mb-1">Average</small>
+                      <span className="badge bg-primary fs-6 px-2 py-1">{deviceStats?.avgErrorCount?.toFixed(2) || '0.00'}</span>
+                    </div>
+                  </div>
+                  <div className="col-6">
+                    <small className="text-muted d-block mb-1">Std Dev</small>
+                    <span className="badge bg-warning text-dark fs-6 px-2 py-1">{deviceStats?.stdDevErrorCount?.toFixed(2) || '0.00'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        {isExpanded && (
-          <div className="mt-2">
+        <div className="mt-2">
             <div className="d-flex gap-3">
               <div className="form-check">
                 <input
@@ -78,30 +92,53 @@ const OutlierParticipantTable = ({
                   onChange={(e) => setShowDoubleClickOnly(e.target.checked)}
                 />
                 <label className="form-check-label small" htmlFor="showDoubleClickOnly">
-                  Show double click only
+                  Show double clicks only
                 </label>
               </div>
             </div>
           </div>
-        )}
       </div>
-      {isExpanded && (
-        <div className="card-body">
-        <div className="table-responsive">
-          <table className="table table-bordered table-sm">
-            <thead>
-              <tr>
-                <th className="bg-light text-center" style={{ width: '40px' }}></th>
-                <th className="bg-light text-center">Participant</th>
-                <th className="bg-light text-center">Error Trail Count</th>
-                <th className="bg-light text-center">Error Time</th>
-                <th className="bg-light text-center">Trail Count</th>
-                <th className="bg-light text-center">Double Clicks</th>
-                <th className="bg-light text-center">Status</th>
-                <th className="bg-light text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+      <div className="card-body">
+        {filteredParticipants.length === 0 ? (
+          <div className="text-center text-muted py-4">
+            {showOutliersOnly && showDoubleClickOnly ? (
+              <div>
+                <i className="bi bi-info-circle me-2"></i>
+                No participants found with both outliers and double clicks
+              </div>
+            ) : showOutliersOnly ? (
+              <div>
+                <i className="bi bi-info-circle me-2"></i>
+                No outlier participants found for this device
+              </div>
+            ) : showDoubleClickOnly ? (
+              <div>
+                <i className="bi bi-info-circle me-2"></i>
+                No participants with double clicks found for this device
+              </div>
+            ) : (
+              <div>
+                <i className="bi bi-info-circle me-2"></i>
+                No participants found for this device
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="table-responsive">
+            <table className="table table-bordered table-sm">
+              <thead>
+                <tr>
+                  <th className="bg-light text-center" style={{ width: '40px' }}></th>
+                  <th className="bg-light text-center">Participant</th>
+                  <th className="bg-light text-center">Error Count</th>
+                  <th className="bg-light text-center">Extra Clicks</th>
+                  <th className="bg-light text-center">Valid Trails</th>
+                  <th className="bg-light text-center">Double Clicks</th>
+                  <th className="bg-light text-center">Category</th>
+                  <th className="bg-light text-center">Options</th>
+                </tr>
+              </thead>
+              <tbody>
               {filteredParticipants.sort((a, b) => {
                 // Sort participants numerically (same as Participant vs Difficulty Analysis)
                 const numA = parseInt(a.replace(/\D/g, '')) || 0;
@@ -156,12 +193,24 @@ const OutlierParticipantTable = ({
                       </td>
                       <td className="text-center align-middle">
                         <button
-                          className="btn btn-sm btn-outline-danger"
+                          className="btn btn-sm text-danger"
                           onClick={(e) => {
                             e.stopPropagation();
                             onToggleParticipantDelete(deviceKey, participantKey, true);
                           }}
                           title="Delete participant"
+                          style={{
+                            border: 'none',
+                            background: 'none',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = '#ffe6e6';
+                            e.target.style.borderRadius = '4px';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = 'transparent';
+                          }}
                         >
                           <i className="bi bi-trash"></i>
                         </button>
@@ -187,8 +236,8 @@ const OutlierParticipantTable = ({
             </tbody>
           </table>
         </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

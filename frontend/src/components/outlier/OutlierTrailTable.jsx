@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Fragment } from 'react';
 import { trailHasDoubleClick, detectDoubleClicks } from '../../utils/outlier/outlierUtils';
 import { calculateDifficulty } from '../../utils/detail/moveTimeUtils';
 
@@ -29,7 +29,7 @@ const OutlierTrailTable = ({
             <tr>
               <th style={{ width: '40px' }}></th>
               <th>Trail Number</th>
-              <th>Error Time</th>
+              <th>Extra Clicks</th>
               <th>Event Time</th>
               <th>Double Click</th>
             </tr>
@@ -81,20 +81,20 @@ const OutlierTrailTable = ({
                                   <th style={{ width: '120px' }}>
                                     <i className="bi bi-person me-1"></i>Participant
                                   </th>
-                                  <th style={{ width: '100px' }}>
-                                    <i className="bi bi-list-ol me-1"></i>Trail No
+                                  <th style={{ width: '80px' }}>
+                                    <i className="bi bi-list-ol me-1"></i>Trail
                                   </th>
-                                  <th style={{ width: '120px' }}>
+                                  <th style={{ width: '100px' }}>
                                     <i className="bi bi-calculator me-1"></i>ID (W/D)
                                   </th>
-                                  <th style={{ width: '100px' }}>
+                                  <th style={{ width: '80px' }}>
                                     <i className="bi bi-play-circle me-1"></i>Action
                                   </th>
-                                  <th style={{ width: '120px' }}>
-                                    <i className="bi bi-cursor-fill me-1"></i>Double Click
+                                  <th style={{ width: '70px' }}>
+                                    <i className="bi bi-cursor-fill me-1"></i>Dbl
                                   </th>
-                                  <th style={{ width: '120px' }}>
-                                    <i className="bi bi-geo me-1"></i>Coordinate
+                                  <th style={{ width: '100px' }}>
+                                    <i className="bi bi-geo me-1"></i>Coord
                                   </th>
                                   <th style={{ width: '140px' }}>
                                     <i className="bi bi-clock me-1"></i>Timestamp
@@ -108,17 +108,7 @@ const OutlierTrailTable = ({
                                   const difficulty = firstRecord?.width && firstRecord?.distance ?
                                     calculateDifficulty(firstRecord.distance, firstRecord.width) : '-';
 
-                                  // Detect double clicks in this trail
-                                  const doubleClicks = detectDoubleClicks(trailRecords);
-
-                                  // Create a map to identify which records are involved in double clicks
-                                  const doubleClickRecords = new Set();
-                                  doubleClicks.forEach(dc => {
-                                    const firstIndex = trailRecords.findIndex(r => r.timestamp === dc.firstClick.timestamp);
-                                    const secondIndex = trailRecords.findIndex(r => r.timestamp === dc.secondClick.timestamp);
-                                    if (firstIndex !== -1) doubleClickRecords.add(firstIndex);
-                                    if (secondIndex !== -1) doubleClickRecords.add(secondIndex);
-                                  });
+                                  // No need for complex double click detection - we check mark field directly
 
                                   return trailRecords.map((record, index) => (
                                     <tr key={index}>
@@ -134,14 +124,16 @@ const OutlierTrailTable = ({
                                           </span>
                                         </td>
                                       )}
-                                      <td>
-                                        <div className="small">
-                                          <strong>{difficulty}</strong>
-                                        </div>
-                                        <div className="text-muted" style={{ fontSize: '0.75rem' }}>
-                                          ({firstRecord?.width || '-'}/{firstRecord?.distance || '-'})
-                                        </div>
-                                      </td>
+                                      {index === 0 && (
+                                        <td rowSpan={trailRecords.length} className="align-middle">
+                                          <div className="small">
+                                            <strong>{difficulty}</strong>
+                                          </div>
+                                          <div className="text-muted" style={{ fontSize: '0.75rem' }}>
+                                            ({firstRecord?.width || '-'}/{firstRecord?.distance || '-'})
+                                          </div>
+                                        </td>
+                                      )}
                                       <td>
                                         <span className={`badge ${
                                           record.mark === 'start' ? 'bg-primary' :
@@ -152,10 +144,9 @@ const OutlierTrailTable = ({
                                         </span>
                                       </td>
                                       <td>
-                                        {doubleClickRecords.has(index) ? (
+                                        {record.mark === 'start-else' ? (
                                           <span className="badge bg-warning text-dark">
-                                            <i className="bi bi-cursor-fill me-1"></i>
-                                            Record #{index + 1}
+                                            <i className="bi bi-cursor-fill"></i>
                                           </span>
                                         ) : (
                                           <span className="text-muted">-</span>
@@ -182,11 +173,11 @@ const OutlierTrailTable = ({
                                 <div className="d-flex flex-wrap gap-2 mb-2">
                                   <span className="badge bg-primary">start</span>
                                   <span className="badge bg-success">target</span>
-                                  <span className="badge bg-warning text-dark">others (intermediate)</span>
+                                  <span className="badge bg-warning text-dark">others (extra clicks)</span>
                                 </div>
                                 <h6 className="text-muted">Double Click Legend:</h6>
                                 <div className="d-flex flex-wrap gap-2">
-                                  <span className="badge bg-warning text-dark"><i className="bi bi-cursor-fill me-1"></i>Double Click Record</span>
+                                  <span className="badge bg-warning text-dark"><i className="bi bi-cursor-fill me-1"></i>Dbl = Double Click</span>
                                 </div>
                               </div>
                               <div className="col-md-6">
@@ -194,7 +185,8 @@ const OutlierTrailTable = ({
                                   <strong>Difficulty (ID):</strong> Calculated using Fitts' Law: log₂(distance/width + 1)<br/>
                                   <strong>Coordinate Format:</strong> (x, y) pixels<br/>
                                   <strong>Timestamp Format:</strong> Raw timestamp (milliseconds)<br/>
-                                  <strong>Double Click Detection:</strong> Records within 500ms and 25px distance
+                                  <strong>Dbl Column:</strong> Shows double-click events ('start-else' markers)<br/>
+                                  <strong>Double Click Detection:</strong> Records marked as 'start-else' in trail data
                                 </div>
                               </div>
                             </div>

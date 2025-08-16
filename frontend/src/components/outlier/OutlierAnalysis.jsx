@@ -20,6 +20,7 @@ const OutlierAnalysis = ({
   toggleParticipantDelete
 }) => {
   const [viewMode, setViewMode] = useState('overview'); // 'overview' or 'device-analysis'
+  const [participantViewMode, setParticipantViewMode] = useState('participant-overview'); // 'participant-overview' or 'participant-analysis'
 
   // Get the first device as default if none selected
   const defaultDevice = selectedOutlierDevice || Object.keys(outlierData)[0];
@@ -35,7 +36,7 @@ const OutlierAnalysis = ({
             Outlier Analysis
           </h5>
           <small className="text-white">
-            Note: All calculations consider both available and calculable trails that are not deleted. Outlier detection is based on mean + 2 standard deviations.
+            Note: All calculations use valid trails (available + calculable) that are not deleted. Outliers are identified as participants exceeding mean + 2 standard deviations for error count or error time.
           </small>
         </div>
         <div className="card-body">
@@ -85,7 +86,7 @@ const OutlierAnalysis = ({
           Outlier Analysis
         </h5>
         <small className="text-white">
-          Note: All calculations consider both available and calculable trails that are not deleted. Outlier detection is based on mean + 2 standard deviations.
+          Note: All calculations use valid trails (available + calculable) that are not deleted. Outliers are identified as participants exceeding mean + 2 standard deviations for error count or error time.
         </small>
       </div>
       <div className="card-body">
@@ -105,7 +106,7 @@ const OutlierAnalysis = ({
               className={`btn ${viewMode === 'device-analysis' ? 'btn-primary' : 'btn-outline-primary'}`}
               onClick={() => setViewMode('device-analysis')}
             >
-              <i className="bi bi-person-lines-fill me-1"></i>
+              <i className="bi bi-tablet me-1"></i>
               Device Analysis
             </button>
           </div>
@@ -145,22 +146,49 @@ const OutlierAnalysis = ({
               </div>
             </div>
 
-            {/* Participant vs Difficulty Analysis for selected device */}
-            <OutlierDeviceDifficultyTable
-              outlierData={outlierData}
-              data={data}
-              selectedDevice={currentDevice}
-              showParticipantView={true}
-            />
+            {/* Participant Mode Selection Buttons */}
+            <div className="btn-toolbar mb-4" role="toolbar">
+              <div className="btn-group me-2 mb-2" role="group">
+                <button
+                  className={`btn ${participantViewMode === 'participant-overview' ? 'btn-success' : 'btn-outline-success'}`}
+                  onClick={() => setParticipantViewMode('participant-overview')}
+                >
+                  <i className="bi bi-grid-3x3 me-1"></i>
+                  Participant Overview
+                </button>
+              </div>
+              <div className="btn-group mb-2" role="group">
+                <button
+                  className={`btn ${participantViewMode === 'participant-analysis' ? 'btn-warning' : 'btn-outline-warning'}`}
+                  onClick={() => setParticipantViewMode('participant-analysis')}
+                >
+                  <i className="bi bi-people me-1"></i>
+                  Participant Analysis
+                </button>
+              </div>
+            </div>
 
-            {/* Participants table for selected device */}
-            <OutlierParticipantTable
-              participants={outlierData[currentDevice]?.participants}
-              onSelectParticipant={handleSelectOutlierParticipant}
-              onToggleParticipantDelete={toggleParticipantDelete}
-              deviceKey={currentDevice}
-              data={data}
-            />
+            {/* Content based on participant view mode */}
+            {participantViewMode === 'participant-overview' ? (
+              // Participant Overview: Participant vs Difficulty Matrix
+              <OutlierDeviceDifficultyTable
+                outlierData={outlierData}
+                data={data}
+                selectedDevice={currentDevice}
+                deviceStats={outlierData[currentDevice]?.stats}
+                showParticipantView={true}
+              />
+            ) : (
+              // Participant Analysis: Participants Table
+              <OutlierParticipantTable
+                participants={outlierData[currentDevice]?.participants}
+                deviceStats={outlierData[currentDevice]?.stats}
+                onSelectParticipant={handleSelectOutlierParticipant}
+                onToggleParticipantDelete={toggleParticipantDelete}
+                deviceKey={currentDevice}
+                data={data}
+              />
+            )}
           </div>
         )}
       </div>

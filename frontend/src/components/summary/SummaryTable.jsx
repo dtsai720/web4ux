@@ -94,8 +94,8 @@ const SummaryTable = ({
         ) : (
           <div className="text-center py-5">
             <div className="mb-3" style={{ fontSize: '3rem' }}>🔍</div>
-            <h5 className="text-muted">No Data Found</h5>
-            <p className="text-muted">Try adjusting your search criteria</p>
+            <h5 className="text-muted">No Projects Found</h5>
+            <p className="text-muted">Try adjusting your search criteria or check if projects have been synced</p>
           </div>
         )}
       </div>

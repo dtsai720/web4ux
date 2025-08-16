@@ -11,7 +11,7 @@ const LoadingIndicator = () => {
       <div className="spinner-border text-primary" role="status">
         <span className="visually-hidden">Loading...</span>
       </div>
-      <p className="mt-2 text-muted">Loading summaries...</p>
+      <p className="mt-2 text-muted">Loading projects...</p>
     </div>
   );
 };

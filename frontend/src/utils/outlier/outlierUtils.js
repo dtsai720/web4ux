@@ -34,54 +34,22 @@ export const isOutlier = (participantData, deviceStats) => {
 };
 
 /**
- * Detects double clicks in raw trail data based on coordinates and timestamps
- * @param {Array} trailRecords - Array of trail records with x, y, timestamp
- * @param {Object} options - Detection options
- * @returns {Array} - Array of detected double clicks
+ * Detects double clicks in raw trail data based on 'start-else' mark
+ * @param {Array} trailRecords - Array of trail records with mark field
+ * @returns {Array} - Array of detected double clicks (records with mark='start-else')
  */
-export const detectDoubleClicks = (trailRecords, options = {}) => {
-  const {
-    maxTimeDiff = 500,    // 最大時間間隔 (ms)
-    maxDistance = 25,     // 最大距離 (pixels)
-    minTimeDiff = 50      // 最小時間間隔，避免誤觸
-  } = options;
+export const detectDoubleClicks = (trailRecords) => {
+  if (!trailRecords || trailRecords.length === 0) return [];
 
-  if (!trailRecords || trailRecords.length < 2) return [];
-
-  const doubleClicks = [];
-
-  for (let i = 1; i < trailRecords.length; i++) {
-    const prev = trailRecords[i - 1];
-    const curr = trailRecords[i];
-
-    // 計算時間差
-    const timeDiff = curr.timestamp - prev.timestamp;
-
-    // 計算距離
-    const distance = Math.sqrt(
-      Math.pow(curr.x - prev.x, 2) +
-      Math.pow(curr.y - prev.y, 2)
-    );
-
-    // 檢查是否符合 double click 條件
-    if (timeDiff >= minTimeDiff &&
-        timeDiff <= maxTimeDiff &&
-        distance <= maxDistance) {
-      doubleClicks.push({
-        firstClick: prev,
-        secondClick: curr,
-        timeDiff,
-        distance
-      });
-    }
-  }
+  // Filter records with mark = 'start-else' to identify double clicks
+  const doubleClicks = trailRecords.filter(record => record.mark === 'start-else');
 
   return doubleClicks;
 };
 
 /**
  * Calculates double click statistics for a participant across all their trails
- * Each trail counts as maximum 1 if it contains any double clicks
+ * Each trail counts as maximum 1 if it contains any 'start-else' marks
  * @param {Object} participantData - Participant's trail data
  * @returns {Object} - Double click statistics
  */
@@ -105,22 +73,22 @@ export const calculateDoubleClickStats = (participantData) => {
       trailsWithDoubleClicks.push({
         trailKey,
         hasDoubleClick: true,
-        doubleClickCount: doubleClicks.length,
+        doubleClickCount: doubleClicks.length, // 'start-else' 記錄的數量
         doubleClicks
       });
     }
   });
 
   return {
-    count: trailsWithDoubleClicksCount, // 有 double click 的 trails 數量
+    count: trailsWithDoubleClicksCount, // 有 'start-else' 標記的 trails 數量
     trails: trailsWithDoubleClicks
   };
 };
 
 /**
- * Checks if a specific trail has double clicks
+ * Checks if a specific trail has double clicks (contains 'start-else' marks)
  * @param {Array} trailRecords - Array of trail records
- * @returns {boolean} - True if trail has double clicks
+ * @returns {boolean} - True if trail has 'start-else' marks
  */
 export const trailHasDoubleClick = (trailRecords) => {
   const doubleClicks = detectDoubleClicks(trailRecords);
