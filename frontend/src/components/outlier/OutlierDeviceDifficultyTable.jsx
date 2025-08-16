@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { calculateDifficulty } from '../../utils/detail/moveTimeUtils';
 
 const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, showParticipantView = false }) => {
+  const [isExpanded, setIsExpanded] = useState(true);
 
   // Extract devices or participants based on view mode
   const getRowKeys = () => {
@@ -12,7 +13,10 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, showP
       const deviceData = data[selectedDevice];
       if (deviceData && typeof deviceData === 'object') {
         Object.keys(deviceData).forEach(participantSerial => {
-          keys.add(participantSerial);
+          // Filter out 'stats' key as it's used for calculations, not a real participant
+          if (participantSerial !== 'stats') {
+            keys.add(participantSerial);
+          }
         });
       }
     } else {
@@ -24,7 +28,16 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, showP
       }
     }
 
-    return Array.from(keys).sort();
+    // Sort participants numerically (similar to dataUtils.js)
+    return Array.from(keys).sort((a, b) => {
+      if (showParticipantView) {
+        // For participants, try to extract number and sort numerically
+        const numA = parseInt(a.replace(/\D/g, '')) || 0;
+        const numB = parseInt(b.replace(/\D/g, '')) || 0;
+        return numA !== numB ? numA - numB : a.localeCompare(b);
+      }
+      return a.localeCompare(b);
+    });
   };
 
   const rowKeys = getRowKeys();
@@ -192,76 +205,91 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, showP
 
   return (
     <div className="card mb-4">
-      <div className="card-header bg-light">
-        <h6 className="mb-0">
-          {showParticipantView ? 'Participant vs Difficulty Analysis' : 'Device vs Difficulty Analysis'}
-        </h6>
-        <small className="text-muted">
-          {showParticipantView ? 'Error Count per Participant' : 'Error Count / Total Trails (Percentage)'}
-        </small>
-      </div>
-      <div className="card-body">
-        <div className="table-responsive">
-          <table className="table table-bordered table-sm">
-            <thead>
-              <tr>
-                <th className="bg-light text-center">
-                  {showParticipantView ? 'Participant / Difficulty' : 'Device / Difficulty'}
-                </th>
-                {difficulties.map(difficulty => (
-                  <th key={difficulty} className="bg-light text-center">
-                    ID {difficulty}
-                  </th>
-                ))}
-                {showParticipantView && (
-                  <th className="bg-light text-center">Total</th>
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {rowKeys.map(rowKey => (
-                <tr key={rowKey}>
-                  <td className="bg-light text-center align-middle">
-                    <strong>{rowKey}</strong>
-                  </td>
-                  {difficulties.map(difficulty => {
-                    const stats = getStatsForRowDifficulty(rowKey, difficulty);
-                    return (
-                      <td key={difficulty} className="text-center align-middle">
-                        {showParticipantView ? (
-                          // Participant view: show only error count
-                          <span className="fw-bold">
-                            {stats.errorCount}
-                          </span>
-                        ) : (
-                          // Device view: show error count / total trails (percentage)
-                          stats.totalTrails > 0 ? (
-                            <div>
-                              <div className="fw-bold">
-                                {stats.errorCount} / {stats.totalTrails}
-                              </div>
-                              <div className="text-muted small">
-                                {stats.percentage.toFixed(1)}%
-                              </div>
-                            </div>
-                          ) : (
-                            <span className="text-muted">-</span>
-                          )
-                        )}
-                      </td>
-                    );
-                  })}
-                  {showParticipantView && (
-                    <td className="text-center align-middle bg-light">
-                      <strong>{getTotalStatsForRow(rowKey)}</strong>
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <div
+        className={`card-header bg-light ${showParticipantView ? 'cursor-pointer' : ''}`}
+        onClick={showParticipantView ? () => setIsExpanded(!isExpanded) : undefined}
+        style={showParticipantView ? { cursor: 'pointer' } : {}}
+      >
+        <div className="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 className="mb-0">
+              {showParticipantView ? 'Participant vs Difficulty Analysis' : 'Device vs Difficulty Analysis'}
+            </h6>
+            <small className="text-muted">
+              {showParticipantView ? 'Error Count per Participant' : 'Error Count / Total Trails (Percentage)'}
+            </small>
+          </div>
+          {showParticipantView && (
+            <div className="text-muted">
+              <i className={`bi ${isExpanded ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
+            </div>
+          )}
         </div>
       </div>
+      {isExpanded && (
+        <div className="card-body">
+          <div className="table-responsive">
+            <table className="table table-bordered table-sm">
+              <thead>
+                <tr>
+                  <th className="bg-light text-center">
+                    {showParticipantView ? 'Participant / Difficulty' : 'Device / Difficulty'}
+                  </th>
+                  {difficulties.map(difficulty => (
+                    <th key={difficulty} className="bg-light text-center">
+                      ID {difficulty}
+                    </th>
+                  ))}
+                  {showParticipantView && (
+                    <th className="bg-light text-center">Total</th>
+                  )}
+                </tr>
+              </thead>
+              <tbody>
+                {rowKeys.map(rowKey => (
+                  <tr key={rowKey}>
+                    <td className="bg-light text-center align-middle">
+                      <strong>{rowKey}</strong>
+                    </td>
+                    {difficulties.map(difficulty => {
+                      const stats = getStatsForRowDifficulty(rowKey, difficulty);
+                      return (
+                        <td key={difficulty} className="text-center align-middle">
+                          {showParticipantView ? (
+                            // Participant view: show only error count
+                            <span>
+                              {stats.errorCount}
+                            </span>
+                          ) : (
+                            // Device view: show error count / total trails (percentage)
+                            stats.totalTrails > 0 ? (
+                              <div>
+                                <div className="fw-bold">
+                                  {stats.errorCount} / {stats.totalTrails}
+                                </div>
+                                <div className="text-muted small">
+                                  {stats.percentage.toFixed(1)}%
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="text-muted">-</span>
+                            )
+                          )}
+                        </td>
+                      );
+                    })}
+                    {showParticipantView && (
+                      <td className="text-center align-middle bg-light">
+                        {getTotalStatsForRow(rowKey)}
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

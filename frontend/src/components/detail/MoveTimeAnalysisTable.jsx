@@ -37,7 +37,7 @@ const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
                   </div>
                 </th>
               ))}
-              <th className="text-center bg-info text-white" style={{ minWidth: '120px' }}>
+              <th className="text-center" style={{ minWidth: '120px' }}>
                 <i className="bi bi-calculator me-1"></i>
                 Average
               </th>
@@ -66,7 +66,7 @@ const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
                       </td>
                     );
                   })}
-                  <td className="text-center bg-light">
+                  <td className="text-center">
                     {totalMoveTime !== null ? (
                       <span className="fw-normal" style={{ fontFamily: 'monospace' }}>
                         {formatMoveTime(totalMoveTime)}
