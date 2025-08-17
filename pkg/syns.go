@@ -49,7 +49,7 @@ func (a *App) StartSync() error {
 
 	a.isSyncing = true
 
-	// 創建一個可取消的 context
+	// Create a cancellable context
 	ctx, cancel := context.WithCancel(a.ctx)
 	a.cancelFunc = cancel
 	go a.performSync(ctx)
@@ -85,7 +85,7 @@ func (a *App) performSync(ctx context.Context) {
 		a.log.Infof("project: %+v", project)
 		select {
 		case <-ctx.Done():
-			// 發送取消事件
+			// Send cancellation event
 			a.emitSyncProgress(SyncProgress{
 				CurrentProject: project.Name,
 				CurrentIndex:   i,
@@ -124,7 +124,7 @@ func (a *App) performSync(ctx context.Context) {
 		}
 	}
 
-	// 同步完成
+	// Sync completed
 	a.emitSyncProgress(SyncProgress{
 		CurrentProject: "All projects completed",
 		Progress:       100,
@@ -136,7 +136,7 @@ func (a *App) performSync(ctx context.Context) {
 }
 
 func (a *App) emitSyncProgress(progress SyncProgress) {
-	// 使用 Wails 的事件系統發送進度更新
+	// Send progress updates using Wails event system
 	runtime.EventsEmit(a.ctx, "sync:progress", progress)
 	a.log.Infof("Sync Progress: %+v\n", progress)
 }

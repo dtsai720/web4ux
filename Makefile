@@ -15,3 +15,39 @@ build:
 	@echo "Building the project..."
 	@go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
 	@echo "Build completed successfully."
+
+.PHONY: test-frontend
+test-frontend:
+	@echo "Running frontend tests..."
+	@cd frontend && npm run test:run
+	@echo "Frontend tests completed successfully."
+
+.PHONY: test-all
+test-all: test test-frontend
+	@echo "All tests completed successfully."
+
+.PHONY: test-coverage
+test-coverage:
+	@echo "Running tests with coverage..."
+	@go test -race -coverprofile=coverage.out ./... -coverpkg=./... | grep -v "coverage: [statement blocks]"
+	@cat coverage.out | grep -v "/mocks/" > coverage_filtered.out
+	@go tool cover -html=coverage_filtered.out -o coverage.html
+	@echo "Coverage report generated: coverage.html (mocks excluded)"
+
+.PHONY: test-frontend-watch
+test-frontend-watch:
+	@echo "Running frontend tests in watch mode..."
+	@cd frontend && npm run test
+
+.PHONY: deps
+deps:
+	@echo "Installing dependencies..."
+	@go mod download
+	@cd frontend && npm install
+	@echo "Dependencies installed successfully."
+
+.PHONY: mockgen
+mockgen:
+	@echo "Generating mocks..."
+	@./scripts/genmock.sh
+	@echo "Mocks generated successfully."
