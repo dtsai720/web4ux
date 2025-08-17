@@ -10,6 +10,13 @@ import (
 	"github.com/web4ux/src/sliceutils"
 )
 
+var (
+	errSyncInProgress            = errors.New("sync in progress")
+	errFailedToLogin             = errors.New("failed to login")
+	errSyncAlreadyInProgress     = errors.New("sync already in progress")
+	errNoSyncOperationInProgress = errors.New("no sync operation in progress")
+)
+
 type SyncProgress struct {
 	CurrentProject string `json:"currentProject"`
 	CurrentIndex   int    `json:"currentIndex"`
@@ -29,14 +36,14 @@ func (a *App) LoginAndSync(email, password string) (*LoginResponse, error) {
 		return &LoginResponse{
 			Success: false,
 			Message: "Sync already in progress",
-		}, errors.New("sync in progress")
+		}, errSyncInProgress
 	}
 
 	if err := a.fetcher.Login(a.ctx, a.log, email, password); err != nil {
 		return &LoginResponse{
 			Success: false,
 			Message: "invalid email or password",
-		}, errors.New("failed to login")
+		}, errFailedToLogin
 	}
 
 	return &LoginResponse{Success: true, Message: "Login successful"}, nil
@@ -44,12 +51,12 @@ func (a *App) LoginAndSync(email, password string) (*LoginResponse, error) {
 
 func (a *App) StartSync() error {
 	if a.isSyncing {
-		return errors.New("sync already in progress")
+		return errSyncAlreadyInProgress
 	}
 
 	a.isSyncing = true
 
-	// 創建一個可取消的 context
+	// Create a cancellable context
 	ctx, cancel := context.WithCancel(a.ctx)
 	a.cancelFunc = cancel
 	go a.performSync(ctx)
@@ -85,7 +92,7 @@ func (a *App) performSync(ctx context.Context) {
 		a.log.Infof("project: %+v", project)
 		select {
 		case <-ctx.Done():
-			// 發送取消事件
+			// Send cancellation event
 			a.emitSyncProgress(SyncProgress{
 				CurrentProject: project.Name,
 				CurrentIndex:   i,
@@ -124,7 +131,7 @@ func (a *App) performSync(ctx context.Context) {
 		}
 	}
 
-	// 同步完成
+	// Sync completed
 	a.emitSyncProgress(SyncProgress{
 		CurrentProject: "All projects completed",
 		Progress:       100,
@@ -136,14 +143,14 @@ func (a *App) performSync(ctx context.Context) {
 }
 
 func (a *App) emitSyncProgress(progress SyncProgress) {
-	// 使用 Wails 的事件系統發送進度更新
+	// Send progress updates using Wails event system
 	runtime.EventsEmit(a.ctx, "sync:progress", progress)
 	a.log.Infof("Sync Progress: %+v\n", progress)
 }
 
 func (a *App) CancelSync() error {
 	if !a.isSyncing || a.cancelFunc == nil {
-		return errors.New("no sync operation in progress")
+		return errNoSyncOperationInProgress
 	}
 
 	a.cancelFunc()

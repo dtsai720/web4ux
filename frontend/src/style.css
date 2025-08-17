@@ -3,3 +3,42 @@ body {
     "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
 }
+
+/* Clickable table row styling */
+.table tbody tr.cursor-pointer:hover {
+    background-color: #f8f9fa !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+}
+
+.table tbody tr.cursor-pointer.table-danger:hover {
+    background-color: #f5c2c7 !important;
+}
+
+/* Additional hover effect for trail table rows */
+.table-hover tbody tr.cursor-pointer:hover {
+    background-color: #e9ecef !important;
+}
+
+/* Delete button styling */
+.delete-btn {
+    transition: all 0.2s ease;
+    opacity: 0.6;
+}
+
+.delete-btn:hover {
+    color: #dc3545 !important;
+    background-color: #f8d7da !important;
+    border-radius: 4px !important;
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.delete-btn:active {
+    transform: scale(0.95);
+}
+
+.delete-btn:focus {
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
+    outline: none;
+}

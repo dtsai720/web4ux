@@ -59,6 +59,11 @@ func (w *WinfittsDetail) Load(slice []string) error {
 
 		return num, true
 	})
+
+	if len(numbers) < 2 {
+		return errs.ErrInsufficientCoordinateNumbers
+	}
+
 	w.Position.X = numbers[0]
 	w.Position.Y = numbers[1]
 	timestamp, err := strconv.Atoi(slice[3])
@@ -90,7 +95,7 @@ func (w *WinfittsSummary) Load(slice []string) error {
 			continue
 		}
 
-		matches := spanRegex.FindAllStringSubmatch(builder.String(), -1)
+		matches := SpanRegex.FindAllStringSubmatch(builder.String(), -1)
 		w.TrailNumber, err = strconv.Atoi(matches[0][1])
 		if err != nil {
 			return err
@@ -117,7 +122,7 @@ func (w *WinfittsSummary) Load(slice []string) error {
 		builder.WriteString(context)
 	}
 
-	details := winfittsDetailRegex.FindAllStringSubmatch(builder.String(), -1)
+	details := WinfittsDetailRegex.FindAllStringSubmatch(builder.String(), -1)
 	for _, content := range details {
 		var detail WinfittsDetail
 		if err := detail.Load(content); err != nil {
@@ -137,20 +142,21 @@ type WinfittsRawData struct {
 	Items             []WinfittsSummary
 }
 
+//nolint:cyclop
 func (w *WinfittsRawData) Load(slice []string) error {
 	var builder strings.Builder
 	contexts := make([]string, 0, len(slice))
 	slice = append(slice, "<div class=\"data2-pack \">")
 	for _, line := range slice {
 		if strings.Contains(line, "<div class=\"data-pack\">") {
-			matches := spanRegex.FindAllStringSubmatch(builder.String(), -1)
+			matches := SpanRegex.FindAllStringSubmatch(builder.String(), -1)
 			if len(matches) != 2 || len(matches[0]) != 2 || len(matches[1]) != 2 {
 				return errs.ErrRegexMismatch
 			}
 			w.ParticipantSerial = matches[0][1]
 			w.Participant = matches[1][1]
 
-			matches = deviceRegex.FindAllStringSubmatch(builder.String(), -1)
+			matches = DeviceRegex.FindAllStringSubmatch(builder.String(), -1)
 			if len(matches) != 2 || len(matches[1]) != 2 {
 				return errs.ErrRegexMismatch
 			}

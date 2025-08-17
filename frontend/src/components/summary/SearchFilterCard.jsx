@@ -29,21 +29,21 @@ const SearchFilterCard = ({
       <div className="card-body">
         <div className="row g-3">
           <div className="col-md-4">
-            <label className="form-label fw-semibold">Search by Name</label>
+            <label className="form-label fw-semibold">Project Name</label>
             <input
               type="text"
               className="form-control"
-              placeholder="Enter name..."
+              placeholder="Enter project name..."
               value={searchName}
               onChange={(e) => setSearchName(e.target.value)}
             />
           </div>
           <div className="col-md-4">
-            <label className="form-label fw-semibold">Search by Creator</label>
+            <label className="form-label fw-semibold">Creator</label>
             <input
               type="text"
               className="form-control"
-              placeholder="Enter creator..."
+              placeholder="Enter creator name..."
               value={searchCreator}
               onChange={(e) => setSearchCreator(e.target.value)}
             />
@@ -54,7 +54,7 @@ const SearchFilterCard = ({
               onClick={handleReset}
             >
               <span className="me-1">🔄</span>
-              Reset
+              Clear Filters
             </button>
           </div>
         </div>

@@ -20,13 +20,12 @@ const GuideAccordion = () => {
         activeAccordion={activeAccordion}
         toggleAccordion={handleToggleAccordion}
       >
-        <p>Follow these steps to effectively use the application:</p>
+        <p>Follow these steps to effectively use UX Analytics Studio:</p>
         <ol>
-          <li><strong>Sync Data:</strong> First, synchronize your data from the server</li>
-          <li><strong>View Summary:</strong> Check the summary page for an overview of your data</li>
-          <li><strong>Detail Records:</strong> Explore detailed records for specific information</li>
-          <li><strong>Results Analysis:</strong> View analysis results of your data</li>
-          <li><strong>Outlier Management:</strong> Identify and manage outliers in your data</li>
+          <li><strong>Sync Data:</strong> First, synchronize your UX test data from the server</li>
+          <li><strong>Browse Projects:</strong> Use the Projects Dashboard to view and manage your test projects</li>
+          <li><strong>Analyze Data:</strong> Access Project Analysis with multiple analysis modes (color-coded for easy identification)</li>
+          <li><strong>Navigate Efficiently:</strong> Use double-click navigation and color-coded modes for seamless workflow</li>
         </ol>
         <div className="alert alert-primary">
           <strong>Important:</strong> Always start with the Sync process to ensure you have the latest data.
@@ -40,11 +39,11 @@ const GuideAccordion = () => {
         toggleAccordion={handleToggleAccordion}
       >
         <ol>
-          <li>Click the "Sync" button on the homepage</li>
+          <li>Click the "Sync" button from the UX Analytics Studio homepage</li>
           <li>Enter your Email and Password</li>
           <li>Click "Login & Sync" button</li>
           <li>Wait for sync progress to complete</li>
-          <li>Once sync is complete, you can view data in the Summary page</li>
+          <li>Once sync is complete, you can view projects in the Projects Dashboard</li>
         </ol>
         <div className="alert alert-info">
           <strong>Note:</strong> The sync process may take several minutes. Please maintain a stable internet connection.
@@ -53,96 +52,52 @@ const GuideAccordion = () => {
 
       <AccordionItem
         id="summary-guide"
-        title="How to View Data Summary"
+        title="How to Use Projects Dashboard"
         activeAccordion={activeAccordion}
         toggleAccordion={handleToggleAccordion}
       >
-        <p>After syncing, access the Summary page to view an overview of your data:</p>
+        <p>After syncing, access the Projects Dashboard to manage your UX test projects:</p>
         <ol>
-          <li>Click on "Summary" from the homepage or navigation menu</li>
+          <li>Click on "Projects" from the homepage</li>
           <li>Use the search and filter options to find specific projects</li>
-          <li>Click on any project to view its detailed information</li>
+          <li>Click on any project to enter Project Analysis mode</li>
         </ol>
-        <p>The Summary page displays the following information:</p>
+        <p>The Projects Dashboard displays:</p>
         <ul>
-          <li><strong>Total Items:</strong> Total number of synchronized records</li>
-          <li><strong>Category Statistics:</strong> Data distribution by categories</li>
-          <li><strong>Sync Status:</strong> Current synchronization status</li>
-          <li><strong>Last Updated:</strong> Time of last data synchronization</li>
+          <li><strong>Project List:</strong> All available UX test projects with metadata</li>
+          <li><strong>Search & Filter:</strong> Tools to quickly locate specific projects</li>
+          <li><strong>Project Details:</strong> Name, creator, and last updated information</li>
+          <li><strong>Quick Access:</strong> Direct navigation to project analysis</li>
         </ul>
         <div className="alert alert-warning">
-          <strong>Reminder:</strong> If no sync has been performed, the Summary page will prompt you to sync first.
+          <strong>Reminder:</strong> If no sync has been performed, the Projects Dashboard will prompt you to sync first.
         </div>
       </AccordionItem>
 
       <AccordionItem
-        id="detail-record-guide"
-        title="Using Detail Records"
+        id="analysis-tools-guide"
+        title="Using Analysis Tools"
         activeAccordion={activeAccordion}
         toggleAccordion={handleToggleAccordion}
       >
-        <p>Detail Records provide comprehensive information about specific data points:</p>
+        <p>Project Analysis provides comprehensive tools for analyzing UX/UI testing data with color-coded modes:</p>
         <ol>
-          <li>Access Detail Records from the Summary page by clicking on a specific project</li>
-          <li>Use the navigation buttons to move between different sections</li>
-          <li>Toggle between different view modes using the mode selection buttons</li>
-          <li>Use the Group By selector to organize data in different ways</li>
+          <li>Access analysis from the Projects Dashboard by clicking on a specific project</li>
+          <li>Use the color-coded mode selection buttons to switch between analysis types</li>
+          <li>Double-click headers to quickly return to previous views</li>
         </ol>
-        <p>The Detail Record view includes:</p>
+        <p>Available analysis modes (color-coded):</p>
         <ul>
-          <li><strong>Project Information:</strong> Overview of the selected project</li>
-          <li><strong>Participant Data:</strong> Information about participants in the project</li>
-          <li><strong>Trial Information:</strong> Detailed data about individual trials</li>
-          <li><strong>Statistical Metrics:</strong> Various statistical measurements of the data</li>
+          <li><strong>🔵 Outlier Analysis (Dark Blue):</strong> Identify statistical outliers in movement data (Default mode)</li>
+          <li><strong>🟢 Movement Time Matrix (Green):</strong> Analyze movement patterns and timing data</li>
+          <li><strong>🟠 Error Trail Analysis (Orange):</strong> Examine trails with errors or extra clicks</li>
+          <li><strong>🔴 Deleted Items (Red):</strong> Manage deleted participants and restore data</li>
         </ul>
-        <div className="alert alert-info">
-          <strong>Trail Availability Status:</strong>
-          <ul className="mb-0 mt-2">
-            <li><strong>Available (Green):</strong> Trail has both start and target marks, with start occurring before target.</li>
-            <li><strong>Calculable (Blue):</strong> Trail has target as the last timestamp and start occurs before target, but may have other format concerns. Despite these concerns, these trails are still calculable and included in calculations.</li>
-            <li><strong>Unavailable (Yellow):</strong> Trail is missing start or target marks, or has other critical issues that prevent calculation.</li>
-          </ul>
-        </div>
-        <div className="alert alert-info">
-          <strong>Tip:</strong> Use the accordion interface to expand and collapse sections for better readability.
-        </div>
-      </AccordionItem>
-
-      <AccordionItem
-        id="results-guide"
-        title="Viewing Results"
-        activeAccordion={activeAccordion}
-        toggleAccordion={handleToggleAccordion}
-      >
-        <p>The Results section provides analytical insights into your data:</p>
-        <ol>
-          <li>Navigate to the Results tab from the Detail page</li>
-          <li>Select the devices you want to include in the analysis using the Device Selection Table</li>
-          <li>View the Width/Distance Table for detailed measurements</li>
-          <li>Analyze the statistical data presented in various formats</li>
-        </ol>
-        <p>Key features of the Results view:</p>
-        <ul>
-          <li><strong>Device Comparison:</strong> Compare data across different devices</li>
-          <li><strong>Statistical Analysis:</strong> View statistical breakdowns of your data</li>
-          <li><strong>Data Visualization:</strong> Visual representations of key metrics</li>
-          <li><strong>Export Options:</strong> Export your results for external use</li>
-        </ul>
-        <div className="alert alert-info">
-          <strong>Important:</strong> Results calculations include data that is either fully available or calculable (but not fully available), and not deleted. This ensures that your analysis is based on valid, current data.
-        </div>
-        <div className="alert alert-info">
-          <strong>Trail Availability Status:</strong>
-          <ul className="mb-0 mt-2">
-            <li><strong>Available (Green):</strong> Trail has both start and target marks, with start occurring before target.</li>
-            <li><strong>Calculable (Blue):</strong> Trail has target as the last timestamp and start occurs before target, but may have other format concerns. Despite these concerns, these trails are still calculable and included in calculations.</li>
-            <li><strong>Unavailable (Yellow):</strong> Trail is missing start or target marks, or has other critical issues that prevent calculation.</li>
-          </ul>
-        </div>
         <div className="alert alert-success">
-          <strong>Pro Tip:</strong> Focus on the key metrics that are most relevant to your research or analysis goals.
+          <strong>Note:</strong> The application automatically opens in Outlier Analysis mode when entering a project for efficient data analysis.
         </div>
       </AccordionItem>
+
 
       <AccordionItem
         id="outlier-guide"
@@ -150,36 +105,36 @@ const GuideAccordion = () => {
         activeAccordion={activeAccordion}
         toggleAccordion={handleToggleAccordion}
       >
-        <p>The Outlier Analysis helps identify and manage data points that deviate significantly from the norm:</p>
+        <p>The 🔵 <strong>Outlier Analysis (Dark Blue Mode)</strong> helps identify participants whose performance deviates significantly from normal patterns:</p>
         <ol>
-          <li>Access the Outlier tab from the Detail page</li>
-          <li>Review the Outlier Device Cards showing statistical anomalies</li>
-          <li>Examine the Outlier Participant and Trail Tables for detailed information</li>
-          <li>Use the navigation options to explore different outlier categories</li>
+          <li>Access from Project Analysis - automatically opens in this mode</li>
+          <li>Choose between "Device Overview" and "Device Analysis" views</li>
+          <li>Review outlier statistics and participant data</li>
+          <li>Use double-click navigation to drill down into specific data</li>
+          <li>Manage outliers through delete/restore functions</li>
         </ol>
-        <p>Important outlier management features:</p>
+        <p><strong>Outlier Detection Algorithm:</strong></p>
         <ul>
-          <li><strong>Outlier Detection:</strong> Automatic identification of statistical outliers</li>
-          <li><strong>Detailed Analysis:</strong> In-depth information about each outlier</li>
-          <li><strong>Data Management:</strong> Options to handle outliers appropriately</li>
-          <li><strong>Delete Function:</strong> Remove outliers from your dataset (only available in the Outlier page)</li>
+          <li><strong>Statistical Threshold:</strong> Data points exceeding mean + 2 standard deviations</li>
+          <li><strong>Error Count Analysis:</strong> Participants with significantly more errors than average</li>
+          <li><strong>Extra Clicks Analysis:</strong> Participants with exceptionally high extra click counts</li>
+          <li><strong>Double-Click Detection:</strong> Automatic identification using 'start-else' markers in trail data</li>
         </ul>
-        <div className="alert alert-info">
-          <strong>Definition:</strong> In this application, outliers are defined as data points that are more than 2 standard deviations from the mean. This statistical threshold helps identify values that significantly deviate from normal patterns.
+        <p><strong>Analysis Features:</strong></p>
+        <ul>
+          <li><strong>Device vs Difficulty Matrix:</strong> Visual comparison across devices and difficulty levels</li>
+          <li><strong>Participant Ranking:</strong> Sorted lists showing outlier participants</li>
+          <li><strong>Trail-Level Details:</strong> Individual trail analysis with error patterns</li>
+          <li><strong>Delete Function:</strong> Remove outliers from dataset (only available in Outlier Analysis)</li>
+        </ul>
+        <div className="alert alert-primary">
+          <strong>Outlier Definition:</strong> Participants whose error count or error time exceeds mean + 2 standard deviations are automatically flagged as outliers.
         </div>
         <div className="alert alert-info">
-          <strong>Data Inclusion:</strong> Outlier calculations include data that is either fully available or calculable (but not fully available), and not deleted, ensuring accurate anomaly detection based on your current dataset.
+          <strong>Data Inclusion:</strong> Calculations include both available and calculable trails that are not deleted, ensuring comprehensive analysis.
         </div>
-        <div className="alert alert-info">
-          <strong>Trail Availability Status:</strong>
-          <ul className="mb-0 mt-2">
-            <li><strong>Available (Green):</strong> Trail has both start and target marks, with start occurring before target.</li>
-            <li><strong>Calculable (Blue):</strong> Trail has target as the last timestamp and start occurs before target, but may have other format concerns. Despite these concerns, these trails are still calculable and included in calculations.</li>
-            <li><strong>Unavailable (Yellow):</strong> Trail is missing start or target marks, or has other critical issues that prevent calculation.</li>
-          </ul>
-        </div>
-        <div className="alert alert-warning">
-          <strong>Important:</strong> Deletion of data is only available in the Outlier page to prevent accidental data loss.
+        <div className="alert alert-danger">
+          <strong>Data Safety:</strong> Deletion is only available in 🔵 Outlier Analysis mode to prevent accidental data loss.
         </div>
       </AccordionItem>
 
@@ -189,26 +144,76 @@ const GuideAccordion = () => {
         activeAccordion={activeAccordion}
         toggleAccordion={handleToggleAccordion}
       >
-        <p>Properly manage your data with delete and restore functions:</p>
-        <h6>Deleting Data:</h6>
+        <p>Efficiently manage your UX test data with comprehensive delete and restore functions:</p>
+        <h6>🔵 Deleting Data (Outlier Analysis):</h6>
         <ol>
-          <li>Navigate to the Outlier page where deletion is enabled</li>
-          <li>Select the outlier data points you wish to remove</li>
-          <li>Click the Delete button to remove the selected data</li>
-          <li>Confirm the deletion when prompted</li>
+          <li>Navigate to 🔵 Outlier Analysis mode (dark blue header)</li>
+          <li>Review outlier participants and trails identified by the system</li>
+          <li>Click delete buttons next to specific participants or trails</li>
+          <li>Confirm deletion when prompted - data is soft-deleted, not permanently removed</li>
         </ol>
-        <h6>Restoring Deleted Data:</h6>
+        <h6>🔴 Restoring Deleted Data:</h6>
         <ol>
-          <li>Access the Deleted Items section from the navigation menu</li>
-          <li>Browse through the list of deleted items</li>
-          <li>Select the items you wish to restore</li>
-          <li>Click the Restore button to recover the selected data</li>
+          <li>Click 🔴 "Deleted Items" button to access restoration interface</li>
+          <li>Browse deleted participants with trail counts and record details</li>
+          <li>Click "Restore" buttons to recover specific participants</li>
+          <li>Data immediately returns to active dataset for analysis</li>
         </ol>
-        <div className="alert alert-danger">
-          <strong>Caution:</strong> Deletion operations should be performed carefully as they affect your dataset integrity.
-        </div>
+        <h6>📝 Double-Click Navigation:</h6>
+        <ol>
+          <li>Double-click any analysis mode header to return to previous view</li>
+          <li>Double-click works in all color-coded modes for quick navigation</li>
+          <li>Provides fast workflow for exploring data at different levels</li>
+        </ol>
         <div className="alert alert-info">
-          <strong>Note:</strong> The restore function allows you to recover accidentally deleted data, providing a safety net for your operations.
+          <strong>Double-Click Detection:</strong> The system identifies double-clicks through 'start-else' markers in the raw trail data, which indicate unintended repeated user inputs during testing.
+        </div>
+        <div className="alert alert-warning">
+          <strong>Data Safety:</strong> All deletions are soft-deletes. Data remains in the system and can be restored at any time through the 🔴 Deleted Items interface.
+        </div>
+      </AccordionItem>
+
+      <AccordionItem
+        id="mode-instructions"
+        title="Complete Mode Usage Guide"
+        activeAccordion={activeAccordion}
+        toggleAccordion={handleToggleAccordion}
+      >
+        <h6>🔵 Outlier Analysis (Dark Blue Mode) - Default:</h6>
+        <ul>
+          <li><strong>Purpose:</strong> Identify participants with statistical anomalies in performance</li>
+          <li><strong>Views:</strong> Switch between "Device Overview" (all devices) and "Device Analysis" (single device)</li>
+          <li><strong>Navigation:</strong> Click participants to drill down to trail-level details</li>
+          <li><strong>Features:</strong> Delete outliers, view error patterns, double-click detection</li>
+        </ul>
+
+        <h6>🟢 Movement Time Matrix (Green Mode):</h6>
+        <ul>
+          <li><strong>Purpose:</strong> Analyze movement patterns and timing relationships based on Fitts's Law</li>
+          <li><strong>Views:</strong> Matrix visualization showing movement correlations across difficulty levels</li>
+          <li><strong>Device Selection:</strong> Choose specific devices for focused analysis</li>
+          <li><strong>Features:</strong> Time-based analysis, pattern recognition, difficulty comparison</li>
+          <li><strong>ID Values:</strong> "ID" refers to Index of Difficulty from Fitts's Law (calculated as log₂(distance/width + 1))</li>
+        </ul>
+
+        <h6>🟠 Error Trail Analysis (Orange Mode):</h6>
+        <ul>
+          <li><strong>Purpose:</strong> Examine trails containing errors or anomalous behaviors</li>
+          <li><strong>Focus:</strong> Detailed error pattern analysis and extra clicks</li>
+          <li><strong>Data:</strong> Shows error sequences, timing, and user behavior patterns</li>
+          <li><strong>Features:</strong> Error classification, behavior analysis</li>
+        </ul>
+
+        <h6>🔴 Deleted Items (Red Mode):</h6>
+        <ul>
+          <li><strong>Purpose:</strong> Manage and restore soft-deleted data</li>
+          <li><strong>Safety Net:</strong> View all deleted participants with restoration options</li>
+          <li><strong>Details:</strong> See deletion impact (trail counts, record counts)</li>
+          <li><strong>Features:</strong> One-click restoration, data integrity protection</li>
+        </ul>
+
+        <div className="alert alert-success">
+          <strong>Pro Tip:</strong> Use the color-coded system to quickly identify your current analysis mode. Each mode has distinct capabilities optimized for different aspects of UX analysis.
         </div>
       </AccordionItem>
 
@@ -227,11 +232,20 @@ const GuideAccordion = () => {
         <h6>Q: Can I use the app offline?</h6>
         <p>A: After syncing, data is stored locally and you can view summary data offline.</p>
 
-        <h6>Q: Why can I only delete data from the Outlier page?</h6>
-        <p>A: This is a safety feature to prevent accidental deletion of important data. Outliers are the most common data points that need removal.</p>
+        <h6>Q: Why can I only delete data from the 🔵 Outlier Analysis mode?</h6>
+        <p>A: This is a safety feature to prevent accidental deletion. Outlier Analysis identifies the most statistically relevant candidates for removal.</p>
 
-        <h6>Q: How do I know if my data has outliers?</h6>
-        <p>A: The Outlier Analysis automatically identifies statistical outliers in your dataset and highlights them for your review.</p>
+        <h6>Q: How does the system detect double-clicks?</h6>
+        <p>A: The system identifies double-clicks by detecting 'start-else' markers in the raw trail data, indicating unintended user input events.</p>
+
+        <h6>Q: What do the different colors mean?</h6>
+        <p>A: 🔵 Dark Blue = Outlier Analysis, 🟢 Green = Movement Time Matrix, 🟠 Orange = Error Trail Analysis, 🔴 Red = Deleted Items. Each color represents a different analysis mode.</p>
+
+        <h6>Q: What does "ID" mean in the difficulty analysis?</h6>
+        <p>A: "ID" stands for Index of Difficulty from Fitts's Law, calculated as log₂(distance/width + 1). It measures how difficult a target is to select based on its size and distance. Higher ID values indicate more difficult targets.</p>
+
+        <h6>Q: How do I quickly navigate between different data levels?</h6>
+        <p>A: Use double-click on any mode header to return to the previous view, or use the close buttons to exit analysis modes.</p>
       </AccordionItem>
     </div>
   );

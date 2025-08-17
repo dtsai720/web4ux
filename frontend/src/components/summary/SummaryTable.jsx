@@ -25,7 +25,7 @@ const SummaryTable = ({
     <div className="card shadow-sm">
       {/* 表格標題和計數 */}
       <div className="card-header bg-light d-flex justify-content-between align-items-center">
-        <h5 className="card-title mb-0">Results ({totalItems} items)</h5>
+        <h5 className="card-title mb-0">Projects ({totalItems} items)</h5>
       </div>
 
       <div className="card-body p-0">
@@ -94,8 +94,8 @@ const SummaryTable = ({
         ) : (
           <div className="text-center py-5">
             <div className="mb-3" style={{ fontSize: '3rem' }}>🔍</div>
-            <h5 className="text-muted">No Data Found</h5>
-            <p className="text-muted">Try adjusting your search criteria</p>
+            <h5 className="text-muted">No Projects Found</h5>
+            <p className="text-muted">Try adjusting your search criteria or check if projects have been synced</p>
           </div>
         )}
       </div>
