@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 
+	"github.com/web4ux/src/common"
 	"github.com/web4ux/src/logger"
 	"go.uber.org/zap"
 )
@@ -14,7 +15,11 @@ import (
 var _ IClient = (*Request)(nil)
 
 type Request struct {
-	client *http.Client
+	client common.Doer
+}
+
+func (r *Request) SetClient(client common.Doer) {
+	r.client = client
 }
 
 // Send implements IClient.

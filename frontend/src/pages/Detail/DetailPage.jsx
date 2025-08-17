@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import DetailRecordComponent from './DetailRecordComponent';
 import OutlierAnalysisComponent from './OutlierAnalysisComponent';
 import DeleteItemComponent from './DeleteItemComponent';
-import ResultAnalysisComponent from './ResultAnalysisComponent';
+import MovementTimeMatrixComponent from './MoveTimeAnalysisComponent';
+import ErrorTrailAnalysisComponent from './ErrorTrailAnalysisComponent';
 
 // Import utility functions
 import {
@@ -16,7 +16,7 @@ import {
   toggleParticipantDelete,
   toggleTrailDelete
 } from '../../utils/detail/apiUtils';
-import { GROUP_BY_OPTIONS, DEFAULT_STATE } from '../../utils/detail/constants';
+import { DEFAULT_STATE } from '../../utils/detail/constants';
 
 // Import UI components
 import SummaryInfoCard from '../../components/detail/SummaryInfoCard';
@@ -28,12 +28,6 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
   const [loading, setLoading] = useState(DEFAULT_STATE.loading);
   const [error, setError] = useState(DEFAULT_STATE.error);
   const [summaryInfo, setSummaryInfo] = useState(DEFAULT_STATE.summaryInfo);
-  const [groupBy, setGroupBy] = useState(DEFAULT_STATE.groupBy);
-  const [expandedLevel1, setExpandedLevel1] = useState(DEFAULT_STATE.expandedLevel1);
-  const [expandedLevel2, setExpandedLevel2] = useState(DEFAULT_STATE.expandedLevel2);
-  const [expandedTrails, setExpandedTrails] = useState(DEFAULT_STATE.expandedTrails);
-  const [detailedData, setDetailedData] = useState(DEFAULT_STATE.detailedData);
-  const [loadingDetailed, setLoadingDetailed] = useState(DEFAULT_STATE.loadingDetailed);
   const [outlierMode, setOutlierMode] = useState(DEFAULT_STATE.outlierMode);
   const [outlierData, setOutlierData] = useState(DEFAULT_STATE.outlierData);
   const [selectedOutlierDevice, setSelectedOutlierDevice] = useState(DEFAULT_STATE.selectedOutlierDevice);
@@ -43,7 +37,8 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
   const [deletedTrails, setDeletedTrails] = useState(DEFAULT_STATE.deletedTrails);
   const [deletedParticipants, setDeletedParticipants] = useState(DEFAULT_STATE.deletedParticipants);
   const [deleteMode, setDeleteMode] = useState(DEFAULT_STATE.deleteMode);
-  const [resultMode, setResultMode] = useState(DEFAULT_STATE.resultMode);
+  const [movementTimeMatrixMode, setMovementTimeMatrixMode] = useState(DEFAULT_STATE.movementTimeMatrixMode || false);
+  const [errorTrailMode, setErrorTrailMode] = useState(DEFAULT_STATE.errorTrailMode || false);
 
   // Load data from API
   const loadData = async () => {
@@ -60,8 +55,8 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
 
       setRawData(result.rawData);
 
-      // Process and organize data
-      const organizedData = organizeData(result.rawData, groupBy);
+      // Process and organize data for outlier analysis (always use by_device grouping)
+      const organizedData = organizeData(result.rawData, 'by_device');
       setData(organizedData.data);
 
       // Collect deleted items
@@ -71,34 +66,6 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
 
       // Set summary info
       setSummaryInfo(result.summaryInfo);
-
-      // Expand first level1 item as default display
-      if (Object.keys(organizedData.data).length > 0) {
-        const firstLevel1Key = Object.keys(organizedData.data)[0];
-        setExpandedLevel1({
-          [firstLevel1Key]: true
-        });
-
-        // If there are level2 items, also expand the first one
-        if (Object.keys(organizedData.data[firstLevel1Key]).length > 0) {
-          const firstLevel2Key = Object.keys(organizedData.data[firstLevel1Key]).filter(key => key !== 'stats')[0];
-          if (firstLevel2Key) {
-            setExpandedLevel2({
-              [`${firstLevel1Key}-${firstLevel2Key}`]: true
-            });
-
-            // If there are trail items, also expand the first one
-            if (Object.keys(organizedData.data[firstLevel1Key][firstLevel2Key]).length > 0) {
-              const firstTrailKey = Object.keys(organizedData.data[firstLevel1Key][firstLevel2Key]).filter(key => key !== 'stats')[0];
-              if (firstTrailKey) {
-                setExpandedTrails({
-                  [`${firstLevel1Key}-${firstLevel2Key}-${firstTrailKey}`]: true
-                });
-              }
-            }
-          }
-        }
-      }
     } catch (err) {
       console.error('Load data error:', err);
       setError(err.message || 'An error occurred while loading data');
@@ -135,21 +102,12 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
 
   // Calculate outliers
   const calculateOutliers = () => {
-    // Only calculate in by_device grouping mode
-    if (groupBy !== 'by_device') {
-      // If not in by_device mode, switch to by_device mode
-      // Actual calculation will be handled in useEffect when groupBy changes
-      setGroupBy('by_device');
-      // Delay setting outlierMode to ensure data has been reorganized
-      setTimeout(() => {
-        setOutlierMode(true);
-      }, 50);
-      return;
-    }
-
-    // If already in by_device mode, set outlierMode directly
-    // Actual calculation will be handled in useEffect
+    // Data is always organized by device, so we can directly enable outlier mode
+    // Also ensure other modes are disabled
     setOutlierMode(true);
+    setDeleteMode(false);
+    setMovementTimeMatrixMode(false);
+    setErrorTrailMode(false);
   };
 
   // Handle selecting outlier device
@@ -178,61 +136,45 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
     setSelectedOutlierTrail(null);
   };
 
-  // Close delete mode
+  // Close delete mode and return to outlier analysis
   const closeDeleteMode = () => {
     setDeleteMode(false);
+    setOutlierMode(true);
+    setMovementTimeMatrixMode(false);
+    setErrorTrailMode(false);
   };
 
-  // Close result mode
-  const closeResultMode = () => {
-    setResultMode(false);
+  // Close movement time matrix mode and return to outlier analysis
+  const closeMovementTimeMatrixMode = () => {
+    setMovementTimeMatrixMode(false);
+    setOutlierMode(true);
+    setDeleteMode(false);
+    setErrorTrailMode(false);
   };
 
-  // Toggle expand level1
-  const toggleExpandLevel1 = (key) => {
-    setExpandedLevel1(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
+  // Close error trail mode and return to outlier analysis
+  const closeErrorTrailMode = () => {
+    setErrorTrailMode(false);
+    setOutlierMode(true);
+    setDeleteMode(false);
+    setMovementTimeMatrixMode(false);
   };
 
-  // Toggle expand level2
-  const toggleExpandLevel2 = (level1Key, level2Key) => {
-    const combinedKey = `${level1Key}-${level2Key}`;
-    setExpandedLevel2(prev => ({
-      ...prev,
-      [combinedKey]: !prev[combinedKey]
-    }));
-  };
-
-  // Toggle expand trail
-  const toggleExpandTrail = (level1Key, level2Key, trailKey) => {
-    const combinedKey = `${level1Key}-${level2Key}-${trailKey}`;
-    setExpandedTrails(prev => ({
-      ...prev,
-      [combinedKey]: !prev[combinedKey]
-    }));
-  };
-
-  // Handle group by change
-  const handleGroupByChange = (newGroupBy) => {
-    setGroupBy(newGroupBy);
-  };
 
   // Load data when selectedSummaryId changes
   useEffect(() => {
     loadData();
-    // Ensure we're in detail record mode by default
+    // Set outlier analysis mode as default instead of detail record mode
     setDeleteMode(false);
-    setOutlierMode(false);
-    setResultMode(false);
+    setOutlierMode(true);
+    setMovementTimeMatrixMode(false);
+    setErrorTrailMode(false);
   }, [selectedSummaryId]);
 
   // Calculate outliers when outlierMode is activated
   useEffect(() => {
-    if (outlierMode && rawData.length > 0 && groupBy === 'by_device') {
-      // Only calculate outliers when in by_device mode and not during the initial switch
-      // Use a timeout to ensure data reorganization has completed
+    if (outlierMode && rawData.length > 0) {
+      // Calculate outliers for by_device grouped data
       const timer = setTimeout(() => {
         const outliers = calculateOutlierData(data, rawData);
         setOutlierData(outliers);
@@ -240,26 +182,7 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
 
       return () => clearTimeout(timer);
     }
-  }, [outlierMode, rawData, groupBy, data]);
-
-  // Reorganize data when groupBy changes
-  useEffect(() => {
-    if (rawData.length > 0) {
-      const organizedData = organizeData(rawData, groupBy);
-      setData(organizedData.data);
-
-      // Reset expanded states
-      setExpandedLevel1({});
-      setExpandedLevel2({});
-      setExpandedTrails({});
-      setDetailedData({});
-
-      // If in outlier mode and switched away from by_device, close outlier mode
-      if (outlierMode && groupBy !== 'by_device') {
-        closeOutlierMode();
-      }
-    }
-  }, [groupBy, rawData]);
+  }, [outlierMode, rawData, data]);
 
   return (
     <div className="container mt-5">
@@ -269,20 +192,40 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
             setCurrentPage={setCurrentPage}
             deleteMode={deleteMode}
             outlierMode={outlierMode}
-            resultMode={resultMode}
+            movementTimeMatrixMode={movementTimeMatrixMode}
+            errorTrailMode={errorTrailMode}
             setDeleteMode={setDeleteMode}
             setOutlierMode={setOutlierMode}
-            setResultMode={setResultMode}
+            setMovementTimeMatrixMode={setMovementTimeMatrixMode}
+            setErrorTrailMode={setErrorTrailMode}
             calculateOutliers={calculateOutliers}
             closeOutlierMode={closeOutlierMode}
-            closeResultMode={closeResultMode}
+            closeDeleteMode={closeDeleteMode}
+            closeMovementTimeMatrixMode={closeMovementTimeMatrixMode}
+            closeErrorTrailMode={closeErrorTrailMode}
           />
 
           {/* Summary Information */}
           {summaryInfo && <SummaryInfoCard summaryInfo={summaryInfo} />}
 
           {/* Render the appropriate component based on mode */}
-          {outlierMode ? (
+          {deleteMode ? (
+            <DeleteItemComponent
+              deletedParticipants={deletedParticipants}
+              toggleParticipantDelete={handleToggleParticipantDelete}
+              closeDeleteMode={closeDeleteMode}
+            />
+          ) : movementTimeMatrixMode ? (
+            <MovementTimeMatrixComponent
+              rawData={rawData}
+              closeMovementTimeMatrixMode={closeMovementTimeMatrixMode}
+            />
+          ) : errorTrailMode ? (
+            <ErrorTrailAnalysisComponent
+              rawData={rawData}
+              closeErrorTrailMode={closeErrorTrailMode}
+            />
+          ) : (
             <OutlierAnalysisComponent
               outlierData={outlierData}
               selectedOutlierDevice={selectedOutlierDevice}
@@ -296,39 +239,6 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
               formatDateTime={formatDateTime}
               toggleTrailDelete={handleToggleTrailDelete}
               toggleParticipantDelete={handleToggleParticipantDelete}
-            />
-          ) : deleteMode ? (
-            <DeleteItemComponent
-              deletedTrails={deletedTrails}
-              deletedParticipants={deletedParticipants}
-              toggleTrailDelete={handleToggleTrailDelete}
-              toggleParticipantDelete={handleToggleParticipantDelete}
-              closeDeleteMode={closeDeleteMode}
-            />
-          ) : resultMode ? (
-            <ResultAnalysisComponent
-              rawData={rawData}
-              closeResultMode={closeResultMode}
-            />
-          ) : (
-            <DetailRecordComponent
-              data={data}
-              loading={loading}
-              error={error}
-              summaryInfo={summaryInfo}
-              groupBy={groupBy}
-              groupByOptions={GROUP_BY_OPTIONS}
-              handleGroupByChange={handleGroupByChange}
-              expandedLevel1={expandedLevel1}
-              toggleExpandLevel1={toggleExpandLevel1}
-              expandedLevel2={expandedLevel2}
-              toggleExpandLevel2={toggleExpandLevel2}
-              expandedTrails={expandedTrails}
-              toggleExpandTrail={toggleExpandTrail}
-              formatDateTime={formatDateTime}
-              toggleTrailDelete={handleToggleTrailDelete}
-              toggleParticipantDelete={handleToggleParticipantDelete}
-              setCurrentPage={setCurrentPage}
             />
           )}
         </div>

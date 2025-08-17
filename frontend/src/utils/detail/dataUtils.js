@@ -1,6 +1,7 @@
 /**
  * Utility functions for handling detail page data
  */
+import { calculateDoubleClickStats } from '../outlier/outlierUtils';
 
 /**
  * Organizes raw data based on grouping type (by device or by participant)
@@ -342,6 +343,7 @@ export const calculateOutlierData = (data, rawData) => {
       let participantErrorTime = 0;
       let participantTrailCount = 0;
       const errorTrails = [];
+      const allAvailableTrails = [];
 
       trailKeys.forEach(trailKey => {
         const trail = participant[trailKey];
@@ -349,6 +351,7 @@ export const calculateOutlierData = (data, rawData) => {
 
         // Include both available and calculable trails in calculations
         if (trailStats.available || trailStats.availableStatus === 2) {
+          allAvailableTrails.push(trailKey);
           if (trailStats.has_error) {
             participantErrorCount++;
             participantErrorTime += trailStats.error_time;
@@ -358,12 +361,18 @@ export const calculateOutlierData = (data, rawData) => {
         }
       });
 
+      // 計算 double click 統計
+      const doubleClickStats = calculateDoubleClickStats(participant);
+
       // 存儲參與者的錯誤數據
       outliers[deviceKey].participants[participantKey] = {
         errorCount: participantErrorCount,
         errorTime: participantErrorTime,
         trailCount: participantTrailCount,
         errorTrails: errorTrails,
+        allAvailableTrails: allAvailableTrails,
+        doubleClickCount: doubleClickStats.count,
+        doubleClickTrails: doubleClickStats.trails,
         isOutlier: false
       };
 

@@ -19,6 +19,10 @@ type Repository struct {
 	queries IDatabase
 }
 
+func (r *Repository) SetQueries(queries IDatabase) {
+	r.queries = queries
+}
+
 // DeleteWinfittsInformation implements IRepository.
 func (r *Repository) DeleteOrRestoreWinfittsInformation(ctx context.Context, arg sqlc.DeleteWinfittsInformationParams) error {
 	return r.queries.DeleteWinfittsInformation(ctx, sqlc.DeleteWinfittsInformationParams{

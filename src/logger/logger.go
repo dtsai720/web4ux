@@ -1,9 +1,14 @@
 package logger
 
-import "go.uber.org/zap"
+import (
+	"github.com/web4ux/src/common"
+	"go.uber.org/zap"
+)
 
-func New(l *zap.Logger) ILogger {
-	return &logger{l}
+func New(l *zap.Logger) ILogger { return &logger{l} }
+
+func NewTestLogger() ILogger {
+	return New(common.Must(zap.NewDevelopment()))
 }
 
 var _ ILogger = (*logger)(nil)

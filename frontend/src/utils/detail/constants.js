@@ -3,31 +3,13 @@
  */
 
 /**
- * Group by options configuration
- */
-export const GROUP_BY_OPTIONS = {
-  by_device: {
-    label: 'Grouped by Device',
-    description: 'Organize data with devices as primary groups, participants as subgroups',
-    icon: '🖥️',
-    structure: 'Device ➜ Participant ➜ Trail'
-  },
-  by_participant: {
-    label: 'Grouped by Participant',
-    description: 'Organize data with participants as primary groups, devices as subgroups',
-    icon: '👤',
-    structure: 'Participant ➜ Device ➜ Trail'
-  }
-};
-
-/**
  * Mode types for the detail page
  */
 export const MODE_TYPES = {
-  DETAIL_RECORD: 'detail_record',
   DELETED_ITEMS: 'deleted_items',
   OUTLIER_ANALYSIS: 'outlier_analysis',
-  RESULT_ANALYSIS: 'result_analysis'
+  MOVEMENT_TIME_MATRIX: 'movement_time_matrix',
+  ERROR_TRAIL_ANALYSIS: 'error_trail_analysis'
 };
 
 /**
@@ -38,12 +20,6 @@ export const DEFAULT_STATE = {
   loading: false,
   error: '',
   summaryInfo: null,
-  groupBy: 'by_device',
-  expandedLevel1: {},
-  expandedLevel2: {},
-  expandedTrails: {},
-  detailedData: {},
-  loadingDetailed: {},
   outlierMode: false,
   outlierData: {},
   selectedOutlierDevice: null,
@@ -53,5 +29,6 @@ export const DEFAULT_STATE = {
   deletedTrails: {},
   deletedParticipants: {},
   deleteMode: false,
-  resultMode: false
+  movementTimeMatrixMode: false,
+  errorTrailMode: false
 };
