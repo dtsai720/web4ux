@@ -14,6 +14,28 @@ const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
     return participant.totalMoveTime / participant.totalTrails;
   };
 
+  // Calculate average move time for each difficulty across all participants
+  const calculateDifficultyAverage = (difficulty) => {
+    const validTimes = participants
+      .map(participant => getParticipantMoveTime(analysisData, participant, difficulty))
+      .filter(time => time !== null);
+
+    if (validTimes.length === 0) return null;
+    return validTimes.reduce((sum, time) => sum + time, 0) / validTimes.length;
+  };
+
+  // Calculate overall average across all participants and difficulties
+  const calculateOverallAverage = () => {
+    const allValidTimes = participants.flatMap(participant =>
+      difficulties
+        .map(difficulty => getParticipantMoveTime(analysisData, participant, difficulty))
+        .filter(time => time !== null)
+    );
+
+    if (allValidTimes.length === 0) return null;
+    return allValidTimes.reduce((sum, time) => sum + time, 0) / allValidTimes.length;
+  };
+
   return (
     <div>
       <h6 className="border-bottom pb-2 mb-3">
@@ -23,7 +45,7 @@ const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
 
       <div className="table-responsive">
         <table className="table table-hover table-bordered">
-          <thead className="table-light">
+          <thead className="table-secondary">
             <tr>
               <th className="text-center" style={{ verticalAlign: 'middle' }}>
                 <i className="bi bi-person me-1"></i>
@@ -48,7 +70,7 @@ const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
               const totalMoveTime = calculateParticipantTotal(participant);
               return (
                 <tr key={participant}>
-                  <td className="fw-bold text-primary">
+                  <td className="fw-bold text-primary text-center">
                     <i className="bi bi-person-fill me-1"></i>
                     {participant}
                   </td>
@@ -78,6 +100,39 @@ const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
                 </tr>
               );
             })}
+            {/* Average row */}
+            <tr className="table-warning">
+              <td className="fw-bold text-center">
+                <i className="bi bi-calculator me-1"></i>
+                Average
+              </td>
+              {difficulties.map(difficulty => {
+                const avgTime = calculateDifficultyAverage(difficulty);
+                return (
+                  <td key={`avg-${difficulty}`} className="text-center">
+                    {avgTime !== null ? (
+                      <span className="fw-bold" style={{ fontFamily: 'monospace' }}>
+                        {formatMoveTime(avgTime)}
+                      </span>
+                    ) : (
+                      <span className="text-muted">-</span>
+                    )}
+                  </td>
+                );
+              })}
+              <td className="text-center">
+                {(() => {
+                  const overallAvg = calculateOverallAverage();
+                  return overallAvg !== null ? (
+                    <span className="fw-bold" style={{ fontFamily: 'monospace' }}>
+                      {formatMoveTime(overallAvg)}
+                    </span>
+                  ) : (
+                    <span className="text-muted">-</span>
+                  );
+                })()}
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>

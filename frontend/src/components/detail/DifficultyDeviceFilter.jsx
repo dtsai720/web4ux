@@ -59,12 +59,6 @@ const DifficultyDeviceFilter = ({
         </select>
       </div>
 
-      {selectedDevice && selectedDifficulty && (
-        <div className="badge bg-info ms-2">
-          <i className="bi bi-funnel me-1"></i>
-          Filtered: {selectedDevice} - ID {selectedDifficulty}
-        </div>
-      )}
     </div>
   );
 };

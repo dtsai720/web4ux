@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import OutlierTrailTable from './OutlierTrailTable';
 
 const OutlierParticipantTable = ({
@@ -13,11 +13,14 @@ const OutlierParticipantTable = ({
   const [showDoubleClickOnly, setShowDoubleClickOnly] = useState(false);
   const [expandedParticipants, setExpandedParticipants] = useState(new Set());
 
+  // Auto-collapse expanded participants when filter changes
+  useEffect(() => {
+    setExpandedParticipants(new Set());
+  }, [showOutliersOnly, showDoubleClickOnly]);
+
   const toggleParticipantExpansion = (participantKey) => {
-    const newExpandedParticipants = new Set(expandedParticipants);
-    if (newExpandedParticipants.has(participantKey)) {
-      newExpandedParticipants.delete(participantKey);
-    } else {
+    const newExpandedParticipants = new Set();
+    if (!expandedParticipants.has(participantKey)) {
       newExpandedParticipants.add(participantKey);
     }
     setExpandedParticipants(newExpandedParticipants);
@@ -43,13 +46,54 @@ const OutlierParticipantTable = ({
       <div className="card-header bg-light">
         <div className="d-flex justify-content-between align-items-start">
           <div>
-            <h6 className="mb-0">Participants</h6>
-            <small className="text-muted">Participant details and outlier status</small>
+            <h6 className="mb-1">Participants</h6>
+            <small className="text-muted d-block mb-2">Participant details and outlier status - Click badges to filter</small>
+            <div className="d-flex flex-wrap gap-2">
+              <span
+                className={`badge ${!showOutliersOnly && !showDoubleClickOnly ? 'bg-primary text-white' : 'bg-light text-dark border'}`}
+                style={{ cursor: 'pointer' }}
+                onClick={() => {
+                  setShowOutliersOnly(false);
+                  setShowDoubleClickOnly(false);
+                }}
+                title="Show all participants"
+              >
+                <i className="bi bi-people me-1"></i>
+                {Object.keys(participants || {}).length} Total
+                {!showOutliersOnly && !showDoubleClickOnly && <i className="bi bi-check-circle ms-1"></i>}
+              </span>
+              <span
+                className={`badge ${showOutliersOnly ? 'bg-danger text-white' : 'bg-light text-danger border'}`}
+                style={{ cursor: 'pointer' }}
+                onClick={() => {
+                  setShowOutliersOnly(!showOutliersOnly);
+                  setShowDoubleClickOnly(false);
+                }}
+                title="Filter outlier participants only"
+              >
+                <i className="bi bi-exclamation-triangle me-1"></i>
+                {Object.values(participants || {}).filter(p => p.isOutlier).length} Outliers
+                {showOutliersOnly && <i className="bi bi-check-circle ms-1"></i>}
+              </span>
+              <span
+                className={`badge ${showDoubleClickOnly ? 'bg-warning text-dark' : 'bg-light text-dark border'}`}
+                style={{ cursor: 'pointer', color: showDoubleClickOnly ? '' : '#b8860b' }}
+                onClick={() => {
+                  setShowDoubleClickOnly(!showDoubleClickOnly);
+                  setShowOutliersOnly(false);
+                }}
+                title="Filter participants with double clicks only"
+              >
+                <i className="bi bi-cursor-fill me-1"></i>
+                {Object.values(participants || {}).filter(p => p.doubleClickCount > 0).length} With Double Clicks
+                {showDoubleClickOnly && <i className="bi bi-check-circle ms-1"></i>}
+              </span>
+            </div>
           </div>
           <div className="text-end">
-            <div className="card border-info bg-light" style={{ minWidth: '200px' }}>
+            <div className="card border-primary bg-light" style={{ minWidth: '200px' }}>
               <div className="card-body py-2 px-3">
-                <h6 className="card-title text-info mb-2 text-center">
+                <h6 className="card-title text-primary mb-2 text-center">
                   <i className="bi bi-graph-up me-1"></i>
                   Error Count Statistics
                 </h6>
@@ -69,34 +113,6 @@ const OutlierParticipantTable = ({
             </div>
           </div>
         </div>
-        <div className="mt-2">
-            <div className="d-flex gap-3">
-              <div className="form-check">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="showOutliersOnly"
-                  checked={showOutliersOnly}
-                  onChange={(e) => setShowOutliersOnly(e.target.checked)}
-                />
-                <label className="form-check-label small" htmlFor="showOutliersOnly">
-                  Show outliers only
-                </label>
-              </div>
-              <div className="form-check">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="showDoubleClickOnly"
-                  checked={showDoubleClickOnly}
-                  onChange={(e) => setShowDoubleClickOnly(e.target.checked)}
-                />
-                <label className="form-check-label small" htmlFor="showDoubleClickOnly">
-                  Show double clicks only
-                </label>
-              </div>
-            </div>
-          </div>
       </div>
       <div className="card-body">
         {filteredParticipants.length === 0 ? (
@@ -126,16 +142,16 @@ const OutlierParticipantTable = ({
         ) : (
           <div className="table-responsive">
             <table className="table table-bordered table-sm">
-              <thead>
+              <thead className="table-secondary">
                 <tr>
-                  <th className="bg-light text-center" style={{ width: '40px' }}></th>
-                  <th className="bg-light text-center">Participant</th>
-                  <th className="bg-light text-center">Error Count</th>
-                  <th className="bg-light text-center">Extra Clicks</th>
-                  <th className="bg-light text-center">Valid Trails</th>
-                  <th className="bg-light text-center">Double Clicks</th>
-                  <th className="bg-light text-center">Category</th>
-                  <th className="bg-light text-center">Options</th>
+                  <th className="text-center" style={{ width: '40px' }}></th>
+                  <th className="text-center">Participant</th>
+                  <th className="text-center">Error Count</th>
+                  <th className="text-center">Extra Clicks</th>
+                  <th className="text-center">Valid Trails</th>
+                  <th className="text-center">Double Clicks</th>
+                  <th className="text-center">Category</th>
+                  <th className="text-center">Options</th>
                 </tr>
               </thead>
               <tbody>

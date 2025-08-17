@@ -216,9 +216,9 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, devic
           </div>
           {showParticipantView && deviceStats && (
             <div className="text-end">
-              <div className="card border-info bg-light" style={{ minWidth: '200px' }}>
+              <div className="card border-primary bg-light" style={{ minWidth: '200px' }}>
                 <div className="card-body py-2 px-3">
-                  <h6 className="card-title text-info mb-2 text-center">
+                  <h6 className="card-title text-primary mb-2 text-center">
                     <i className="bi bi-graph-up me-1"></i>
                     Error Count Statistics
                   </h6>
@@ -242,26 +242,26 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, devic
       </div>
       <div className="card-body">
           <div className="table-responsive">
-            <table className="table table-bordered table-sm">
-              <thead>
+            <table className="table table-hover table-bordered">
+              <thead className="table-dark">
                 <tr>
-                  <th className="bg-light text-center">
+                  <th className="text-center">
                     {showParticipantView ? 'Participant / Difficulty' : 'Device / Difficulty'}
                   </th>
                   {difficulties.map(difficulty => (
-                    <th key={difficulty} className="bg-light text-center">
+                    <th key={difficulty} className="text-center">
                       ID {difficulty}
                     </th>
                   ))}
                   {showParticipantView && (
-                    <th className="bg-light text-center">Total</th>
+                    <th className="text-center">Total</th>
                   )}
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="table-dark">
                 {rowKeys.map(rowKey => (
                   <tr key={rowKey}>
-                    <td className="bg-light text-center align-middle">
+                    <td className="table-dark text-center align-middle">
                       <strong>{rowKey}</strong>
                     </td>
                     {difficulties.map(difficulty => {
@@ -280,19 +280,19 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, devic
                                 <div className="fw-bold">
                                   {stats.errorCount} / {stats.totalTrails}
                                 </div>
-                                <div className="text-muted small">
+                                <div className="text-light small">
                                   {stats.percentage.toFixed(1)}%
                                 </div>
                               </div>
                             ) : (
-                              <span className="text-muted">-</span>
+                              <span className="text-light">-</span>
                             )
                           )}
                         </td>
                       );
                     })}
                     {showParticipantView && (
-                      <td className="text-center align-middle bg-light">
+                      <td className="text-center align-middle table-dark">
                         {getTotalStatsForRow(rowKey)}
                       </td>
                     )}

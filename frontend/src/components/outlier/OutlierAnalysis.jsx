@@ -29,8 +29,8 @@ const OutlierAnalysis = ({
   // If we're in deep navigation (participant or trail selected), show navigation
   if (selectedOutlierParticipant) {
     return (
-      <div className="card mb-4 border-info">
-        <div className="card-header bg-info text-white">
+      <div className="card mb-4 border-primary">
+        <div className="card-header bg-primary text-white">
           <h5 className="mb-0">
             <i className="bi bi-graph-up me-2"></i>
             Outlier Analysis
@@ -79,8 +79,8 @@ const OutlierAnalysis = ({
 
   // Main view: show components based on mode
   return (
-    <div className="card mb-4 border-info">
-      <div className="card-header bg-info text-white">
+    <div className="card mb-4 border-primary">
+      <div className="card-header bg-primary text-white">
         <h5 className="mb-0">
           <i className="bi bi-graph-up me-2"></i>
           Outlier Analysis
@@ -94,7 +94,7 @@ const OutlierAnalysis = ({
         <div className="btn-toolbar mb-4" role="toolbar">
           <div className="btn-group me-2 mb-2" role="group">
             <button
-              className={`btn ${viewMode === 'overview' ? 'btn-info' : 'btn-outline-info'}`}
+              className={`btn ${viewMode === 'overview' ? 'btn-primary' : 'btn-outline-primary'}`}
               onClick={() => setViewMode('overview')}
             >
               <i className="bi bi-grid-3x3 me-1"></i>
@@ -159,8 +159,27 @@ const OutlierAnalysis = ({
               </div>
               <div className="btn-group mb-2" role="group">
                 <button
-                  className={`btn ${participantViewMode === 'participant-analysis' ? 'btn-warning' : 'btn-outline-warning'}`}
+                  className={`btn ${participantViewMode === 'participant-analysis' ? 'btn-warning text-dark' : 'btn-outline-warning text-dark'}`}
                   onClick={() => setParticipantViewMode('participant-analysis')}
+                  style={{
+                    color: participantViewMode === 'participant-analysis' ? '' : '#b8860b',
+                    borderColor: participantViewMode === 'participant-analysis' ? '' : '#b8860b',
+                    transition: 'all 0.15s ease-in-out'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (participantViewMode !== 'participant-analysis') {
+                      e.target.style.backgroundColor = '#ffc107';
+                      e.target.style.borderColor = '#ffc107';
+                      e.target.style.color = 'white';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (participantViewMode !== 'participant-analysis') {
+                      e.target.style.backgroundColor = 'transparent';
+                      e.target.style.borderColor = '#b8860b';
+                      e.target.style.color = '#b8860b';
+                    }
+                  }}
                 >
                   <i className="bi bi-people me-1"></i>
                   Participant Analysis

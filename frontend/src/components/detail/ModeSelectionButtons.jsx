@@ -61,7 +61,7 @@ const ModeSelectionButtons = ({
     <div className="btn-toolbar" role="toolbar">
       <div className="btn-group me-2 mb-2" role="group">
         <button
-          className={`btn ${!deleteMode && !movementTimeMatrixMode && !errorTrailMode ? 'btn-info' : 'btn-outline-info'}`}
+          className={`btn ${!deleteMode && !movementTimeMatrixMode && !errorTrailMode ? 'btn-primary' : 'btn-outline-primary'}`}
           onClick={calculateOutliers}
         >
           <i className="bi bi-graph-up"></i> Outlier Analysis
@@ -89,15 +89,35 @@ const ModeSelectionButtons = ({
       <div className="btn-group me-2 mb-2" role="group">
         {!errorTrailMode ? (
           <button
-            className="btn btn-outline-warning"
+            className="btn btn-outline-warning text-dark"
             onClick={handleErrorTrailMode}
+            style={{
+              color: '#b8860b',
+              borderColor: '#b8860b',
+              transition: 'all 0.15s ease-in-out'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#ffc107';
+              e.target.style.borderColor = '#ffc107';
+              e.target.style.color = 'white';
+              const icon = e.target.querySelector('i');
+              if (icon) icon.style.color = 'white';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.borderColor = '#b8860b';
+              e.target.style.color = '#b8860b';
+              const icon = e.target.querySelector('i');
+              if (icon) icon.style.color = '#b8860b';
+            }}
           >
-            <i className="bi bi-exclamation-triangle"></i> Error Trail Analysis
+            <i className="bi bi-exclamation-triangle" style={{ color: '#b8860b' }}></i> Error Trail Analysis
           </button>
         ) : (
           <button
-            className="btn btn-warning"
+            className="btn btn-warning text-dark"
             onClick={closeErrorTrailMode}
+            style={{ color: '#212529' }}
           >
             <i className="bi bi-x-circle"></i> Close Error Trail Analysis
           </button>

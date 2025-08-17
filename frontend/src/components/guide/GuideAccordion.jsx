@@ -88,7 +88,7 @@ const GuideAccordion = () => {
         </ol>
         <p>Available analysis modes (color-coded):</p>
         <ul>
-          <li><strong>🔵 Outlier Analysis (Blue):</strong> Identify statistical outliers in movement data (Default mode)</li>
+          <li><strong>🔵 Outlier Analysis (Dark Blue):</strong> Identify statistical outliers in movement data (Default mode)</li>
           <li><strong>🟢 Movement Time Matrix (Green):</strong> Analyze movement patterns and timing data</li>
           <li><strong>🟠 Error Trail Analysis (Orange):</strong> Examine trails with errors or extra clicks</li>
           <li><strong>🔴 Deleted Items (Red):</strong> Manage deleted participants and restore data</li>
@@ -105,7 +105,7 @@ const GuideAccordion = () => {
         activeAccordion={activeAccordion}
         toggleAccordion={handleToggleAccordion}
       >
-        <p>The 🔵 <strong>Outlier Analysis (Blue Mode)</strong> helps identify participants whose performance deviates significantly from normal patterns:</p>
+        <p>The 🔵 <strong>Outlier Analysis (Dark Blue Mode)</strong> helps identify participants whose performance deviates significantly from normal patterns:</p>
         <ol>
           <li>Access from Project Analysis - automatically opens in this mode</li>
           <li>Choose between "Device Overview" and "Device Analysis" views</li>
@@ -147,7 +147,7 @@ const GuideAccordion = () => {
         <p>Efficiently manage your UX test data with comprehensive delete and restore functions:</p>
         <h6>🔵 Deleting Data (Outlier Analysis):</h6>
         <ol>
-          <li>Navigate to 🔵 Outlier Analysis mode (blue header)</li>
+          <li>Navigate to 🔵 Outlier Analysis mode (dark blue header)</li>
           <li>Review outlier participants and trails identified by the system</li>
           <li>Click delete buttons next to specific participants or trails</li>
           <li>Confirm deletion when prompted - data is soft-deleted, not permanently removed</li>
@@ -179,7 +179,7 @@ const GuideAccordion = () => {
         activeAccordion={activeAccordion}
         toggleAccordion={handleToggleAccordion}
       >
-        <h6>🔵 Outlier Analysis (Blue Mode) - Default:</h6>
+        <h6>🔵 Outlier Analysis (Dark Blue Mode) - Default:</h6>
         <ul>
           <li><strong>Purpose:</strong> Identify participants with statistical anomalies in performance</li>
           <li><strong>Views:</strong> Switch between "Device Overview" (all devices) and "Device Analysis" (single device)</li>
@@ -239,7 +239,7 @@ const GuideAccordion = () => {
         <p>A: The system identifies double-clicks by detecting 'start-else' markers in the raw trail data, indicating unintended user input events.</p>
 
         <h6>Q: What do the different colors mean?</h6>
-        <p>A: 🔵 Blue = Outlier Analysis, 🟢 Green = Movement Time Matrix, 🟠 Orange = Error Trail Analysis, 🔴 Red = Deleted Items. Each color represents a different analysis mode.</p>
+        <p>A: 🔵 Dark Blue = Outlier Analysis, 🟢 Green = Movement Time Matrix, 🟠 Orange = Error Trail Analysis, 🔴 Red = Deleted Items. Each color represents a different analysis mode.</p>
 
         <h6>Q: What does "ID" mean in the difficulty analysis?</h6>
         <p>A: "ID" stands for Index of Difficulty from Fitts's Law, calculated as log₂(distance/width + 1). It measures how difficult a target is to select based on its size and distance. Higher ID values indicate more difficult targets.</p>

@@ -11,10 +11,8 @@ const OutlierTrailTable = ({
   const [expandedRows, setExpandedRows] = useState(new Set());
 
   const toggleRowExpansion = (trailKey) => {
-    const newExpandedRows = new Set(expandedRows);
-    if (newExpandedRows.has(trailKey)) {
-      newExpandedRows.delete(trailKey);
-    } else {
+    const newExpandedRows = new Set();
+    if (!expandedRows.has(trailKey)) {
       newExpandedRows.add(trailKey);
     }
     setExpandedRows(newExpandedRows);
@@ -22,13 +20,19 @@ const OutlierTrailTable = ({
 
   return (
     <div>
-      <h6 className="border-bottom pb-2 mb-3">Error Trails</h6>
+      <h6 className="border-bottom pb-2 mb-3">
+        <i className="bi bi-person-fill text-primary me-2"></i>
+        <span className="badge bg-primary me-2">Participant {participantKey}</span>
+        <i className="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+        Error Trails Analysis
+      </h6>
       <div className="table-responsive">
         <table className="table table-hover">
-          <thead className="table-light">
+          <thead className="table-secondary">
             <tr>
               <th style={{ width: '40px' }}></th>
               <th>Trail Number</th>
+              <th>ID (W/D)</th>
               <th>Extra Clicks</th>
               <th>Event Time</th>
               <th>Double Click</th>
@@ -54,6 +58,21 @@ const OutlierTrailTable = ({
                       <i className={`bi ${isExpanded ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
                     </td>
                     <td>{trailKey}</td>
+                    <td>
+                      {(() => {
+                        const firstRecord = Array.isArray(trailRecords) ? trailRecords[0] : null;
+                        const difficulty = firstRecord?.width && firstRecord?.distance ?
+                          calculateDifficulty(firstRecord.distance, firstRecord.width) : '-';
+                        return (
+                          <div className="small">
+                            <strong>{difficulty}</strong>
+                            <div className="text-muted" style={{ fontSize: '0.75rem' }}>
+                              ({firstRecord?.width || '-'}/{firstRecord?.distance || '-'})
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </td>
                     <td>{trailStats?.error_time || 0}</td>
                     <td>{trailStats?.event_time || 0}ms</td>
                     <td>
@@ -68,33 +87,26 @@ const OutlierTrailTable = ({
                   </tr>
                   {isExpanded && (
                     <tr>
-                      <td colSpan="5" className="p-0">
+                      <td colSpan="6" className="p-0">
                         <div className="bg-light p-3 border-top">
                           <h6 className="mb-3">
                             <i className="bi bi-list-ul text-primary me-2"></i>
-                            Trail {trailKey} Details
+                            <span className="badge bg-primary me-2">Participant {participantKey}</span>
+                            <span className="badge bg-secondary me-2">Trail {trailKey}</span>
+                            Event Log
                           </h6>
                           <div className="table-responsive">
                             <table className="table table-sm table-striped table-hover">
                               <thead className="table-dark">
                                 <tr>
-                                  <th style={{ width: '120px' }}>
-                                    <i className="bi bi-person me-1"></i>Participant
-                                  </th>
-                                  <th style={{ width: '80px' }}>
-                                    <i className="bi bi-list-ol me-1"></i>Trail
-                                  </th>
-                                  <th style={{ width: '100px' }}>
-                                    <i className="bi bi-calculator me-1"></i>ID (W/D)
-                                  </th>
                                   <th style={{ width: '80px' }}>
                                     <i className="bi bi-play-circle me-1"></i>Action
                                   </th>
-                                  <th style={{ width: '70px' }}>
-                                    <i className="bi bi-cursor-fill me-1"></i>Dbl
+                                  <th style={{ width: '120px' }}>
+                                    <i className="bi bi-cursor-fill me-1"></i>Double Click
                                   </th>
-                                  <th style={{ width: '100px' }}>
-                                    <i className="bi bi-geo me-1"></i>Coord
+                                  <th style={{ width: '120px' }}>
+                                    <i className="bi bi-geo me-1"></i>Position
                                   </th>
                                   <th style={{ width: '140px' }}>
                                     <i className="bi bi-clock me-1"></i>Timestamp
@@ -112,28 +124,6 @@ const OutlierTrailTable = ({
 
                                   return trailRecords.map((record, index) => (
                                     <tr key={index}>
-                                      {index === 0 && (
-                                        <td rowSpan={trailRecords.length} className="table-info fw-bold align-middle">
-                                          {participantKey}
-                                        </td>
-                                      )}
-                                      {index === 0 && (
-                                        <td rowSpan={trailRecords.length} className="align-middle">
-                                          <span className="badge bg-secondary">
-                                            {trailKey}
-                                          </span>
-                                        </td>
-                                      )}
-                                      {index === 0 && (
-                                        <td rowSpan={trailRecords.length} className="align-middle">
-                                          <div className="small">
-                                            <strong>{difficulty}</strong>
-                                          </div>
-                                          <div className="text-muted" style={{ fontSize: '0.75rem' }}>
-                                            ({firstRecord?.width || '-'}/{firstRecord?.distance || '-'})
-                                          </div>
-                                        </td>
-                                      )}
                                       <td>
                                         <span className={`badge ${
                                           record.mark === 'start' ? 'bg-primary' :
@@ -146,7 +136,7 @@ const OutlierTrailTable = ({
                                       <td>
                                         {record.mark === 'start-else' ? (
                                           <span className="badge bg-warning text-dark">
-                                            <i className="bi bi-cursor-fill"></i>
+                                            <i className="bi bi-cursor-fill me-1"></i>Yes
                                           </span>
                                         ) : (
                                           <span className="text-muted">-</span>
@@ -165,31 +155,6 @@ const OutlierTrailTable = ({
                                 })()}
                               </tbody>
                             </table>
-                          </div>
-                          <div className="mt-3">
-                            <div className="row">
-                              <div className="col-md-6">
-                                <h6 className="text-muted">Action Legend:</h6>
-                                <div className="d-flex flex-wrap gap-2 mb-2">
-                                  <span className="badge bg-primary">start</span>
-                                  <span className="badge bg-success">target</span>
-                                  <span className="badge bg-warning text-dark">others (extra clicks)</span>
-                                </div>
-                                <h6 className="text-muted">Double Click Legend:</h6>
-                                <div className="d-flex flex-wrap gap-2">
-                                  <span className="badge bg-warning text-dark"><i className="bi bi-cursor-fill me-1"></i>Dbl = Double Click</span>
-                                </div>
-                              </div>
-                              <div className="col-md-6">
-                                <div className="small text-muted">
-                                  <strong>Difficulty (ID):</strong> Calculated using Fitts' Law: log₂(distance/width + 1)<br/>
-                                  <strong>Coordinate Format:</strong> (x, y) pixels<br/>
-                                  <strong>Timestamp Format:</strong> Raw timestamp (milliseconds)<br/>
-                                  <strong>Dbl Column:</strong> Shows double-click events ('start-else' markers)<br/>
-                                  <strong>Double Click Detection:</strong> Records marked as 'start-else' in trail data
-                                </div>
-                              </div>
-                            </div>
                           </div>
                         </div>
                       </td>

@@ -12,12 +12,10 @@ import React, { useState, Fragment } from 'react';
 const ErrorTrailTable = ({ errorTrails, selectedDevice, selectedDifficulty }) => {
   const [expandedTrails, setExpandedTrails] = useState(new Set());
 
-  // Toggle trail expansion
+  // Toggle trail expansion - only one trail can be expanded at a time
   const toggleTrailExpansion = (trailId) => {
-    const newExpandedTrails = new Set(expandedTrails);
-    if (newExpandedTrails.has(trailId)) {
-      newExpandedTrails.delete(trailId);
-    } else {
+    const newExpandedTrails = new Set();
+    if (!expandedTrails.has(trailId)) {
       newExpandedTrails.add(trailId);
     }
     setExpandedTrails(newExpandedTrails);
@@ -76,19 +74,9 @@ const ErrorTrailTable = ({ errorTrails, selectedDevice, selectedDifficulty }) =>
 
   return (
     <div>
-      <div className="mb-3 d-flex justify-content-between align-items-center">
-        <h6 className="mb-0">
-          <i className="bi bi-exclamation-triangle text-warning me-2"></i>
-          Error Trails: {selectedDevice} (Difficulty ID: {selectedDifficulty})
-        </h6>
-        <span className="badge bg-warning text-dark">
-          {errorTrails.length} Error Trail{errorTrails.length !== 1 ? 's' : ''}
-        </span>
-      </div>
-
       <div className="table-responsive">
         <table className="table table-sm table-striped table-hover">
-          <thead className="table-dark">
+          <thead className="table-secondary">
             <tr>
               <th style={{ width: '40px' }}></th>
               <th style={{ width: '120px' }}>
@@ -97,11 +85,11 @@ const ErrorTrailTable = ({ errorTrails, selectedDevice, selectedDifficulty }) =>
               <th style={{ width: '100px' }}>
                 <i className="bi bi-list-ol me-1"></i>Trail No
               </th>
-              <th style={{ width: '120px' }}>
-                <i className="bi bi-calculator me-1"></i>ID (W/D)
-              </th>
               <th style={{ width: '100px' }}>
                 <i className="bi bi-exclamation-circle me-1"></i>Error Count
+              </th>
+              <th style={{ width: '100px' }}>
+                <i className="bi bi-cursor-fill me-1"></i>Double Click
               </th>
               <th style={{ width: '120px' }}>
                 <i className="bi bi-clock me-1"></i>Event Time
@@ -122,32 +110,35 @@ const ErrorTrailTable = ({ errorTrails, selectedDevice, selectedDifficulty }) =>
                     <tr
                       onClick={() => toggleTrailExpansion(trailId)}
                       style={{ cursor: 'pointer' }}
-                      className="table-warning"
                       title={isExpanded ? "Click to collapse details" : "Click to expand details"}
                     >
                       <td>
-                        <i className={`bi ${isExpanded ? 'bi-chevron-down' : 'bi-chevron-right'}`}></i>
+                        <i className={`bi ${isExpanded ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
                       </td>
                       <td className="fw-bold">
                         {trail.participantSerial}
                       </td>
                       <td>
-                        <span className="badge bg-secondary">
+                        <span>
                           {trail.trailNumber}
                         </span>
-                      </td>
-                      <td>
-                        <div className="small">
-                          <strong>{trail.difficulty}</strong>
-                        </div>
-                        <div className="text-muted" style={{ fontSize: '0.75rem' }}>
-                          ({trail.width}/{trail.distance})
-                        </div>
                       </td>
                       <td>
                         <span className="badge bg-danger">
                           {errorCount}
                         </span>
+                      </td>
+                      <td>
+                        {(() => {
+                          const doubleClickCount = trail.records.filter(r => r.mark === 'start-else').length;
+                          return doubleClickCount > 0 ? (
+                            <span className="badge bg-warning text-dark">
+                              {doubleClickCount}
+                            </span>
+                          ) : (
+                            <span className="text-muted">-</span>
+                          );
+                        })()}
                       </td>
                       <td>
                         <small className="font-monospace">
@@ -162,21 +153,14 @@ const ErrorTrailTable = ({ errorTrails, selectedDevice, selectedDifficulty }) =>
                           <div className="bg-light p-3 border-top">
                             <h6 className="mb-3">
                               <i className="bi bi-list-ul text-primary me-2"></i>
-                              Trail {trail.trailNumber} Details
+                              <span className="badge bg-primary me-2">Participant {trail.participantSerial}</span>
+                              <span className="badge bg-secondary me-2">Trail {trail.trailNumber}</span>
+                              Event Log
                             </h6>
                             <div className="table-responsive">
                               <table className="table table-sm table-striped table-hover">
-                                <thead className="table-dark">
+                                <thead className="table-secondary">
                                   <tr>
-                                    <th style={{ width: '120px' }}>
-                                      <i className="bi bi-person me-1"></i>Participant
-                                    </th>
-                                    <th style={{ width: '100px' }}>
-                                      <i className="bi bi-list-ol me-1"></i>Trail No
-                                    </th>
-                                    <th style={{ width: '120px' }}>
-                                      <i className="bi bi-calculator me-1"></i>ID (W/D)
-                                    </th>
                                     <th style={{ width: '100px' }}>
                                       <i className="bi bi-play-circle me-1"></i>Action
                                     </th>
@@ -184,7 +168,7 @@ const ErrorTrailTable = ({ errorTrails, selectedDevice, selectedDifficulty }) =>
                                       <i className="bi bi-cursor-fill me-1"></i>Double Click
                                     </th>
                                     <th style={{ width: '120px' }}>
-                                      <i className="bi bi-geo me-1"></i>Coordinate
+                                      <i className="bi bi-geo me-1"></i>Position
                                     </th>
                                     <th style={{ width: '140px' }}>
                                       <i className="bi bi-clock me-1"></i>Timestamp
@@ -194,28 +178,6 @@ const ErrorTrailTable = ({ errorTrails, selectedDevice, selectedDifficulty }) =>
                                 <tbody>
                                   {trail.records.map((record, recordIndex) => (
                                     <tr key={`${trailId}-record-${recordIndex}`}>
-                                      {recordIndex === 0 && (
-                                        <td rowSpan={trail.records.length} className="table-info fw-bold align-middle">
-                                          {trail.participantSerial}
-                                        </td>
-                                      )}
-                                      {recordIndex === 0 && (
-                                        <td rowSpan={trail.records.length} className="align-middle">
-                                          <span className="badge bg-secondary">
-                                            {trail.trailNumber}
-                                          </span>
-                                        </td>
-                                      )}
-                                      {recordIndex === 0 && (
-                                        <td rowSpan={trail.records.length} className="align-middle">
-                                          <div className="small">
-                                            <strong>{trail.difficulty}</strong>
-                                          </div>
-                                          <div className="text-muted" style={{ fontSize: '0.75rem' }}>
-                                            ({trail.width}/{trail.distance})
-                                          </div>
-                                        </td>
-                                      )}
                                       <td>
                                         <span className={`badge ${
                                           record.mark === 'start' ? 'bg-primary' :
@@ -229,7 +191,7 @@ const ErrorTrailTable = ({ errorTrails, selectedDevice, selectedDifficulty }) =>
                                         {record.mark === 'start-else' ? (
                                           <span className="badge bg-warning text-dark">
                                             <i className="bi bi-cursor-fill me-1"></i>
-                                            Double Click
+                                            Yes
                                           </span>
                                         ) : (
                                           <span className="text-muted">-</span>

@@ -88,17 +88,15 @@ const ErrorTrailAnalysisComponent = ({
         </h5>
       </div>
       <div className="card-body">
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <div className="d-flex align-items-center">
-            <DifficultyDeviceFilter
-              availableDevices={availableDevices}
-              availableDifficulties={availableDifficulties}
-              selectedDevice={selectedDevice}
-              selectedDifficulty={selectedDifficulty}
-              onDeviceChange={setSelectedDevice}
-              onDifficultyChange={setSelectedDifficulty}
-            />
-          </div>
+        <div className="d-flex justify-content-between align-items-center mb-2">
+          <DifficultyDeviceFilter
+            availableDevices={availableDevices}
+            availableDifficulties={availableDifficulties}
+            selectedDevice={selectedDevice}
+            selectedDifficulty={selectedDifficulty}
+            onDeviceChange={setSelectedDevice}
+            onDifficultyChange={setSelectedDifficulty}
+          />
           <button
             className="btn btn-sm btn-outline-secondary"
             onClick={closeErrorTrailMode}
@@ -106,6 +104,31 @@ const ErrorTrailAnalysisComponent = ({
             <i className="bi bi-x-circle"></i> Close
           </button>
         </div>
+
+        {(selectedDevice && selectedDifficulty) && (
+          <div className="d-flex align-items-center gap-3 mb-3">
+            <div className="badge bg-dark">
+              <i className="bi bi-funnel me-1"></i>
+              Filtered: {selectedDevice} - ID {selectedDifficulty}
+            </div>
+            {filteredData.length > 0 && (
+              <>
+                <span className="badge bg-danger">
+                  {filteredData.length} Error Trail{filteredData.length !== 1 ? 's' : ''}
+                </span>
+                <span className="badge bg-warning text-dark">
+                  <i className="bi bi-cursor-fill me-1"></i>
+                  {(() => {
+                    const doubleClickCount = filteredData.filter(trail =>
+                      trail.records && trail.records.some(record => record.mark === 'start-else')
+                    ).length;
+                    return `${doubleClickCount} Double Click${doubleClickCount !== 1 ? 's' : ''}`;
+                  })()}
+                </span>
+              </>
+            )}
+          </div>
+        )}
 
         {loading ? (
           <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '200px' }}>

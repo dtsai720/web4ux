@@ -9,8 +9,8 @@ const SummaryInfoCard = ({ summaryInfo }) => {
   if (!summaryInfo) return null;
 
   return (
-    <div className="card mb-4 border-primary">
-      <div className="card-header bg-primary text-white">
+    <div className="card mb-4 border-secondary">
+      <div className="card-header bg-secondary text-white">
         <h5 className="mb-0">
           <i className="bi bi-info-circle me-2"></i>
           Project Overview
