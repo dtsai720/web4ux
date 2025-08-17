@@ -1,7 +1,6 @@
 package fetcher_test
 
 import (
-	"context"
 	"errors"
 	"testing"
 	"time"
@@ -17,12 +16,18 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
+var (
+	errNetworkError   = errors.New("network error")
+	errNetworkTimeout = errors.New("network timeout")
+	errDatabaseError  = errors.New("database error")
+)
+
 func TestLogin(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
-	ctx := context.Background()
+	ctx := t.Context()
 	log := logger.NewTestLogger()
 
 	tests := []struct {
@@ -43,7 +48,7 @@ func TestLogin(t *testing.T) {
 			name:        "login with network error",
 			email:       "test@example.com",
 			password:    "password123",
-			actual:      common.Item[[]byte]{Error: errors.New("network error"), Count: 1},
+			actual:      common.Item[[]byte]{Error: errNetworkError, Count: 1},
 			expectError: true,
 		},
 		{
@@ -78,9 +83,9 @@ func TestLogin(t *testing.T) {
 func TestListAllProjects(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
-	ctx := context.Background()
+	ctx := t.Context()
 	log := logger.NewTestLogger()
 
 	tests := []struct {
@@ -95,7 +100,7 @@ func TestListAllProjects(t *testing.T) {
 		},
 		{
 			name:        "network error",
-			actual:      common.Item[[]byte]{Error: errors.New("network timeout"), Count: 1},
+			actual:      common.Item[[]byte]{Error: errNetworkTimeout, Count: 1},
 			expectError: true,
 		},
 	}
@@ -116,7 +121,7 @@ func TestListAllProjects(t *testing.T) {
 
 			result, err := service.ListAllProjects(ctx, log)
 			assert.Equal(t, tt.expectError, err != nil)
-			
+
 			if tt.expectError {
 				assert.Nil(t, result)
 			} else {
@@ -126,17 +131,17 @@ func TestListAllProjects(t *testing.T) {
 	}
 }
 
-func TestFetchDataAndSave(t *testing.T) {
-	t.Parallel()
+type fetchDataTestCase struct {
+	name         string
+	input        htmlparser.ProjectSummary
+	dbResult     common.Item[models.Project]
+	clientResult common.Item[[]byte]
+	dbUpsert     common.Item[any]
+	expectError  bool
+}
 
-	tests := []struct {
-		name         string
-		input        htmlparser.ProjectSummary
-		dbResult     common.Item[models.Project]
-		clientResult common.Item[[]byte]
-		dbUpsert     common.Item[any]
-		expectError  bool
-	}{
+func getBasicTestCases() []fetchDataTestCase {
+	return []fetchDataTestCase{
 		{
 			name: "skip non-winfitts project",
 			input: htmlparser.ProjectSummary{
@@ -153,7 +158,7 @@ func TestFetchDataAndSave(t *testing.T) {
 				Name: "Test Winfitts Project",
 				Link: "/project/winfitts/123",
 			},
-			dbResult:    common.Item[models.Project]{Error: errors.New("database error"), Count: 1},
+			dbResult:    common.Item[models.Project]{Error: errDatabaseError, Count: 1},
 			expectError: true,
 		},
 		{
@@ -170,6 +175,11 @@ func TestFetchDataAndSave(t *testing.T) {
 			},
 			expectError: false,
 		},
+	}
+}
+
+func getAdvancedTestCases() []fetchDataTestCase {
+	return []fetchDataTestCase{
 		{
 			name: "extract raw data links error",
 			input: htmlparser.ProjectSummary{
@@ -182,7 +192,7 @@ func TestFetchDataAndSave(t *testing.T) {
 				Result: models.Project{UpdatedAt: time.Date(2023, 1, 1, 12, 0, 0, 0, time.UTC)},
 				Count:  1,
 			},
-			clientResult: common.Item[[]byte]{Error: errors.New("network error"), Count: 1},
+			clientResult: common.Item[[]byte]{Error: errNetworkError, Count: 1},
 			expectError:  true,
 		},
 		{
@@ -217,51 +227,71 @@ func TestFetchDataAndSave(t *testing.T) {
 			},
 			clientResult: common.Item[[]byte]{
 				Result: []byte(`<a href="/task/winfitts/task1" class="button-5 icon-rawdata ">Task 1</a>`),
-				Count:  2, // extractRawDataLinks + extractWinfittsDetails
+				Count:  2,
 			},
 			dbUpsert:    common.Item[any]{Count: 1},
 			expectError: false,
 		},
 	}
+}
+
+func getFetchDataTestCases() []fetchDataTestCase {
+	var cases []fetchDataTestCase
+	cases = append(cases, getBasicTestCases()...)
+	cases = append(cases, getAdvancedTestCases()...)
+
+	return cases
+}
+
+func setupFetchDataMocks(t *testing.T, tt fetchDataTestCase) (*mock_repository.MockIRepository, *mock_src_request.MockIClient) {
+	t.Helper()
+
+	ctrl := gomock.NewController(t)
+	t.Cleanup(ctrl.Finish)
+
+	ctx := t.Context()
+	mockDB := mock_repository.NewMockIRepository(ctrl)
+	mockClient := mock_src_request.NewMockIClient(ctrl)
+
+	// Set up database mock
+	mockDB.EXPECT().GetProject(ctx, tt.input.ID).
+		Return(tt.dbResult.Result, tt.dbResult.Error).Times(tt.dbResult.Count)
+
+	// Set up client mock
+	if tt.clientResult.Count == 2 {
+		mockClient.EXPECT().Send(gomock.Any(), gomock.Any(), gomock.Any()).
+			Return(tt.clientResult.Result, tt.clientResult.Error)
+		mockClient.EXPECT().Send(gomock.Any(), gomock.Any(), gomock.Any()).
+			Return([]byte(`<html>mock winfitts data</html>`), nil)
+	} else {
+		mockClient.EXPECT().Send(gomock.Any(), gomock.Any(), gomock.Any()).
+			Return(tt.clientResult.Result, tt.clientResult.Error).Times(tt.clientResult.Count)
+	}
+
+	// Set up database upsert mock
+	mockDB.EXPECT().UpsertExtractWinfittsDetails(gomock.Any(), gomock.Any(), gomock.Any()).
+		Return(tt.dbUpsert.Error).Times(tt.dbUpsert.Count)
+
+	return mockDB, mockClient
+}
+
+func TestFetchDataAndSave(t *testing.T) {
+	t.Parallel()
+
+	tests := getFetchDataTestCases()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
-
-			ctx := context.Background()
-			log := logger.NewTestLogger()
-			mockDB := mock_repository.NewMockIRepository(ctrl)
-			mockClient := mock_src_request.NewMockIClient(ctrl)
-
-			// Set up database mock
-			mockDB.EXPECT().GetProject(ctx, tt.input.ID).
-				Return(tt.dbResult.Result, tt.dbResult.Error).Times(tt.dbResult.Count)
-
-			// Set up client mock
-			if tt.clientResult.Count == 2 {
-				// Special case for successful processing with winfitts link
-				mockClient.EXPECT().Send(gomock.Any(), gomock.Any(), gomock.Any()).
-					Return(tt.clientResult.Result, tt.clientResult.Error) // extractRawDataLinks
-				mockClient.EXPECT().Send(gomock.Any(), gomock.Any(), gomock.Any()).
-					Return([]byte(`<html>mock winfitts data</html>`), nil) // extractWinfittsDetails
-			} else {
-				mockClient.EXPECT().Send(gomock.Any(), gomock.Any(), gomock.Any()).
-					Return(tt.clientResult.Result, tt.clientResult.Error).Times(tt.clientResult.Count)
-			}
-
-			// Set up database upsert mock
-			mockDB.EXPECT().UpsertExtractWinfittsDetails(gomock.Any(), gomock.Any(), gomock.Any()).
-				Return(tt.dbUpsert.Error).Times(tt.dbUpsert.Count)
+			mockDB, mockClient := setupFetchDataMocks(t, tt)
 
 			service := fetcher.New(
 				fetcher.WithDatabase(mockDB),
 				fetcher.WithClient(mockClient),
 			)
 
-			err := service.FetchDataAndSave(ctx, log, tt.input)
+			err := service.FetchDataAndSave(t.Context(), logger.NewTestLogger(), tt.input)
 			assert.Equal(t, tt.expectError, err != nil)
 		})
 	}

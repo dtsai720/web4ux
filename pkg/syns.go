@@ -10,6 +10,13 @@ import (
 	"github.com/web4ux/src/sliceutils"
 )
 
+var (
+	errSyncInProgress            = errors.New("sync in progress")
+	errFailedToLogin             = errors.New("failed to login")
+	errSyncAlreadyInProgress     = errors.New("sync already in progress")
+	errNoSyncOperationInProgress = errors.New("no sync operation in progress")
+)
+
 type SyncProgress struct {
 	CurrentProject string `json:"currentProject"`
 	CurrentIndex   int    `json:"currentIndex"`
@@ -29,14 +36,14 @@ func (a *App) LoginAndSync(email, password string) (*LoginResponse, error) {
 		return &LoginResponse{
 			Success: false,
 			Message: "Sync already in progress",
-		}, errors.New("sync in progress")
+		}, errSyncInProgress
 	}
 
 	if err := a.fetcher.Login(a.ctx, a.log, email, password); err != nil {
 		return &LoginResponse{
 			Success: false,
 			Message: "invalid email or password",
-		}, errors.New("failed to login")
+		}, errFailedToLogin
 	}
 
 	return &LoginResponse{Success: true, Message: "Login successful"}, nil
@@ -44,7 +51,7 @@ func (a *App) LoginAndSync(email, password string) (*LoginResponse, error) {
 
 func (a *App) StartSync() error {
 	if a.isSyncing {
-		return errors.New("sync already in progress")
+		return errSyncAlreadyInProgress
 	}
 
 	a.isSyncing = true
@@ -143,7 +150,7 @@ func (a *App) emitSyncProgress(progress SyncProgress) {
 
 func (a *App) CancelSync() error {
 	if !a.isSyncing || a.cancelFunc == nil {
-		return errors.New("no sync operation in progress")
+		return errNoSyncOperationInProgress
 	}
 
 	a.cancelFunc()

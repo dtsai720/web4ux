@@ -25,3 +25,9 @@ func Ternary[T any](condition bool, trueValue T, falseValue T) T {
 
 	return falseValue
 }
+
+type Item[T any] struct {
+	Result T
+	Error  error
+	Count  int
+}

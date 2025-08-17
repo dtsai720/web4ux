@@ -30,9 +30,9 @@ test-all: test test-frontend
 test-coverage:
 	@echo "Running tests with coverage..."
 	@go test -race -coverprofile=coverage.out ./... -coverpkg=./... | grep -v "coverage: [statement blocks]"
-	@cat coverage.out | grep -v "/mocks/" > coverage_filtered.out
+	@cat coverage.out | grep -v "/mocks/" | grep -v "/sqlc/" > coverage_filtered.out
 	@go tool cover -html=coverage_filtered.out -o coverage.html
-	@echo "Coverage report generated: coverage.html (mocks excluded)"
+	@echo "Coverage report generated: coverage.html (mocks and sqlc excluded)"
 
 .PHONY: test-frontend-watch
 test-frontend-watch:

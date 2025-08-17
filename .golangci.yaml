@@ -1,6 +1,5 @@
 version: "2"
 run:
-  concurrency: 2
   go: "1.24"
   tests: true
 linters:
@@ -9,10 +8,12 @@ linters:
     - contextcheck
     - depguard
     - exhaustruct
+    - funlen
     - gomodguard
     - lll
     - mnd
     - revive
+    - testpackage
     - varnamelen
     - wrapcheck
     - wsl
@@ -28,6 +29,7 @@ linters:
       - third_party$
       - builtin$
       - examples$
+      - _test\.go$
 formatters:
   enable:
     - gofmt

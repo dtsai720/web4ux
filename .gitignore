@@ -7,3 +7,7 @@ build/
 local.db*
 CLAUDE.md
 *.md
+cover*
+*.out
+*.md5
+frontend/wailsjs

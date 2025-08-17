@@ -1,7 +1,6 @@
 package analyzer_test
 
 import (
-	"context"
 	"errors"
 	"testing"
 
@@ -15,36 +14,33 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-func TestListSummaries(t *testing.T) {
-	t.Parallel()
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+var (
+	errDatabaseConnectionFailed = errors.New("database connection failed")
+	errProjectNotFound          = errors.New("project not found")
+	errDatabaseUpdateFailed     = errors.New("database update failed")
+)
 
-	ctx := context.Background()
+type listSummariesArgs struct {
+	name      string
+	creator   string
+	orderBy   string
+	direction string
+	offset    int64
+	limit     int64
+}
 
-	tests := []struct {
-		name        string
-		args        struct {
-			name      string
-			creator   string
-			orderBy   string
-			direction string
-			offset    int64
-			limit     int64
-		}
-		dbResult    common.Item[models.ProjectSummaries]
-		expectError bool
-	}{
+type listSummariesTestCase struct {
+	name        string
+	args        listSummariesArgs
+	dbResult    common.Item[models.ProjectSummaries]
+	expectError bool
+}
+
+func getListSummariesTestCases() []listSummariesTestCase {
+	return []listSummariesTestCase{
 		{
 			name: "successful list summaries",
-			args: struct {
-				name      string
-				creator   string
-				orderBy   string
-				direction string
-				offset    int64
-				limit     int64
-			}{
+			args: listSummariesArgs{
 				name:      "test project",
 				creator:   "test user",
 				orderBy:   "name",
@@ -66,14 +62,7 @@ func TestListSummaries(t *testing.T) {
 		},
 		{
 			name: "database error",
-			args: struct {
-				name      string
-				creator   string
-				orderBy   string
-				direction string
-				offset    int64
-				limit     int64
-			}{
+			args: listSummariesArgs{
 				name:      "",
 				creator:   "",
 				orderBy:   "name",
@@ -82,12 +71,21 @@ func TestListSummaries(t *testing.T) {
 				limit:     10,
 			},
 			dbResult: common.Item[models.ProjectSummaries]{
-				Error: errors.New("database connection failed"),
+				Error: errDatabaseConnectionFailed,
 				Count: 1,
 			},
 			expectError: true,
 		},
 	}
+}
+
+func TestListSummaries(t *testing.T) {
+	t.Parallel()
+	ctrl := gomock.NewController(t)
+	t.Cleanup(ctrl.Finish)
+
+	ctx := t.Context()
+	tests := getListSummariesTestCases()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -105,7 +103,7 @@ func TestListSummaries(t *testing.T) {
 
 			result, err := service.ListSummaries(ctx, tt.args.name, tt.args.creator, tt.args.orderBy, tt.args.direction, tt.args.offset, tt.args.limit)
 			assert.Equal(t, tt.expectError, err != nil)
-			
+
 			if !tt.expectError {
 				assert.Equal(t, tt.dbResult.Result, result)
 			}
@@ -116,9 +114,9 @@ func TestListSummaries(t *testing.T) {
 func TestGetProjectDetailByID(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
-	ctx := context.Background()
+	ctx := t.Context()
 
 	tests := []struct {
 		name        string
@@ -142,7 +140,7 @@ func TestGetProjectDetailByID(t *testing.T) {
 			name:      "project not found",
 			projectID: "non-existent",
 			dbResult: common.Item[[]models.ProjectDetail]{
-				Error: errors.New("project not found"),
+				Error: errProjectNotFound,
 				Count: 1,
 			},
 			expectError: true,
@@ -165,7 +163,7 @@ func TestGetProjectDetailByID(t *testing.T) {
 
 			result, err := service.GetProjectDetailByID(ctx, tt.projectID)
 			assert.Equal(t, tt.expectError, err != nil)
-			
+
 			if !tt.expectError {
 				assert.Equal(t, tt.dbResult.Result, result)
 			}
@@ -176,9 +174,9 @@ func TestGetProjectDetailByID(t *testing.T) {
 func TestDeleteOrRestore(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
-	ctx := context.Background()
+	ctx := t.Context()
 
 	tests := []struct {
 		name          string
@@ -206,7 +204,7 @@ func TestDeleteOrRestore(t *testing.T) {
 			informationID: "info-error",
 			deleted:       true,
 			dbResult: common.Item[any]{
-				Error: errors.New("database update failed"),
+				Error: errDatabaseUpdateFailed,
 				Count: 1,
 			},
 			expectError: true,
