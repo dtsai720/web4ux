@@ -1,4 +1,4 @@
-name: CI
+name: Web4UX CI Pipeline
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  test-go:
-    name: Go Tests and Lint
+  backend-quality:
+    name: Go Backend - Tests & Linting
     runs-on: ubuntu-latest
 
     steps:
@@ -27,20 +27,20 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-go-
 
-    - name: Install dependencies
+    - name: Install Go dependencies
       run: go mod download
 
     - name: Install golangci-lint
       run: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
 
-    - name: Run linter
+    - name: Run Go linting
       run: make lint
 
-    - name: Run tests
+    - name: Run Go tests with race detection
       run: make test
 
-  test-frontend:
-    name: Frontend Tests and Lint
+  frontend-quality:
+    name: React Frontend - Tests & Linting
     runs-on: ubuntu-latest
 
     steps:
@@ -53,13 +53,13 @@ jobs:
         cache: 'npm'
         cache-dependency-path: frontend/package-lock.json
 
-    - name: Install dependencies
+    - name: Install React dependencies
       run: cd frontend && npm ci
 
-    - name: Run linter
+    - name: Run ESLint (TypeScript/React)
       run: make lint-frontend
 
-    - name: Run tests
+    - name: Run Vitest unit tests
       run: make test-frontend
 
     # Skip frontend build in CI - requires Wails runtime generation
