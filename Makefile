@@ -22,6 +22,12 @@ test-frontend:
 	@cd frontend && npm run test:run
 	@echo "Frontend tests completed successfully."
 
+.PHONY: lint-frontend
+lint-frontend:
+	@echo "Running frontend linting..."
+	@cd frontend && npm run lint
+	@echo "Frontend linting completed successfully."
+
 .PHONY: test-all
 test-all: test test-frontend
 	@echo "All tests completed successfully."
