@@ -62,7 +62,8 @@ export const calculateMoveTimeAnalysis = (rawData) => {
       Object.values(trailGroups).forEach(trail => {
         // Calculate difficulty
         const difficulty = calculateDifficulty(trail.distance, trail.width);
-        const difficultyKey = difficulty.toString();
+        // Use W/D combination as key to ensure uniqueness for same difficulty values
+        const difficultyKey = `W${trail.width}D${trail.distance}`;
 
         // Calculate move time (event time) for this trail
         const startRecord = trail.records.find(r => r.mark === 'start');
@@ -148,8 +149,24 @@ export const calculateMoveTimeAnalysis = (rawData) => {
         });
       });
 
-      // Sort difficulties and create organized data structure
-      const sortedDifficulties = Object.keys(difficultyGroups).sort((a, b) => parseFloat(a) - parseFloat(b));
+      // Sort difficulties by their calculated difficulty values, then by width and distance
+      const sortedDifficulties = Object.keys(difficultyGroups).sort((a, b) => {
+        const groupA = difficultyGroups[a];
+        const groupB = difficultyGroups[b];
+
+        // First sort by difficulty value
+        if (groupA.difficulty !== groupB.difficulty) {
+          return groupA.difficulty - groupB.difficulty;
+        }
+
+        // Then by width
+        if (groupA.width !== groupB.width) {
+          return groupA.width - groupB.width;
+        }
+
+        // Finally by distance
+        return groupA.distance - groupB.distance;
+      });
       const sortedParticipants = Object.keys(participantData).sort((a, b) => {
         const numA = parseInt(a.replace(/\D/g, '')) || 0;
         const numB = parseInt(b.replace(/\D/g, '')) || 0;
@@ -184,17 +201,17 @@ export const formatMoveTime = (moveTime) => {
 };
 
 /**
- * Get participant's move time for a specific difficulty
+ * Get participant's move time for a specific difficulty key (W/D combination)
  * @param {Object} analysisData - Analysis data for the device
  * @param {string} participantSerial - Participant serial
- * @param {string} difficulty - Difficulty level
+ * @param {string} difficultyKey - Difficulty key (W{width}D{distance} format)
  * @returns {number|null} Average move time or null if not available
  */
-export const getParticipantMoveTime = (analysisData, participantSerial, difficulty) => {
-  if (!analysisData.difficultyGroups[difficulty] ||
-      !analysisData.difficultyGroups[difficulty].participants[participantSerial]) {
+export const getParticipantMoveTime = (analysisData, participantSerial, difficultyKey) => {
+  if (!analysisData.difficultyGroups[difficultyKey] ||
+      !analysisData.difficultyGroups[difficultyKey].participants[participantSerial]) {
     return null;
   }
 
-  return analysisData.difficultyGroups[difficulty].participants[participantSerial].averageMoveTime;
+  return analysisData.difficultyGroups[difficultyKey].participants[participantSerial].averageMoveTime;
 };
