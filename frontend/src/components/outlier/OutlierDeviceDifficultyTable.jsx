@@ -61,8 +61,8 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, devic
                 if (firstRecord && !firstRecord.deleted && firstRecord.distance && firstRecord.width) {
                   const difficulty = calculateDifficulty(firstRecord.distance, firstRecord.width);
                   if (difficulty !== undefined && difficulty !== null) {
-                    // Create unique key combining difficulty, width, and distance
-                    const key = `${difficulty}-W${firstRecord.width}D${firstRecord.distance}`;
+                    // Create unique key using width and distance directly to ensure uniqueness
+                    const key = `W${firstRecord.width}D${firstRecord.distance}`;
                     if (!difficultyMap.has(key)) {
                       difficultyMap.set(key, {
                         difficulty: difficulty,
