@@ -4,7 +4,6 @@ import React from 'react';
  * Component for mode selection buttons
  * @param {Object} props - Component props
  * @param {Boolean} props.deleteMode - Whether delete mode is active
- * @param {Boolean} props.outlierMode - Whether outlier mode is active
  * @param {Boolean} props.movementTimeMatrixMode - Whether movement time matrix mode is active
  * @param {Boolean} props.errorTrailMode - Whether error trail mode is active
  * @param {Function} props.setDeleteMode - Function to set delete mode
@@ -12,14 +11,12 @@ import React from 'react';
  * @param {Function} props.setMovementTimeMatrixMode - Function to set movement time matrix mode
  * @param {Function} props.setErrorTrailMode - Function to set error trail mode
  * @param {Function} props.calculateOutliers - Function to calculate outliers
- * @param {Function} props.closeOutlierMode - Function to close outlier mode
  * @param {Function} props.closeDeleteMode - Function to close delete mode
  * @param {Function} props.closeMovementTimeMatrixMode - Function to close movement time matrix mode
  * @param {Function} props.closeErrorTrailMode - Function to close error trail mode
  */
 const ModeSelectionButtons = ({
   deleteMode,
-  outlierMode,
   movementTimeMatrixMode,
   errorTrailMode,
   setDeleteMode,
@@ -27,7 +24,6 @@ const ModeSelectionButtons = ({
   setMovementTimeMatrixMode,
   setErrorTrailMode,
   calculateOutliers,
-  closeOutlierMode,
   closeDeleteMode,
   closeMovementTimeMatrixMode,
   closeErrorTrailMode

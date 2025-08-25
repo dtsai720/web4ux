@@ -10,9 +10,7 @@ const OutlierAnalysisComponent = ({
   handleSelectOutlierDevice,
   handleSelectOutlierParticipant,
   handleSelectOutlierTrail,
-  closeOutlierMode,
   data,
-  toggleTrailDelete,
   toggleParticipantDelete
 }) => {
   return (
@@ -24,10 +22,8 @@ const OutlierAnalysisComponent = ({
       handleSelectOutlierDevice={handleSelectOutlierDevice}
       handleSelectOutlierParticipant={handleSelectOutlierParticipant}
       handleSelectOutlierTrail={handleSelectOutlierTrail}
-      closeOutlierMode={closeOutlierMode}
       data={data}
       formatDateTime={formatDateTime}
-      toggleTrailDelete={toggleTrailDelete}
       toggleParticipantDelete={toggleParticipantDelete}
     />
   );
