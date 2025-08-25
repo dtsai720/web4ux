@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { detectErrorTrails } from '../../utils/detail/errorTrailUtils';
 import ErrorTrailTable from '../../components/detail/ErrorTrailTable';
-import DifficultyDeviceFilter from '../../components/detail/DifficultyDeviceFilter';
 
 const ErrorTrailAnalysisComponent = ({
   rawData,
@@ -10,9 +9,7 @@ const ErrorTrailAnalysisComponent = ({
   const [errorTrailData, setErrorTrailData] = useState({});
   const [loading, setLoading] = useState(true);
   const [selectedDevice, setSelectedDevice] = useState('');
-  const [selectedDifficulty, setSelectedDifficulty] = useState('');
   const [availableDevices, setAvailableDevices] = useState([]);
-  const [availableDifficulties, setAvailableDifficulties] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
 
   // Handle double click to go back
@@ -26,36 +23,24 @@ const ErrorTrailAnalysisComponent = ({
       const results = detectErrorTrails(rawData);
       setErrorTrailData(results);
 
-      // Get available devices and difficulties
+      // Get available devices
       const devices = Object.keys(results.byDevice || {}).sort();
-      const difficulties = Object.keys(results.byDifficulty || {}).sort((a, b) => {
-        // Extract difficulty number from string like "3.5 (10/105)"
-        const diffA = parseFloat(a.split(' ')[0]);
-        const diffB = parseFloat(b.split(' ')[0]);
-        return diffA - diffB;
-      });
-
       setAvailableDevices(devices);
-      setAvailableDifficulties(difficulties);
 
-      // Auto-select first device and difficulty if not already selected
+      // Auto-select first device if not already selected
       if (devices.length > 0 && !selectedDevice) {
         setSelectedDevice(devices[0]);
-      }
-      if (difficulties.length > 0 && !selectedDifficulty) {
-        setSelectedDifficulty(difficulties[0]);
       }
 
       setLoading(false);
     }
-  }, [rawData, selectedDevice, selectedDifficulty]);
+  }, [rawData, selectedDevice]);
 
-  // Filter data when device or difficulty changes
+  // Filter data when device changes
   useEffect(() => {
-    if (selectedDevice && selectedDifficulty && errorTrailData.errorTrails) {
+    if (selectedDevice && errorTrailData.errorTrails) {
       const filtered = errorTrailData.errorTrails.filter(trail =>
-        trail.deviceName === selectedDevice &&
-        trail.difficultyId === selectedDifficulty
+        trail.deviceName === selectedDevice
       );
 
       // Sort by participant then trail number
@@ -69,7 +54,7 @@ const ErrorTrailAnalysisComponent = ({
     } else {
       setFilteredData([]);
     }
-  }, [selectedDevice, selectedDifficulty, errorTrailData]);
+  }, [selectedDevice, errorTrailData]);
 
   return (
     <div className="card mb-4 border-warning">
@@ -89,14 +74,21 @@ const ErrorTrailAnalysisComponent = ({
       </div>
       <div className="card-body">
         <div className="d-flex justify-content-between align-items-center mb-2">
-          <DifficultyDeviceFilter
-            availableDevices={availableDevices}
-            availableDifficulties={availableDifficulties}
-            selectedDevice={selectedDevice}
-            selectedDifficulty={selectedDifficulty}
-            onDeviceChange={setSelectedDevice}
-            onDifficultyChange={setSelectedDifficulty}
-          />
+          <div className="d-flex align-items-center gap-3">
+            <div className="form-group">
+              <label className="form-label fw-bold mb-1">Device:</label>
+              <select
+                className="form-select form-select-sm"
+                value={selectedDevice}
+                onChange={(e) => setSelectedDevice(e.target.value)}
+                style={{ minWidth: '150px' }}
+              >
+                {availableDevices.map(device => (
+                  <option key={device} value={device}>{device}</option>
+                ))}
+              </select>
+            </div>
+          </div>
           <button
             className="btn btn-sm btn-outline-secondary"
             onClick={closeErrorTrailMode}
@@ -105,11 +97,11 @@ const ErrorTrailAnalysisComponent = ({
           </button>
         </div>
 
-        {(selectedDevice && selectedDifficulty) && (
+        {selectedDevice && (
           <div className="d-flex align-items-center gap-3 mb-3">
             <div className="badge bg-dark">
               <i className="bi bi-funnel me-1"></i>
-              Filtered: {selectedDevice} - ID {selectedDifficulty}
+              Device: {selectedDevice}
             </div>
             {filteredData.length > 0 && (
               <>
@@ -137,16 +129,15 @@ const ErrorTrailAnalysisComponent = ({
             </div>
             <span className="ms-3">Detecting error trails...</span>
           </div>
-        ) : selectedDevice && selectedDifficulty ? (
+        ) : selectedDevice ? (
           <ErrorTrailTable
             errorTrails={filteredData}
             selectedDevice={selectedDevice}
-            selectedDifficulty={selectedDifficulty}
           />
         ) : (
           <div className="alert alert-info">
             <i className="bi bi-info-circle me-2"></i>
-            Please select both Device and Difficulty to view error trails.
+            Please select a Device to view error trails.
           </div>
         )}
       </div>
