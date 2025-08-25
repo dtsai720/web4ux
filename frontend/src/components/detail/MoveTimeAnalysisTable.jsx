@@ -5,7 +5,7 @@ import { formatMoveTime, getParticipantMoveTime } from '../../utils/detail/moveT
  * Table component for displaying movement time matrix results
  */
 const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
-  const { difficulties, participants, participantData } = analysisData;
+  const { difficulties, participants, participantData, difficultyGroups } = analysisData;
 
   // Calculate total average move time for each participant across all difficulties
   const calculateParticipantTotal = (participantSerial) => {
@@ -15,9 +15,9 @@ const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
   };
 
   // Calculate average move time for each difficulty across all participants
-  const calculateDifficultyAverage = (difficulty) => {
+  const calculateDifficultyAverage = (difficultyKey) => {
     const validTimes = participants
-      .map(participant => getParticipantMoveTime(analysisData, participant, difficulty))
+      .map(participant => getParticipantMoveTime(analysisData, participant, difficultyKey))
       .filter(time => time !== null);
 
     if (validTimes.length === 0) return null;
@@ -28,7 +28,7 @@ const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
   const calculateOverallAverage = () => {
     const allValidTimes = participants.flatMap(participant =>
       difficulties
-        .map(difficulty => getParticipantMoveTime(analysisData, participant, difficulty))
+        .map(difficultyKey => getParticipantMoveTime(analysisData, participant, difficultyKey))
         .filter(time => time !== null)
     );
 
@@ -51,14 +51,22 @@ const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
                 <i className="bi bi-person me-1"></i>
                 Participant
               </th>
-              {difficulties.map(difficulty => (
-                <th key={difficulty} className="text-center" style={{ minWidth: '120px' }}>
-                  <div className="fw-bold">
-                    <span className="badge bg-primary text-white me-1">ID</span>
-                    {difficulty}
-                  </div>
-                </th>
-              ))}
+              {difficulties.map(difficultyKey => {
+                const difficultyData = difficultyGroups[difficultyKey];
+                return (
+                  <th key={difficultyKey} className="text-center" style={{ minWidth: '120px' }}>
+                    <div className="fw-bold">
+                      <div>
+                        <span className="badge bg-primary text-white me-1">ID</span>
+                        {difficultyData.difficulty}
+                      </div>
+                      <small className="text-muted d-block mt-1">
+                        W{difficultyData.width}/D{difficultyData.distance}
+                      </small>
+                    </div>
+                  </th>
+                );
+              })}
               <th className="text-center" style={{ minWidth: '120px' }}>
                 <i className="bi bi-calculator me-1"></i>
                 Average
@@ -74,10 +82,10 @@ const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
                     <i className="bi bi-person-fill me-1"></i>
                     {participant}
                   </td>
-                  {difficulties.map(difficulty => {
-                    const moveTime = getParticipantMoveTime(analysisData, participant, difficulty);
+                  {difficulties.map(difficultyKey => {
+                    const moveTime = getParticipantMoveTime(analysisData, participant, difficultyKey);
                     return (
-                      <td key={`${participant}-${difficulty}`} className="text-center">
+                      <td key={`${participant}-${difficultyKey}`} className="text-center">
                         {moveTime !== null ? (
                           <span className="fw-normal" style={{ fontFamily: 'monospace' }}>
                             {formatMoveTime(moveTime)}
@@ -106,10 +114,10 @@ const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
                 <i className="bi bi-calculator me-1"></i>
                 Average
               </td>
-              {difficulties.map(difficulty => {
-                const avgTime = calculateDifficultyAverage(difficulty);
+              {difficulties.map(difficultyKey => {
+                const avgTime = calculateDifficultyAverage(difficultyKey);
                 return (
-                  <td key={`avg-${difficulty}`} className="text-center">
+                  <td key={`avg-${difficultyKey}`} className="text-center">
                     {avgTime !== null ? (
                       <span className="fw-bold" style={{ fontFamily: 'monospace' }}>
                         {formatMoveTime(avgTime)}

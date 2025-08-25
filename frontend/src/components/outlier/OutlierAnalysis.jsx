@@ -13,10 +13,8 @@ const OutlierAnalysis = ({
   handleSelectOutlierDevice,
   handleSelectOutlierParticipant,
   handleSelectOutlierTrail,
-  closeOutlierMode,
   data,
   formatDateTime,
-  toggleTrailDelete,
   toggleParticipantDelete
 }) => {
   const [viewMode, setViewMode] = useState('overview'); // 'overview' or 'device-analysis'

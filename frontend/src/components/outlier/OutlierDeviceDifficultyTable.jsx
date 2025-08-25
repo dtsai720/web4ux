@@ -41,9 +41,9 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, devic
 
   const rowKeys = getRowKeys();
 
-  // Get all difficulties from grouped data structure
-  const getAllDifficulties = () => {
-    const difficulties = new Set();
+  // Get all difficulties with their W/D values from grouped data structure
+  const getAllDifficultiesWithWD = () => {
+    const difficultyMap = new Map();
 
     if (data && typeof data === 'object') {
       // Determine which devices to check
@@ -61,7 +61,16 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, devic
                 if (firstRecord && !firstRecord.deleted && firstRecord.distance && firstRecord.width) {
                   const difficulty = calculateDifficulty(firstRecord.distance, firstRecord.width);
                   if (difficulty !== undefined && difficulty !== null) {
-                    difficulties.add(difficulty);
+                    // Create unique key using width and distance directly to ensure uniqueness
+                    const key = `W${firstRecord.width}D${firstRecord.distance}`;
+                    if (!difficultyMap.has(key)) {
+                      difficultyMap.set(key, {
+                        difficulty: difficulty,
+                        width: firstRecord.width,
+                        distance: firstRecord.distance,
+                        uniqueKey: key
+                      });
+                    }
                   }
                 }
               }
@@ -71,13 +80,22 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, devic
       });
     }
 
-    return Array.from(difficulties).sort((a, b) => a - b);
+    // Convert to array and sort first by difficulty, then by width, then by distance
+    return Array.from(difficultyMap.values()).sort((a, b) => {
+      if (a.difficulty !== b.difficulty) {
+        return a.difficulty - b.difficulty;
+      }
+      if (a.width !== b.width) {
+        return a.width - b.width;
+      }
+      return a.distance - b.distance;
+    });
   };
 
-  const difficulties = getAllDifficulties();
+  const difficultiesWithWD = getAllDifficultiesWithWD();
 
-  // Calculate stats for each row-difficulty combination
-  const getStatsForRowDifficulty = (rowKey, difficulty) => {
+  // Calculate stats for each row-difficulty combination with specific W/D values
+  const getStatsForRowDifficultyWD = (rowKey, difficultyItem) => {
     if (!data || typeof data !== 'object') {
       return { errorCount: 0, totalTrails: 0, percentage: 0 };
     }
@@ -99,7 +117,10 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, devic
             if (firstRecord && !firstRecord.deleted && firstRecord.distance && firstRecord.width) {
               const trailDifficulty = calculateDifficulty(firstRecord.distance, firstRecord.width);
 
-              if (Math.abs(trailDifficulty - difficulty) < 0.001) {
+              // Match both difficulty and specific W/D values
+              if (Math.abs(trailDifficulty - difficultyItem.difficulty) < 0.001 &&
+                  firstRecord.width === difficultyItem.width &&
+                  firstRecord.distance === difficultyItem.distance) {
                 totalTrails++;
 
                 const hasError = isErrorTrail(trailRecords);
@@ -126,7 +147,10 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, devic
               if (firstRecord && !firstRecord.deleted && firstRecord.distance && firstRecord.width) {
                 const trailDifficulty = calculateDifficulty(firstRecord.distance, firstRecord.width);
 
-                if (Math.abs(trailDifficulty - difficulty) < 0.001) {
+                // Match both difficulty and specific W/D values
+                if (Math.abs(trailDifficulty - difficultyItem.difficulty) < 0.001 &&
+                    firstRecord.width === difficultyItem.width &&
+                    firstRecord.distance === difficultyItem.distance) {
                   totalTrails++;
 
                   const hasError = isErrorTrail(trailRecords);
@@ -150,8 +174,8 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, devic
   const getTotalStatsForRow = (rowKey) => {
     let totalErrors = 0;
 
-    difficulties.forEach(difficulty => {
-      const stats = getStatsForRowDifficulty(rowKey, difficulty);
+    difficultiesWithWD.forEach(difficultyItem => {
+      const stats = getStatsForRowDifficultyWD(rowKey, difficultyItem);
       totalErrors += stats.errorCount;
     });
 
@@ -248,9 +272,10 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, devic
                   <th className="text-center">
                     {showParticipantView ? 'Participant / Difficulty' : 'Device / Difficulty'}
                   </th>
-                  {difficulties.map(difficulty => (
-                    <th key={difficulty} className="text-center">
-                      ID {difficulty}
+                  {difficultiesWithWD.map(item => (
+                    <th key={item.uniqueKey} className="text-center">
+                      <div>ID {item.difficulty}</div>
+                      <small className="text-light">W{item.width}/D{item.distance}</small>
                     </th>
                   ))}
                   {showParticipantView && (
@@ -264,10 +289,10 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, devic
                     <td className="table-dark text-center align-middle">
                       <strong>{rowKey}</strong>
                     </td>
-                    {difficulties.map(difficulty => {
-                      const stats = getStatsForRowDifficulty(rowKey, difficulty);
+                    {difficultiesWithWD.map(difficultyItem => {
+                      const stats = getStatsForRowDifficultyWD(rowKey, difficultyItem);
                       return (
-                        <td key={difficulty} className="text-center align-middle">
+                        <td key={difficultyItem.uniqueKey} className="text-center align-middle">
                           {showParticipantView ? (
                             // Participant view: show only error count
                             <span>
