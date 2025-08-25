@@ -5,7 +5,7 @@ import { formatMoveTime, getParticipantMoveTime } from '../../utils/detail/moveT
  * Table component for displaying movement time matrix results
  */
 const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
-  const { difficulties, participants, participantData } = analysisData;
+  const { difficulties, participants, participantData, difficultyGroups } = analysisData;
 
   // Calculate total average move time for each participant across all difficulties
   const calculateParticipantTotal = (participantSerial) => {
@@ -51,14 +51,24 @@ const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
                 <i className="bi bi-person me-1"></i>
                 Participant
               </th>
-              {difficulties.map(difficulty => (
-                <th key={difficulty} className="text-center" style={{ minWidth: '120px' }}>
-                  <div className="fw-bold">
-                    <span className="badge bg-primary text-white me-1">ID</span>
-                    {difficulty}
-                  </div>
-                </th>
-              ))}
+              {difficulties.map(difficulty => {
+                const difficultyData = difficultyGroups[difficulty];
+                return (
+                  <th key={difficulty} className="text-center" style={{ minWidth: '120px' }}>
+                    <div className="fw-bold">
+                      <div>
+                        <span className="badge bg-primary text-white me-1">ID</span>
+                        {difficulty}
+                      </div>
+                      {difficultyData && (
+                        <small className="text-muted d-block mt-1">
+                          W{difficultyData.width}/D{difficultyData.distance}
+                        </small>
+                      )}
+                    </div>
+                  </th>
+                );
+              })}
               <th className="text-center" style={{ minWidth: '120px' }}>
                 <i className="bi bi-calculator me-1"></i>
                 Average
