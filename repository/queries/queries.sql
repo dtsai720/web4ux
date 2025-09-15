@@ -1,6 +1,6 @@
 -- name: UpsertDevices :one
-INSERT INTO devices (id, name, project_id)
-VALUES (@id, @name, @project_id)
+INSERT INTO devices (id, "order", name, project_id)
+VALUES (@id, @order, @name, @project_id)
 ON CONFLICT(name, project_id) DO UPDATE
     SET name = EXCLUDED.name
 RETURNING *;

@@ -49,6 +49,7 @@ SELECT projects.name AS project_name,
 	projects.creator AS project_creator,
 	projects.updated_at AS project_updated_at,
 	devices.name AS device_name,
+	devices."order" AS device_order,
 	participants.name AS participant_name,
 	participants.serial AS participant_serial,
 	winfitts_information.id AS information_id,
@@ -72,7 +73,7 @@ INNER JOIN winfitts ON
 INNER JOIN winfitts_information ON winfitts.id = winfitts_information.winfitts_id
 INNER JOIN winfitts_details ON winfitts_information.id = winfitts_details.information_id
 WHERE projects.id = ?1
-ORDER BY device_name,  participant_name, trail_number ASC
+ORDER BY device_name, participant_name, trail_number ASC
 `
 
 type GetProjectDetailByIDRow struct {
@@ -81,6 +82,7 @@ type GetProjectDetailByIDRow struct {
 	ProjectCreator    string
 	ProjectUpdatedAt  string
 	DeviceName        string
+	DeviceOrder       string
 	ParticipantName   string
 	ParticipantSerial string
 	InformationID     string
@@ -111,6 +113,7 @@ func (q *Queries) GetProjectDetailByID(ctx context.Context, projectID string) ([
 			&i.ProjectCreator,
 			&i.ProjectUpdatedAt,
 			&i.DeviceName,
+			&i.DeviceOrder,
 			&i.ParticipantName,
 			&i.ParticipantSerial,
 			&i.InformationID,

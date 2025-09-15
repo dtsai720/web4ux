@@ -24,23 +24,34 @@ func (q *Queries) DeleteWinfittsInformation(ctx context.Context, arg DeleteWinfi
 }
 
 const upsertDevices = `-- name: UpsertDevices :one
-INSERT INTO devices (id, name, project_id)
-VALUES (?1, ?2, ?3)
+INSERT INTO devices (id, "order", name, project_id)
+VALUES (?1, ?2, ?3, ?4)
 ON CONFLICT(name, project_id) DO UPDATE
     SET name = EXCLUDED.name
-RETURNING id, name, project_id
+RETURNING id, "order", name, project_id
 `
 
 type UpsertDevicesParams struct {
 	ID        string
+	Order     string
 	Name      string
 	ProjectID string
 }
 
 func (q *Queries) UpsertDevices(ctx context.Context, arg UpsertDevicesParams) (Device, error) {
-	row := q.db.QueryRowContext(ctx, upsertDevices, arg.ID, arg.Name, arg.ProjectID)
+	row := q.db.QueryRowContext(ctx, upsertDevices,
+		arg.ID,
+		arg.Order,
+		arg.Name,
+		arg.ProjectID,
+	)
 	var i Device
-	err := row.Scan(&i.ID, &i.Name, &i.ProjectID)
+	err := row.Scan(
+		&i.ID,
+		&i.Order,
+		&i.Name,
+		&i.ProjectID,
+	)
 	return i, err
 }
 

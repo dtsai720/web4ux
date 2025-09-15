@@ -131,6 +131,7 @@ func (r *Repository) GetProjectDetailByID(ctx context.Context, projectID string)
 			ProjectCreator:    in.ProjectCreator,
 			ProjectUpdatedAt:  in.ProjectUpdatedAt,
 			DeviceName:        in.DeviceName,
+			DeviceOrder:       in.DeviceOrder,
 			ParticipantName:   in.ParticipantName,
 			ParticipantSerial: in.ParticipantSerial,
 			InformationID:     in.InformationID,

@@ -90,7 +90,7 @@ const GuideAccordion = () => {
         <ul>
           <li><strong>🔵 Outlier Analysis (Dark Blue):</strong> Identify statistical outliers in movement data (Default mode)</li>
           <li><strong>🟢 Movement Time Matrix (Green):</strong> Analyze movement patterns and timing data</li>
-          <li><strong>🟠 Error Trail Analysis (Orange):</strong> Examine trails with errors or extra clicks</li>
+          <li><strong>🟠 Error Trail Analysis (Orange):</strong> Examine trails with errors or extra clicks - filter by device and ID (default: 1.6)</li>
           <li><strong>🔴 Deleted Items (Red):</strong> Manage deleted participants and restore data</li>
         </ul>
         <div className="alert alert-success">
@@ -199,9 +199,10 @@ const GuideAccordion = () => {
         <h6>🟠 Error Trail Analysis (Orange Mode):</h6>
         <ul>
           <li><strong>Purpose:</strong> Examine trails containing errors or anomalous behaviors</li>
-          <li><strong>Focus:</strong> Detailed error pattern analysis and extra clicks</li>
-          <li><strong>Data:</strong> Shows error sequences, timing, and user behavior patterns</li>
-          <li><strong>Features:</strong> Error classification, behavior analysis</li>
+          <li><strong>Filtering:</strong> Filter by Device and ID (W/D) - defaults to ID 1.6</li>
+          <li><strong>Data:</strong> Shows error sequences with raw timestamp data and user behavior patterns</li>
+          <li><strong>Features:</strong> Error classification, behavior analysis, double-click detection</li>
+          <li><strong>Display:</strong> Flat table showing all error actions with participant, trail, and timing information</li>
         </ul>
 
         <h6>🔴 Deleted Items (Red Mode):</h6>
