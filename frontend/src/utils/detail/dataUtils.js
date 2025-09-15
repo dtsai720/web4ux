@@ -25,7 +25,21 @@ export const organizeData = (rawData, groupByType) => {
   };
 
   // 獲取排序後的 device 和 participant 列表
-  const sortedDevices = [...new Set(activeData.map(record => record.deviceName))].sort(sortByNumeric);
+  // 創建 device 到 deviceOrder 的映射
+  const deviceOrderMap = {};
+  activeData.forEach(record => {
+    if (!deviceOrderMap[record.deviceName]) {
+      deviceOrderMap[record.deviceName] = record.deviceOrder;
+    }
+  });
+
+  // 按 deviceOrder 排序 devices
+  const sortedDevices = [...new Set(activeData.map(record => record.deviceName))]
+    .sort((a, b) => {
+      const orderA = deviceOrderMap[a] || '';
+      const orderB = deviceOrderMap[b] || '';
+      return orderA.localeCompare(orderB);
+    });
   const sortedParticipants = [...new Set(activeData.map(record => record.participantSerial))].sort(sortByNumeric);
 
   if (groupByType === 'by_device') {
@@ -64,7 +78,20 @@ export const organizeData = (rawData, groupByType) => {
       const participantRecords = activeData.filter(record => record.participantSerial === participantKey);
 
       // 對當前 participant 的 devices 進行排序
-      const participantDevices = [...new Set(participantRecords.map(record => record.deviceName))].sort(sortByNumeric);
+      // 創建當前 participant 的 device 到 deviceOrder 的映射
+      const participantDeviceOrderMap = {};
+      participantRecords.forEach(record => {
+        if (!participantDeviceOrderMap[record.deviceName]) {
+          participantDeviceOrderMap[record.deviceName] = record.deviceOrder;
+        }
+      });
+
+      const participantDevices = [...new Set(participantRecords.map(record => record.deviceName))]
+        .sort((a, b) => {
+          const orderA = participantDeviceOrderMap[a] || '';
+          const orderB = participantDeviceOrderMap[b] || '';
+          return orderA.localeCompare(orderB);
+        });
 
       participantDevices.forEach(deviceKey => {
         organized[participantKey][deviceKey] = {};

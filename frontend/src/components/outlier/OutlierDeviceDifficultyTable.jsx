@@ -6,6 +6,7 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, devic
   // Extract devices or participants based on view mode
   const getRowKeys = () => {
     const keys = new Set();
+    const deviceOrderMap = {};
 
     if (showParticipantView && selectedDevice) {
       // Show participants for selected device
@@ -23,6 +24,25 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, devic
       if (data && typeof data === 'object') {
         Object.keys(data).forEach(deviceName => {
           keys.add(deviceName);
+
+          // Extract deviceOrder from the first available record
+          const deviceData = data[deviceName];
+          if (deviceData && typeof deviceData === 'object') {
+            const participantKeys = Object.keys(deviceData).filter(key => key !== 'stats');
+            if (participantKeys.length > 0) {
+              const firstParticipant = deviceData[participantKeys[0]];
+              const trailKeys = Object.keys(firstParticipant).filter(key => key !== 'stats');
+              if (trailKeys.length > 0) {
+                const firstTrail = firstParticipant[trailKeys[0]];
+                if (Array.isArray(firstTrail) && firstTrail.length > 0) {
+                  const firstRecord = firstTrail[0];
+                  if (firstRecord && firstRecord.deviceOrder) {
+                    deviceOrderMap[deviceName] = firstRecord.deviceOrder;
+                  }
+                }
+              }
+            }
+          }
         });
       }
     }
@@ -34,8 +54,12 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, devic
         const numA = parseInt(a.replace(/\D/g, '')) || 0;
         const numB = parseInt(b.replace(/\D/g, '')) || 0;
         return numA !== numB ? numA - numB : a.localeCompare(b);
+      } else {
+        // For devices, sort by deviceOrder
+        const orderA = deviceOrderMap[a] || '';
+        const orderB = deviceOrderMap[b] || '';
+        return orderA.localeCompare(orderB);
       }
-      return a.localeCompare(b);
     });
   };
 
@@ -182,6 +206,29 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, devic
     return totalErrors;
   };
 
+  // Calculate total errors for each difficulty column across all participants
+  const getTotalStatsForColumn = (difficultyItem) => {
+    let totalErrors = 0;
+
+    rowKeys.forEach(rowKey => {
+      const stats = getStatsForRowDifficultyWD(rowKey, difficultyItem);
+      totalErrors += stats.errorCount;
+    });
+
+    return totalErrors;
+  };
+
+  // Calculate grand total of all errors
+  const getGrandTotal = () => {
+    let grandTotal = 0;
+
+    rowKeys.forEach(rowKey => {
+      grandTotal += getTotalStatsForRow(rowKey);
+    });
+
+    return grandTotal;
+  };
+
   // Helper function to detect if a trail has extra clicks
   const isErrorTrail = (trailRecords) => {
     let startFound = false;
@@ -324,6 +371,23 @@ const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, devic
                   </tr>
                 ))}
               </tbody>
+              {showParticipantView && (
+                <tfoot className="table-dark">
+                  <tr>
+                    <th className="text-center align-middle">
+                      Total
+                    </th>
+                    {difficultiesWithWD.map(difficultyItem => (
+                      <th key={difficultyItem.uniqueKey} className="text-center align-middle">
+                        {getTotalStatsForColumn(difficultyItem)}
+                      </th>
+                    ))}
+                    <th className="text-center align-middle">
+                      {getGrandTotal()}
+                    </th>
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </div>
         </div>
