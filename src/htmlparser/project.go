@@ -1,14 +1,16 @@
 package htmlparser
 
 import (
+	"context"
 	"strings"
 	"time"
 
 	"github.com/web4ux/src/errs"
+	"github.com/web4ux/src/logger"
 	"github.com/web4ux/src/sliceutils"
 )
 
-func ExtractProjectSummaries(htmlContent string) ([]ProjectSummary, error) {
+func ExtractProjectSummaries(ctx context.Context, log logger.ILogger, htmlContent string) ([]ProjectSummary, error) {
 	content := parseContentForProjectSummaries(htmlContent)
 	names := projectNameRegex.FindAllStringSubmatch(content, -1)
 	creators := projectCreatorRegex.FindAllStringSubmatch(content, -1)
