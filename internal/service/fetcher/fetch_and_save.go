@@ -21,7 +21,7 @@ func (s *Service) FetchDataAndSave(ctx context.Context, logger logger.ILogger, i
 
 	log.Info("Processing winfitts project", zap.String("link", in.Link))
 
-	project, err := s.db.GetProject(ctx, in.ID)
+	project, err := s.db.FindProject(ctx, log, in.ID)
 	if err != nil {
 		log.Error("Failed to get existing project from database", zap.Error(err))
 		return err
@@ -74,7 +74,7 @@ func (s *Service) FetchDataAndSave(ctx context.Context, logger logger.ILogger, i
 		linkLogger.Info("Saving winfitts data to database",
 			zap.String("task_id", taskId),
 			zap.Int("rows_count", len(rows)))
-		if err := s.db.UpsertExtractWinfittsDetails(ctx, in, rows); err != nil {
+		if err := s.db.UpsertExtractWinfittsDetails(ctx, linkLogger, in, rows); err != nil {
 			linkLogger.Error("Failed to save winfitts details to database",
 				zap.String("task_id", taskId),
 				zap.Error(err))

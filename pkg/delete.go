@@ -9,7 +9,7 @@ type Request struct {
 }
 
 func (a *App) DeleteOrRestore(projectID string, informationID string, deleted bool) string {
-	if err := a.analyzer.DeleteOrRestore(a.ctx, informationID, deleted); err != nil {
+	if err := a.analyzer.DeleteOrRestore(a.ctx, a.log, informationID, deleted); err != nil {
 		a.log.With(zap.Error(err)).Error("An error occurred while delete or restore")
 	}
 

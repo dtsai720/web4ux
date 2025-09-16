@@ -254,7 +254,8 @@ func setupFetchDataMocks(t *testing.T, tt fetchDataTestCase) (*mock_repository.M
 	mockClient := mock_src_request.NewMockIClient(ctrl)
 
 	// Set up database mock
-	mockDB.EXPECT().GetProject(ctx, tt.input.ID).
+	log := logger.NewTestLogger()
+	mockDB.EXPECT().FindProject(ctx, log, tt.input.ID).
 		Return(tt.dbResult.Result, tt.dbResult.Error).Times(tt.dbResult.Count)
 
 	// Set up client mock
@@ -269,7 +270,7 @@ func setupFetchDataMocks(t *testing.T, tt fetchDataTestCase) (*mock_repository.M
 	}
 
 	// Set up database upsert mock
-	mockDB.EXPECT().UpsertExtractWinfittsDetails(gomock.Any(), gomock.Any(), gomock.Any()).
+	mockDB.EXPECT().UpsertExtractWinfittsDetails(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 		Return(tt.dbUpsert.Error).Times(tt.dbUpsert.Count)
 
 	return mockDB, mockClient
