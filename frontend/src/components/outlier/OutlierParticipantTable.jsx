@@ -4,7 +4,6 @@ import OutlierTrailTable from './OutlierTrailTable';
 const OutlierParticipantTable = ({
   participants,
   deviceStats,
-  onSelectParticipant,
   onToggleParticipantDelete,
   deviceKey,
   data

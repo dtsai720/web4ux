@@ -26,7 +26,6 @@ const SyncPage = ({ setCurrentPage }) => {
   useEffect(() => {
     // 監聽同步進度事件
     EventsOn('sync:progress', (progress) => {
-      console.log('Received sync progress:', progress);
       setSyncProgress(progress);
 
       if (progress.isCompleted) {
@@ -50,8 +49,8 @@ const SyncPage = ({ setCurrentPage }) => {
     try {
       const status = await checkSyncStatus();
       setIsSyncing(status.isSyncing);
-    } catch (error) {
-      console.error('Failed to get sync status:', error);
+    } catch {
+      // Error handled silently
     }
   };
 
@@ -70,7 +69,6 @@ const SyncPage = ({ setCurrentPage }) => {
           setLoginError(response.message);
         }
       } catch (error) {
-        console.error("Login failed:", error);
         setLoginError('Login failed. Please check your credentials.');
       }
 
@@ -90,7 +88,6 @@ const SyncPage = ({ setCurrentPage }) => {
       });
       await startSyncUtil();
     } catch (error) {
-      console.error("Failed to start sync:", error);
       setIsSyncing(false);
     }
   };
@@ -103,8 +100,8 @@ const SyncPage = ({ setCurrentPage }) => {
         ...prev,
         isCancelled: true
       }));
-    } catch (error) {
-      console.error("Failed to cancel sync:", error);
+    } catch {
+      // Error handled silently
     }
   };
 

@@ -1,5 +1,5 @@
-import React, { useState, Fragment } from 'react';
-import { trailHasDoubleClick, detectDoubleClicks } from '../../utils/outlier/outlierUtils';
+import React, { useState } from 'react';
+import { trailHasDoubleClick } from '../../utils/outlier/outlierUtils';
 import { calculateDifficulty } from '../../utils/detail/moveTimeUtils';
 
 const OutlierTrailTable = ({
@@ -44,7 +44,6 @@ const OutlierTrailTable = ({
               const trailStats = data[deviceKey]?.[participantKey]?.[trailKey]?.stats;
               const hasDoubleClick = Array.isArray(trailRecords) ? trailHasDoubleClick(trailRecords) : false;
               const isExpanded = expandedRows.has(trailKey);
-              const hasError = trailStats?.has_error || false;
 
               return (
                 <React.Fragment key={trailKey}>
@@ -116,9 +115,6 @@ const OutlierTrailTable = ({
                               <tbody>
                                 {Array.isArray(trailRecords) && (() => {
                                   // Calculate difficulty from the first record (which should have width/distance)
-                                  const firstRecord = trailRecords[0];
-                                  const difficulty = firstRecord?.width && firstRecord?.distance ?
-                                    calculateDifficulty(firstRecord.distance, firstRecord.width) : '-';
 
                                   // No need for complex double click detection - we check mark field directly
 
