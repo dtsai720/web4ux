@@ -13,7 +13,7 @@ func (s *Service) ListAllProjects(ctx context.Context, log logger.ILogger) ([]ht
 	output := make([]htmlparser.ProjectSummary, 0, 100)
 	summaries := make([]htmlparser.ProjectSummary, 1)
 	var err error
-	handleFn := WrapFSingleParam(5*time.Second, s.extractProjectSummaries)
+	handleFn := WrapWithDelay(5*time.Second, s.extractProjectSummaries)
 	for len(summaries) != 0 {
 		summaries, err = handleFn(ctx, log, offset)
 		if err != nil {

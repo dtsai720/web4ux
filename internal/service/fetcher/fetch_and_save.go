@@ -37,8 +37,8 @@ func (s *Service) FetchDataAndSave(ctx context.Context, logger logger.ILogger, i
 	log.Info("Project needs update",
 		zap.Time("current_version", project.UpdatedAt),
 		zap.Time("new_version", in.Time))
-	detailFn := WrapFSingleParam(5*time.Second, s.extractWinfittsDetails)
-	linkFn := WrapFSingleParam(15*time.Second, s.extractRawDataLinks)
+	detailFn := WrapWithDelay(5*time.Second, s.extractWinfittsDetails)
+	linkFn := WrapWithDelay(15*time.Second, s.extractRawDataLinks)
 
 	log.Info("Extracting raw data links from project")
 	links, err := linkFn(ctx, log, &in)

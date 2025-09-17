@@ -7,9 +7,9 @@ import (
 	"github.com/web4ux/src/logger"
 )
 
-type HandleSingleParam[T any, R any] func(ctx context.Context, log logger.ILogger, in T) (R, error)
+type DelayedHandlerFunc[T any, R any] func(ctx context.Context, log logger.ILogger, in T) (R, error)
 
-func WrapFSingleParam[T any, R any](duration time.Duration, f HandleSingleParam[T, R]) HandleSingleParam[T, R] {
+func WrapWithDelay[T any, R any](duration time.Duration, f DelayedHandlerFunc[T, R]) DelayedHandlerFunc[T, R] {
 	var zero R
 
 	return func(ctx context.Context, log logger.ILogger, in T) (R, error) {
