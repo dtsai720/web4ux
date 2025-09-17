@@ -17,11 +17,11 @@ export const organizeData = (rawData, groupByType) => {
 
   // 對 device 和 participant 進行排序，確保按照數字順序顯示
   const sortByNumeric = (a, b) => {
-    // 提取數字部分
+    // 提取數字部分進行數字比較
     const numA = parseInt(a.replace(/\D/g, '')) || 0;
     const numB = parseInt(b.replace(/\D/g, '')) || 0;
-    // 直接比較數字大小
-    return a < b? -1: 1;
+    // 使用數字進行比較
+    return numA - numB;
   };
 
   // 獲取排序後的 device 和 participant 列表
