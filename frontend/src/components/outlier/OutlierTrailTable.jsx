@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
 import { trailHasDoubleClick } from '../../utils/outlier/outlierUtils';
 import { calculateDifficulty } from '../../utils/detail/moveTimeUtils';
-
-const BADGE_CLASSES = {
-  start: 'bg-primary',
-  target: 'bg-success',
-  default: 'bg-warning text-dark'
-};
+import { BADGE_CLASSES } from '../../constants/outlierConstants';
 
 const MAIN_HEADERS = [
   { text: '', width: '40px' },
