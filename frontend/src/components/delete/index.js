@@ -1,6 +1,16 @@
 /**
  * Export all delete-related components
  */
-export { default as DeletedItemsContainer } from './DeletedItemsContainer';
-export { default as DeletedParticipantsList } from './DeletedParticipantsList';
-export { default as EmptyStateMessage } from './EmptyStateMessage';
+import DeletedItemsContainer from './DeletedItemsContainer';
+import DeletedItemsTabs from './DeletedItemsTabs';
+import DeletedParticipantsList from './DeletedParticipantsList';
+import DeletedTrailsList from './DeletedTrailsList';
+import EmptyStateMessage from './EmptyStateMessage';
+
+export {
+  DeletedItemsContainer,
+  DeletedItemsTabs,
+  DeletedParticipantsList,
+  DeletedTrailsList,
+  EmptyStateMessage
+};
