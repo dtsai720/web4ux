@@ -86,6 +86,7 @@ export const detectErrorTrails = (rawData) => {
       totalErrorTrails: errorTrails.length
     };
   } catch (error) {
+    console.error('Error detecting error trails:', error);
     return {
       errorTrails: [],
       byDevice: {},

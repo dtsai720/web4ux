@@ -25,6 +25,8 @@ import DetailPageHeader from '../../components/detail/DetailPageHeader';
 const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
   // State management
   const [data, setData] = useState(DEFAULT_STATE.data);
+  const [loading, setLoading] = useState(DEFAULT_STATE.loading);
+  const [error, setError] = useState(DEFAULT_STATE.error);
   const [summaryInfo, setSummaryInfo] = useState(DEFAULT_STATE.summaryInfo);
   const [outlierMode, setOutlierMode] = useState(DEFAULT_STATE.outlierMode);
   const [outlierData, setOutlierData] = useState(DEFAULT_STATE.outlierData);
@@ -32,6 +34,7 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
   const [selectedOutlierParticipant, setSelectedOutlierParticipant] = useState(DEFAULT_STATE.selectedOutlierParticipant);
   const [selectedOutlierTrail, setSelectedOutlierTrail] = useState(DEFAULT_STATE.selectedOutlierTrail);
   const [rawData, setRawData] = useState(DEFAULT_STATE.rawData);
+  const [deletedTrails, setDeletedTrails] = useState(DEFAULT_STATE.deletedTrails);
   const [deletedParticipants, setDeletedParticipants] = useState(DEFAULT_STATE.deletedParticipants);
   const [deleteMode, setDeleteMode] = useState(DEFAULT_STATE.deleteMode);
   const [movementTimeMatrixMode, setMovementTimeMatrixMode] = useState(DEFAULT_STATE.movementTimeMatrixMode || false);
@@ -64,6 +67,7 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
       // Set summary info
       setSummaryInfo(result.summaryInfo);
     } catch (err) {
+      console.error('Load data error:', err);
       setError(err.message || 'An error occurred while loading data');
     } finally {
       setLoading(false);
@@ -78,8 +82,8 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
         // Reload data
         await loadData();
       }
-    } catch {
-      // Error handled silently
+    } catch (err) {
+      console.error(`Toggle participant ${isDelete ? 'delete' : 'restore'} failed:`, err);
     }
   };
 
@@ -91,8 +95,8 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
         // Reload data
         await loadData();
       }
-    } catch {
-      // Error handled silently
+    } catch (err) {
+      console.error(`Toggle trail ${isDelete ? 'delete' : 'restore'} failed:`, err);
     }
   };
 
@@ -172,7 +176,7 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
     if (outlierMode && rawData.length > 0) {
       // Calculate outliers for by_device grouped data
       const timer = setTimeout(() => {
-        const outliers = calculateOutlierData(data);
+        const outliers = calculateOutlierData(data, rawData);
         setOutlierData(outliers);
       }, 100);
 

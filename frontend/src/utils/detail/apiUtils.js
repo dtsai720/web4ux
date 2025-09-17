@@ -44,6 +44,7 @@ export const loadProjectData = async (selectedSummaryId) => {
       throw new Error('Invalid data format received');
     }
   } catch (err) {
+    console.error('Load data error:', err);
     throw err;
   }
 };
@@ -66,16 +67,19 @@ export const toggleParticipantDelete = async (deviceKey, participantKey, rawData
     );
 
     if (recordsToUpdate.length === 0) {
+      console.log(`No records found to ${isDelete ? 'delete' : 'restore'} for participant: ${participantKey}`);
       return;
     }
 
     // Call delete/restore API
     for (const record of removeDuplicates(recordsToUpdate)) {
       await DeleteOrRestore(record.projectId, record.informationId, isDelete);
+      console.log(`${isDelete ? 'Deleted' : 'Restored'} participant record: ${record.informationId}`);
     }
 
     return true;
   } catch (err) {
+    console.error(`Toggle participant ${isDelete ? 'delete' : 'restore'} failed:`, err);
     throw err;
   }
 };
@@ -100,16 +104,19 @@ export const toggleTrailDelete = async (deviceKey, participantKey, trailKey, raw
     );
 
     if (recordsToUpdate.length === 0) {
+      console.log(`No records found to ${isDelete ? 'delete' : 'restore'} for trail: ${trailKey}`);
       return;
     }
 
     // Call delete/restore API
     for (const record of removeDuplicates(recordsToUpdate)) {
       await DeleteOrRestore(record.projectId, record.informationId, isDelete);
+      console.log(`${isDelete ? 'Deleted' : 'Restored'} trail record: ${record.informationId}`);
     }
 
     return true;
   } catch (err) {
+    console.error(`Toggle trail ${isDelete ? 'delete' : 'restore'} failed:`, err);
     throw err;
   }
 };

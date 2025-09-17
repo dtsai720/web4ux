@@ -1,7 +1,7 @@
 import React from 'react';
 import { calculateDifficulty } from '../../utils/detail/moveTimeUtils';
 
-const OutlierDeviceDifficultyTable = ({ data, selectedDevice, deviceStats, showParticipantView = false }) => {
+const OutlierDeviceDifficultyTable = ({ outlierData, data, selectedDevice, deviceStats, showParticipantView = false }) => {
 
   // Extract devices or participants based on view mode
   const getRowKeys = () => {

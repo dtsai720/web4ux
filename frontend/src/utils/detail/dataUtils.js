@@ -113,7 +113,7 @@ export const organizeData = (rawData, groupByType) => {
   }
 
   // 計算每個 trail 的統計數據
-  calculateTrailStats(organized);
+  calculateTrailStats(organized, groupByType);
 
   return { data: organized };
 };
@@ -123,7 +123,7 @@ export const organizeData = (rawData, groupByType) => {
  * @param {Object} organizedData - The organized data structure
  * @param {String} groupByType - The grouping type
  */
-export const calculateTrailStats = (organizedData) => {
+export const calculateTrailStats = (organizedData, groupByType) => {
   // 遍歷所有 level1 (device 或 participant)
   Object.keys(organizedData).forEach(level1Key => {
     // 遍歷所有 level2 (participant 或 device)
@@ -339,7 +339,7 @@ export const formatDateTime = (timestamp) => {
  * @param {Array} rawData - The raw data array
  * @returns {Object} Outlier data
  */
-export const calculateOutlierData = (data) => {
+export const calculateOutlierData = (data, rawData) => {
   const outliers = {};
 
   // 遍歷所有 devices

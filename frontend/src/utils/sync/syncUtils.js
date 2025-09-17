@@ -9,6 +9,7 @@ export const checkSyncStatus = async () => {
     const status = await GetSyncStatus();
     return status;
   } catch (error) {
+    console.error('Failed to get sync status:', error);
     throw error;
   }
 };
@@ -28,6 +29,7 @@ export const handleLogin = async (email, password) => {
     const response = await LoginAndSync(email, password);
     return response;
   } catch (error) {
+    console.error("Login failed:", error);
     return {
       success: false,
       message: 'Login failed. Please check your credentials.'
@@ -44,6 +46,7 @@ export const handleStartSync = async () => {
     await StartSync();
     return { success: true };
   } catch (error) {
+    console.error("Failed to start sync:", error);
     throw error;
   }
 };
@@ -57,6 +60,7 @@ export const handleCancelSync = async () => {
     await CancelSync();
     return { success: true };
   } catch (error) {
+    console.error("Failed to cancel sync:", error);
     throw error;
   }
 };
