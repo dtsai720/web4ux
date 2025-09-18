@@ -1,12 +1,5 @@
-import React from 'react';
 import EmptyStateMessage from './EmptyStateMessage';
 
-/**
- * Component to display a list of deleted trails
- * @param {Object} deletedTrails - Object containing deleted trails
- * @param {Function} toggleTrailDelete - Function to toggle trail deletion status
- * @returns {JSX.Element} - The deleted trails list component
- */
 const DeletedTrailsList = ({ deletedTrails, toggleTrailDelete }) => {
   if (Object.keys(deletedTrails).length === 0) {
     return <EmptyStateMessage message="No deleted trails found." />;

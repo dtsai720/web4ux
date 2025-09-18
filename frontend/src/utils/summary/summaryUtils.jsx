@@ -23,11 +23,11 @@ export const formatDate = (dateString) => {
   // 計算時區偏移（分鐘）
   const offsetMinutes = date.getTimezoneOffset();
   const offsetHours = Math.floor(Math.abs(offsetMinutes) / 60);
-  const offsetMins = Math.abs(offsetMinutes) % 60;
+  const offsetMinutesRemainder = Math.abs(offsetMinutes) % 60;
   const sign = offsetMinutes <= 0 ? '+' : '-';
-  const tzOffset = `${sign}${pad(offsetHours)}:${pad(offsetMins)}`;
+  const timezoneOffset = `${sign}${pad(offsetHours)}:${pad(offsetMinutesRemainder)}`;
 
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds} ${tzOffset}`;
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds} ${timezoneOffset}`;
 };
 
 /**

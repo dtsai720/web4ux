@@ -17,15 +17,29 @@ export const organizeData = (rawData, groupByType) => {
 
   // 對 device 和 participant 進行排序，確保按照數字順序顯示
   const sortByNumeric = (a, b) => {
-    // 提取數字部分
+    // 提取數字部分進行數字比較
     const numA = parseInt(a.replace(/\D/g, '')) || 0;
     const numB = parseInt(b.replace(/\D/g, '')) || 0;
-    // 直接比較數字大小
-    return a < b? -1: 1;
+    // 使用數字進行比較
+    return numA - numB;
   };
 
   // 獲取排序後的 device 和 participant 列表
-  const sortedDevices = [...new Set(activeData.map(record => record.deviceName))].sort(sortByNumeric);
+  // 創建 device 到 deviceOrder 的映射
+  const deviceOrderMap = {};
+  activeData.forEach(record => {
+    if (!deviceOrderMap[record.deviceName]) {
+      deviceOrderMap[record.deviceName] = record.deviceOrder;
+    }
+  });
+
+  // 按 deviceOrder 排序 devices
+  const sortedDevices = [...new Set(activeData.map(record => record.deviceName))]
+    .sort((a, b) => {
+      const orderA = deviceOrderMap[a] || '';
+      const orderB = deviceOrderMap[b] || '';
+      return orderA.localeCompare(orderB);
+    });
   const sortedParticipants = [...new Set(activeData.map(record => record.participantSerial))].sort(sortByNumeric);
 
   if (groupByType === 'by_device') {
@@ -64,7 +78,20 @@ export const organizeData = (rawData, groupByType) => {
       const participantRecords = activeData.filter(record => record.participantSerial === participantKey);
 
       // 對當前 participant 的 devices 進行排序
-      const participantDevices = [...new Set(participantRecords.map(record => record.deviceName))].sort(sortByNumeric);
+      // 創建當前 participant 的 device 到 deviceOrder 的映射
+      const participantDeviceOrderMap = {};
+      participantRecords.forEach(record => {
+        if (!participantDeviceOrderMap[record.deviceName]) {
+          participantDeviceOrderMap[record.deviceName] = record.deviceOrder;
+        }
+      });
+
+      const participantDevices = [...new Set(participantRecords.map(record => record.deviceName))]
+        .sort((a, b) => {
+          const orderA = participantDeviceOrderMap[a] || '';
+          const orderB = participantDeviceOrderMap[b] || '';
+          return orderA.localeCompare(orderB);
+        });
 
       participantDevices.forEach(deviceKey => {
         organized[participantKey][deviceKey] = {};
@@ -86,7 +113,7 @@ export const organizeData = (rawData, groupByType) => {
   }
 
   // 計算每個 trail 的統計數據
-  calculateTrailStats(organized, groupByType);
+  calculateTrailStats(organized);
 
   return { data: organized };
 };
@@ -94,9 +121,8 @@ export const organizeData = (rawData, groupByType) => {
 /**
  * Calculates statistics for trails in organized data
  * @param {Object} organizedData - The organized data structure
- * @param {String} groupByType - The grouping type
  */
-export const calculateTrailStats = (organizedData, groupByType) => {
+export const calculateTrailStats = (organizedData) => {
   // 遍歷所有 level1 (device 或 participant)
   Object.keys(organizedData).forEach(level1Key => {
     // 遍歷所有 level2 (participant 或 device)
@@ -309,10 +335,9 @@ export const formatDateTime = (timestamp) => {
 /**
  * Calculates outlier data from organized data
  * @param {Object} data - The organized data
- * @param {Array} rawData - The raw data array
  * @returns {Object} Outlier data
  */
-export const calculateOutlierData = (data, rawData) => {
+export const calculateOutlierData = (data) => {
   const outliers = {};
 
   // 遍歷所有 devices

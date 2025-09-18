@@ -17,11 +17,12 @@ func mapToUpsertProjectParams(project models.ProjectSummary) sqlc.UpsertProjectP
 	}
 }
 
-func mapToUpsertDevicesParams(project models.ProjectSummary, deviceName string) sqlc.UpsertDevicesParams {
+func mapToUpsertDevicesParams(project models.ProjectSummary, row models.WinfittsRawData) sqlc.UpsertDevicesParams {
 	return sqlc.UpsertDevicesParams{
 		ID:        uuid.NewString(),
+		Order:     row.DeviceOrder,
 		ProjectID: project.ID,
-		Name:      deviceName,
+		Name:      row.DeviceName,
 	}
 }
 

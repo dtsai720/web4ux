@@ -1,39 +1,81 @@
--- name: UpsertDevices :one
-INSERT INTO devices (id, name, project_id)
-VALUES (@id, @name, @project_id)
-ON CONFLICT(name, project_id) DO UPDATE
-    SET name = EXCLUDED.name
-RETURNING *;
+-- name: FindProject :one
+SELECT * FROM projects WHERE id = @id;
 
--- name: UpsertParticipants :one
-INSERT INTO participants (id, name, project_id, serial)
-VALUES (@id, @name, @project_id, @serial)
-ON CONFLICT(name, project_id) DO UPDATE
-    SET name = EXCLUDED.name
-RETURNING *;
+-- name: CountProjects :one
+SELECT COUNT(1) FROM projects
+WHERE (COALESCE(@name, '') = '' OR name LIKE @name)
+AND (COALESCE(@creator, '') = '' OR creator LIKE @creator);
 
--- name: UpsertWinfitts :one
-INSERT INTO winfitts (id, project_id, device_id, participant_id)
-VALUES (@id, @project_id, @device_id, @participant_id)
-ON CONFLICT(project_id, device_id, participant_id) DO UPDATE
-    SET device_id = EXCLUDED.device_id
-RETURNING *;
+-- name: ListProjectsByTimeDesc :many
+SELECT * FROM projects
+WHERE (COALESCE(@name, '') = '' OR name LIKE @name)
+AND (COALESCE(@creator, '') = '' OR creator LIKE @creator)
+ORDER BY updated_at DESC
+LIMIT @limit OFFSET @offset;
 
--- name: UpsertWinfittsInformation :one
-INSERT INTO winfitts_information (id, winfitts_id, trail_number, width, distance, angle, is_failed, error_times, deleted)
-VALUES (@id, @winfitts_id, @trail_number, @width, @distance, @angle, @is_failed, @error_times, @deleted)
-ON CONFLICT(winfitts_id, trail_number) DO UPDATE
-    SET is_failed = EXCLUDED.is_failed,
-    error_times = EXCLUDED.error_times,
-    deleted = EXCLUDED.deleted
-RETURNING *;
+-- name: ListProjectsByTimeAsc :many
+SELECT * FROM projects
+WHERE (COALESCE(@name, '') = '' OR name LIKE @name)
+AND (COALESCE(@creator, '') = '' OR creator LIKE @creator)
+ORDER BY updated_at ASC
+LIMIT @limit OFFSET @offset;
 
--- name: UpsertWinfittsDetail :one
-INSERT INTO winfitts_details (id, information_id, mark, x, y, timestamp)
-VALUES (@id, @information_id, @mark, @x, @y, @timestamp)
-ON CONFLICT(information_id, timestamp) DO UPDATE
-    SET timestamp = EXCLUDED.timestamp
-RETURNING *;
+-- name: ListProjectsByNameDesc :many
+SELECT * FROM projects
+WHERE (COALESCE(@name, '') = '' OR name LIKE @name)
+AND (COALESCE(@creator, '') = '' OR creator LIKE @creator)
+ORDER BY name DESC, updated_at DESC
+LIMIT @limit OFFSET @offset;
 
--- name: DeleteWinfittsInformation :exec
-UPDATE winfitts_information SET deleted = @deleted WHERE id = @information_id;
+-- name: ListProjectsByNameAsc :many
+SELECT * FROM projects
+WHERE (COALESCE(@name, '') = '' OR name LIKE @name)
+AND (COALESCE(@creator, '') = '' OR creator LIKE @creator)
+ORDER BY name ASC, updated_at DESC
+LIMIT @limit OFFSET @offset;
+
+-- name: ListProjectsByCreatorDesc :many
+SELECT * FROM projects
+WHERE (COALESCE(@name, '') = '' OR name LIKE @name)
+AND (COALESCE(@creator, '') = '' OR creator LIKE @creator)
+ORDER BY creator DESC, updated_at DESC
+LIMIT @limit OFFSET @offset;
+
+-- name: ListProjectsByCreatorAsc :many
+SELECT * FROM projects
+WHERE (COALESCE(@name, '') = '' OR name LIKE @name)
+AND (COALESCE(@creator, '') = '' OR creator LIKE @creator)
+ORDER BY creator ASC, updated_at DESC
+LIMIT @limit OFFSET @offset;
+
+-- name: FindProjectDetails :many
+SELECT projects.name AS project_name,
+	projects.id AS project_id,
+	projects.creator AS project_creator,
+	projects.updated_at AS project_updated_at,
+	devices.name AS device_name,
+	devices."order" AS device_order,
+	participants.name AS participant_name,
+	participants.serial AS participant_serial,
+	winfitts_information.id AS information_id,
+	winfitts_information.deleted,
+	winfitts_information.error_times,
+	winfitts_information.is_failed,
+	winfitts_information.trail_number,
+	winfitts_information.width,
+	winfitts_information.distance,
+	winfitts_details.mark,
+	winfitts_details.timestamp,
+	winfitts_details.x,
+	winfitts_details.y
+FROM projects
+INNER JOIN devices ON projects.id = devices.project_id
+INNER JOIN participants ON projects.id  = participants.project_id
+INNER JOIN winfitts ON
+	projects.id = winfitts.project_id
+	AND devices.id = winfitts.device_id
+	AND participants.id = winfitts.participant_id
+INNER JOIN winfitts_information ON winfitts.id = winfitts_information.winfitts_id
+INNER JOIN winfitts_details ON winfitts_information.id = winfitts_details.information_id
+WHERE projects.id = @project_id
+ORDER BY device_name, participant_name, trail_number ASC

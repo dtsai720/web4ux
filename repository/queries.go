@@ -9,84 +9,94 @@ import (
 	"github.com/web4ux/models"
 	"github.com/web4ux/repository/sqlc"
 	"github.com/web4ux/src/common"
+	"github.com/web4ux/src/logger"
 	"github.com/web4ux/src/sliceutils"
 )
 
-const defaultDirection = "desc"
+const defaultSortDirection = "desc"
 
-func (r *Repository) listProjects(ctx context.Context, name string, creator string, orderBy string, direction string, offset, limit int64) ([]sqlc.Project, error) {
-	switch orderBy {
+func (r *Repository) listProjects(ctx context.Context, req models.ListProjectRequest) ([]sqlc.Project, error) {
+	nameFilter := req.Name + "%"
+	creatorFilter := req.Creator + "%"
+	sortDirection := "desc"
+	if req.IsASC {
+		sortDirection = "asc"
+	}
+	switch req.OrderBy {
 	case "name":
-		if direction == defaultDirection {
-			return r.queries.ListProjectsOrderByNameDesc(ctx, sqlc.ListProjectsOrderByNameDescParams{
-				Name:    name,
-				Creator: creator,
-				Offset:  offset,
-				Limit:   limit,
+		if sortDirection == defaultSortDirection {
+			return r.queries.ListProjectsByNameDesc(ctx, sqlc.ListProjectsByNameDescParams{
+				Name:    nameFilter,
+				Creator: creatorFilter,
+				Offset:  req.Offset,
+				Limit:   req.Limit,
 			})
 		}
 
-		return r.queries.ListProjectsOrderByNameAsc(ctx, sqlc.ListProjectsOrderByNameAscParams{
-			Name:    name,
-			Creator: creator,
-			Offset:  offset,
-			Limit:   limit,
+		return r.queries.ListProjectsByNameAsc(ctx, sqlc.ListProjectsByNameAscParams{
+			Name:    nameFilter,
+			Creator: creatorFilter,
+			Offset:  req.Offset,
+			Limit:   req.Limit,
 		})
 	case "creator":
-		if direction == defaultDirection {
-			return r.queries.ListProjectsOrderByCreatorDesc(ctx, sqlc.ListProjectsOrderByCreatorDescParams{
-				Name:    name,
-				Creator: creator,
-				Offset:  offset,
-				Limit:   limit,
+		if sortDirection == defaultSortDirection {
+			return r.queries.ListProjectsByCreatorDesc(ctx, sqlc.ListProjectsByCreatorDescParams{
+				Name:    nameFilter,
+				Creator: creatorFilter,
+				Offset:  req.Offset,
+				Limit:   req.Limit,
 			})
 		}
 
-		return r.queries.ListProjectsOrderByCreatorAsc(ctx, sqlc.ListProjectsOrderByCreatorAscParams{
-			Name:    name,
-			Creator: creator,
-			Offset:  offset,
-			Limit:   limit,
+		return r.queries.ListProjectsByCreatorAsc(ctx, sqlc.ListProjectsByCreatorAscParams{
+			Name:    nameFilter,
+			Creator: creatorFilter,
+			Offset:  req.Offset,
+			Limit:   req.Limit,
 		})
 	}
 
-	if direction == defaultDirection {
-		return r.queries.ListProjectsOrderByUpdatedAtDesc(ctx, sqlc.ListProjectsOrderByUpdatedAtDescParams{
-			Name:    name,
-			Creator: creator,
-			Offset:  offset,
-			Limit:   limit,
+	if sortDirection == defaultSortDirection {
+		return r.queries.ListProjectsByTimeDesc(ctx, sqlc.ListProjectsByTimeDescParams{
+			Name:    nameFilter,
+			Creator: creatorFilter,
+			Offset:  req.Offset,
+			Limit:   req.Limit,
 		})
 	}
 
-	return r.queries.ListProjectsOrderByUpdatedAtAsc(ctx, sqlc.ListProjectsOrderByUpdatedAtAscParams{
-		Name:    name,
-		Creator: creator,
-		Offset:  offset,
-		Limit:   limit,
+	return r.queries.ListProjectsByTimeAsc(ctx, sqlc.ListProjectsByTimeAscParams{
+		Name:    nameFilter,
+		Creator: creatorFilter,
+		Offset:  req.Offset,
+		Limit:   req.Limit,
 	})
 }
 
-// ListProjects implements IRepository.
-func (r *Repository) ListProjects(ctx context.Context, name string, creator string, orderBy string, direction string, offset, limit int64) (models.ProjectSummaries, error) {
+// ListProjects implements QueryRepository.
+func (r *Repository) ListProjects(ctx context.Context, log logger.ILogger, req models.ListProjectRequest) (models.ProjectSummaries, error) {
 	var result models.ProjectSummaries
-	name += "%"
-	creator += "%"
-	output, err := r.listProjects(ctx, name, creator, orderBy, direction, offset, limit)
+
+	projects, err := r.listProjects(ctx, req)
 	if err != nil {
+		log.Error("failed to list projects", err)
 		return result, err
 	}
 
+	nameFilter := req.Name + "%"
+	creatorFilter := req.Creator + "%"
 	count, err := r.queries.CountProjects(ctx, sqlc.CountProjectsParams{
-		Name:    name,
-		Creator: creator,
+		Name:    nameFilter,
+		Creator: creatorFilter,
 	})
 	if err != nil {
+		log.Error("failed to count projects", err)
 		return result, err
 	}
 
 	result.Total = count
-	result.Data = sliceutils.Map(output, func(in sqlc.Project) models.Project {
+	result.Data = sliceutils.Map(projects, func(in sqlc.Project) models.Project {
 		return models.Project{
 			ID:        in.ID,
 			Name:      in.Name,
@@ -98,14 +108,16 @@ func (r *Repository) ListProjects(ctx context.Context, name string, creator stri
 	return result, nil
 }
 
-// GetProject implements IRepository.
-func (r *Repository) GetProject(ctx context.Context, id string) (models.Project, error) {
-	output, err := r.queries.GetProject(ctx, id)
+// FindProject implements QueryRepository.
+func (r *Repository) FindProject(ctx context.Context, log logger.ILogger, id string) (models.Project, error) {
+	output, err := r.queries.FindProject(ctx, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
+			log.Info("project not found", "project_id", id)
 			return models.Project{}, nil
 		}
 
+		log.Error("failed to find project", err, "project_id", id)
 		return models.Project{}, err
 	}
 
@@ -117,20 +129,22 @@ func (r *Repository) GetProject(ctx context.Context, id string) (models.Project,
 	}, nil
 }
 
-// GetProjectDetailByID implements IRepository.
-func (r *Repository) GetProjectDetailByID(ctx context.Context, projectID string) ([]models.ProjectDetail, error) {
-	result, err := r.queries.GetProjectDetailByID(ctx, projectID)
+// FindProjectDetails implements QueryRepository.
+func (r *Repository) FindProjectDetails(ctx context.Context, log logger.ILogger, projectID string) ([]models.ProjectDetail, error) {
+	result, err := r.queries.FindProjectDetails(ctx, projectID)
 	if err != nil {
+		log.Error("failed to find project details", err, "project_id", projectID)
 		return nil, err
 	}
 
-	return sliceutils.Map(result, func(in sqlc.GetProjectDetailByIDRow) models.ProjectDetail {
+	return sliceutils.Map(result, func(in sqlc.FindProjectDetailsRow) models.ProjectDetail {
 		return models.ProjectDetail{
 			ProjectID:         in.ProjectID,
 			ProjectName:       in.ProjectName,
 			ProjectCreator:    in.ProjectCreator,
 			ProjectUpdatedAt:  in.ProjectUpdatedAt,
 			DeviceName:        in.DeviceName,
+			DeviceOrder:       in.DeviceOrder,
 			ParticipantName:   in.ParticipantName,
 			ParticipantSerial: in.ParticipantSerial,
 			InformationID:     in.InformationID,

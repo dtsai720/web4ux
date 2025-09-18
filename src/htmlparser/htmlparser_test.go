@@ -1,6 +1,7 @@
 package htmlparser_test
 
 import (
+	"context"
 	_ "embed"
 	"fmt"
 	"testing"
@@ -10,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/web4ux/src/htmlparser"
+	"github.com/web4ux/src/logger"
 )
 
 //go:embed testdata/projects.xml
@@ -151,7 +153,9 @@ func TestExtractProjectSummaries(t *testing.T) {
 	for _, tt := range extractProjectSummariesTestCases {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			result, err := htmlparser.ExtractProjectSummaries(tt.htmlContent)
+			ctx := context.Background()
+			log := logger.NewTestLogger()
+			result, err := htmlparser.ExtractProjectSummaries(ctx, log, tt.htmlContent)
 
 			if tt.expectedError {
 				assert.Error(t, err)
@@ -178,7 +182,9 @@ func TestExtractProjectSummaries_WithTestData(t *testing.T) {
 		return
 	}
 
-	result, err := htmlparser.ExtractProjectSummaries(projectsXMLData)
+	ctx := context.Background()
+	log := logger.NewTestLogger()
+	result, err := htmlparser.ExtractProjectSummaries(ctx, log, projectsXMLData)
 	require.NoError(t, err)
 
 	// If it works, validate the results
@@ -244,7 +250,9 @@ func TestExtractProjectSummaries_EdgeCases(t *testing.T) {
 	for _, tt := range edgeCasesTestCases {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			result, err := htmlparser.ExtractProjectSummaries(tt.htmlContent)
+			ctx := context.Background()
+			log := logger.NewTestLogger()
+			result, err := htmlparser.ExtractProjectSummaries(ctx, log, tt.htmlContent)
 			assert.Equal(t, tt.expectError, err != nil)
 			if !tt.expectError {
 				assert.NotNil(t, result)
@@ -271,7 +279,9 @@ func TestExtractProjectSummaries_SpecialCharacters(t *testing.T) {
 	</div>
 	`
 
-	result, err := htmlparser.ExtractProjectSummaries(htmlContent)
+	ctx := context.Background()
+	log := logger.NewTestLogger()
+	result, err := htmlparser.ExtractProjectSummaries(ctx, log, htmlContent)
 	if err != nil {
 		t.Logf("Error parsing special characters: %v", err)
 		t.Skip("Special character test failed, likely due to HTML structure mismatch")
@@ -313,7 +323,9 @@ func TestExtractProjectSummaries_WhitespaceHandling(t *testing.T) {
 	</div>
 	`
 
-	result, err := htmlparser.ExtractProjectSummaries(htmlContent)
+	ctx := context.Background()
+	log := logger.NewTestLogger()
+	result, err := htmlparser.ExtractProjectSummaries(ctx, log, htmlContent)
 	if err != nil {
 		t.Logf("Error parsing whitespace content: %v", err)
 		t.Skip("Whitespace test failed, likely due to HTML structure mismatch")
@@ -357,7 +369,9 @@ func TestExtractProjectSummaries_AllTestData(t *testing.T) {
 				return
 			}
 
-			result, err := htmlparser.ExtractProjectSummaries(tc.data)
+			ctx := context.Background()
+			log := logger.NewTestLogger()
+			result, err := htmlparser.ExtractProjectSummaries(ctx, log, tc.data)
 
 			// Log results for manual verification
 			if err != nil {
@@ -392,9 +406,11 @@ func BenchmarkExtractProjectSummaries(b *testing.B) {
 	</div>
 	`
 
+	ctx := context.Background()
+	log := logger.NewTestLogger()
 	b.ResetTimer()
 	for b.Loop() {
-		_, _ = htmlparser.ExtractProjectSummaries(htmlContent)
+		_, _ = htmlparser.ExtractProjectSummaries(ctx, log, htmlContent)
 	}
 }
 
@@ -420,8 +436,10 @@ func BenchmarkExtractProjectSummaries_Large(b *testing.B) {
 	}
 	htmlContent += `</div>`
 
+	ctx := context.Background()
+	log := logger.NewTestLogger()
 	b.ResetTimer()
 	for b.Loop() {
-		_, _ = htmlparser.ExtractProjectSummaries(htmlContent)
+		_, _ = htmlparser.ExtractProjectSummaries(ctx, log, htmlContent)
 	}
 }

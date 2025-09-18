@@ -1,5 +1,25 @@
 import React from 'react';
 
+// Navigation item component
+const NavigationItem = ({ label, value, onBack, headingLevel = 'h5' }) => {
+  const HeadingTag = headingLevel;
+
+  return (
+    <div className="d-flex align-items-center mb-3">
+      <button
+        className="btn btn-sm btn-outline-secondary me-2"
+        onClick={onBack}
+        title={`Back to ${label}s`}
+      >
+        <i className="bi bi-arrow-left"></i> Back to {label}s
+      </button>
+      <HeadingTag className="mb-0">
+        {label}: {value}
+      </HeadingTag>
+    </div>
+  );
+};
+
 const OutlierNavigation = ({
   selectedDevice,
   selectedParticipant,
@@ -8,42 +28,42 @@ const OutlierNavigation = ({
   onBackToParticipants,
   onBackToTrails
 }) => {
+  const navigationItems = [
+    {
+      condition: selectedDevice,
+      label: 'Device',
+      value: selectedDevice,
+      onBack: onBackToDevices,
+      headingLevel: 'h5'
+    },
+    {
+      condition: selectedParticipant,
+      label: 'Participant',
+      value: selectedParticipant,
+      onBack: onBackToParticipants,
+      headingLevel: 'h6'
+    },
+    {
+      condition: selectedTrail,
+      label: 'Trail',
+      value: selectedTrail,
+      onBack: onBackToTrails,
+      headingLevel: 'h6'
+    }
+  ];
+
   return (
     <div>
-      {selectedDevice && (
-        <div className="d-flex align-items-center mb-3">
-          <button
-            className="btn btn-sm btn-outline-secondary me-2"
-            onClick={onBackToDevices}
-          >
-            <i className="bi bi-arrow-left"></i> Back to Devices
-          </button>
-          <h5 className="mb-0">Device: {selectedDevice}</h5>
-        </div>
-      )}
-
-      {selectedParticipant && (
-        <div className="d-flex align-items-center mb-3">
-          <button
-            className="btn btn-sm btn-outline-secondary me-2"
-            onClick={onBackToParticipants}
-          >
-            <i className="bi bi-arrow-left"></i> Back to Participants
-          </button>
-          <h6 className="mb-0">Participant: {selectedParticipant}</h6>
-        </div>
-      )}
-
-      {selectedTrail && (
-        <div className="d-flex align-items-center mb-3">
-          <button
-            className="btn btn-sm btn-outline-secondary me-2"
-            onClick={onBackToTrails}
-          >
-            <i className="bi bi-arrow-left"></i> Back to Trails
-          </button>
-          <h6 className="mb-0">Trail: {selectedTrail}</h6>
-        </div>
+      {navigationItems.map((item, index) =>
+        item.condition && (
+          <NavigationItem
+            key={index}
+            label={item.label}
+            value={item.value}
+            onBack={item.onBack}
+            headingLevel={item.headingLevel}
+          />
+        )
       )}
     </div>
   );

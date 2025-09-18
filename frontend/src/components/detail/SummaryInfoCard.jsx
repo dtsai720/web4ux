@@ -1,10 +1,4 @@
-import React from 'react';
 
-/**
- * Component to display summary information in a card
- * @param {Object} props - Component props
- * @param {Object} props.summaryInfo - Summary information object
- */
 const SummaryInfoCard = ({ summaryInfo }) => {
   if (!summaryInfo) return null;
 

@@ -1,6 +1,12 @@
 package htmlparser
 
-func ExtractWinfittsDetails(htmlContent string) ([]WinfittsRawData, error) {
+import (
+	"context"
+
+	"github.com/web4ux/src/logger"
+)
+
+func ExtractWinfittsDetails(ctx context.Context, log logger.ILogger, htmlContent string) ([]WinfittsRawData, error) {
 	contents := parseContentForWinfittsDetails(htmlContent)
 	var output []WinfittsRawData
 	for i := 1; i < len(contents); i++ {

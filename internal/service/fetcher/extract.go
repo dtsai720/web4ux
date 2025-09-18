@@ -15,7 +15,7 @@ func (s *Service) extractWinfittsDetails(ctx context.Context, log logger.ILogger
 		return nil, err
 	}
 
-	return htmlparser.ExtractWinfittsDetails(string(htmlContent))
+	return htmlparser.ExtractWinfittsDetails(ctx, log, string(htmlContent))
 }
 
 func (s *Service) extractRawDataLinks(ctx context.Context, log logger.ILogger, summary *htmlparser.ProjectSummary) ([]string, error) {
@@ -27,7 +27,7 @@ func (s *Service) extractRawDataLinks(ctx context.Context, log logger.ILogger, s
 		return nil, err
 	}
 
-	return htmlparser.ExtractRawDataLinks(string(htmlContent)), nil
+	return htmlparser.ExtractRawDataLinks(ctx, log, string(htmlContent)), nil
 }
 
 func (s *Service) extractProjectSummaries(ctx context.Context, log logger.ILogger, offset int) ([]htmlparser.ProjectSummary, error) {
@@ -36,5 +36,5 @@ func (s *Service) extractProjectSummaries(ctx context.Context, log logger.ILogge
 		return nil, err
 	}
 
-	return htmlparser.ExtractProjectSummaries(string(htmlContent))
+	return htmlparser.ExtractProjectSummaries(ctx, log, string(htmlContent))
 }

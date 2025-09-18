@@ -23,8 +23,20 @@ const MovementTimeMatrixComponent = ({
       const results = calculateMoveTimeAnalysis(rawData);
       setAnalysisData(results);
 
-      // Get available devices and set default selection
-      const devices = Object.keys(results);
+      // Get available devices sorted by deviceOrder and set default selection
+      // Create deviceOrder mapping from rawData
+      const deviceOrderMap = {};
+      rawData.forEach(record => {
+        if (!deviceOrderMap[record.deviceName] && record.deviceOrder) {
+          deviceOrderMap[record.deviceName] = record.deviceOrder;
+        }
+      });
+
+      const devices = Object.keys(results).sort((a, b) => {
+        const orderA = deviceOrderMap[a] || '';
+        const orderB = deviceOrderMap[b] || '';
+        return orderA.localeCompare(orderB);
+      });
       setAvailableDevices(devices);
       if (devices.length > 0 && !selectedDevice) {
         setSelectedDevice(devices[0]); // Set first device as default
@@ -32,7 +44,7 @@ const MovementTimeMatrixComponent = ({
 
       setLoading(false);
     }
-  }, [rawData]);
+  }, [rawData, selectedDevice]);
 
   // Handle device selection
   const handleDeviceChange = (deviceName) => {

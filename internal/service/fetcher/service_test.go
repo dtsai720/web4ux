@@ -243,18 +243,18 @@ func getFetchDataTestCases() []fetchDataTestCase {
 	return cases
 }
 
-func setupFetchDataMocks(t *testing.T, tt fetchDataTestCase) (*mock_repository.MockIRepository, *mock_src_request.MockIClient) {
+func setupFetchDataMocks(t *testing.T, tt fetchDataTestCase) (*mock_repository.MockIRepository, *mock_src_request.MockIClient, logger.ILogger) {
 	t.Helper()
 
 	ctrl := gomock.NewController(t)
 	t.Cleanup(ctrl.Finish)
 
-	ctx := t.Context()
 	mockDB := mock_repository.NewMockIRepository(ctrl)
 	mockClient := mock_src_request.NewMockIClient(ctrl)
 
 	// Set up database mock
-	mockDB.EXPECT().GetProject(ctx, tt.input.ID).
+	log := logger.NewTestLogger()
+	mockDB.EXPECT().FindProject(gomock.Any(), gomock.Any(), tt.input.ID).
 		Return(tt.dbResult.Result, tt.dbResult.Error).Times(tt.dbResult.Count)
 
 	// Set up client mock
@@ -269,10 +269,10 @@ func setupFetchDataMocks(t *testing.T, tt fetchDataTestCase) (*mock_repository.M
 	}
 
 	// Set up database upsert mock
-	mockDB.EXPECT().UpsertExtractWinfittsDetails(gomock.Any(), gomock.Any(), gomock.Any()).
+	mockDB.EXPECT().UpsertExtractWinfittsDetails(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 		Return(tt.dbUpsert.Error).Times(tt.dbUpsert.Count)
 
-	return mockDB, mockClient
+	return mockDB, mockClient, log
 }
 
 func TestFetchDataAndSave(t *testing.T) {
@@ -284,14 +284,14 @@ func TestFetchDataAndSave(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			mockDB, mockClient := setupFetchDataMocks(t, tt)
+			mockDB, mockClient, log := setupFetchDataMocks(t, tt)
 
 			service := fetcher.New(
 				fetcher.WithDatabase(mockDB),
 				fetcher.WithClient(mockClient),
 			)
 
-			err := service.FetchDataAndSave(t.Context(), logger.NewTestLogger(), tt.input)
+			err := service.FetchDataAndSave(t.Context(), log, tt.input)
 			assert.Equal(t, tt.expectError, err != nil)
 		})
 	}

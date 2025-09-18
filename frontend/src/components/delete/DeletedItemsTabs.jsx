@@ -1,15 +1,5 @@
-import React from 'react';
 import { toggleActiveTab } from '../../utils/delete/deleteUtils';
 
-/**
- * Component for the tabs navigation in the deleted items view
- * @param {string} activeTab - The currently active tab
- * @param {Function} setActiveTab - Function to set the active tab
- * @param {Object} deletedTrails - Object containing deleted trails
- * @param {Object} deletedParticipants - Object containing deleted participants
- * @param {Function} closeDeleteMode - Function to close delete mode
- * @returns {JSX.Element} - The tabs navigation component
- */
 const DeletedItemsTabs = ({
   activeTab,
   setActiveTab,

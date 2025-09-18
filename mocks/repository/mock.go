@@ -16,6 +16,7 @@ import (
 
 	models "github.com/web4ux/models"
 	sqlc "github.com/web4ux/repository/sqlc"
+	logger "github.com/web4ux/src/logger"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -58,94 +59,94 @@ func (mr *MockListProjectMockRecorder) CountProjects(ctx, arg any) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountProjects", reflect.TypeOf((*MockListProject)(nil).CountProjects), ctx, arg)
 }
 
-// ListProjectsOrderByCreatorAsc mocks base method.
-func (m *MockListProject) ListProjectsOrderByCreatorAsc(ctx context.Context, arg sqlc.ListProjectsOrderByCreatorAscParams) ([]sqlc.Project, error) {
+// ListProjectsByCreatorAsc mocks base method.
+func (m *MockListProject) ListProjectsByCreatorAsc(ctx context.Context, arg sqlc.ListProjectsByCreatorAscParams) ([]sqlc.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProjectsOrderByCreatorAsc", ctx, arg)
+	ret := m.ctrl.Call(m, "ListProjectsByCreatorAsc", ctx, arg)
 	ret0, _ := ret[0].([]sqlc.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListProjectsOrderByCreatorAsc indicates an expected call of ListProjectsOrderByCreatorAsc.
-func (mr *MockListProjectMockRecorder) ListProjectsOrderByCreatorAsc(ctx, arg any) *gomock.Call {
+// ListProjectsByCreatorAsc indicates an expected call of ListProjectsByCreatorAsc.
+func (mr *MockListProjectMockRecorder) ListProjectsByCreatorAsc(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsOrderByCreatorAsc", reflect.TypeOf((*MockListProject)(nil).ListProjectsOrderByCreatorAsc), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsByCreatorAsc", reflect.TypeOf((*MockListProject)(nil).ListProjectsByCreatorAsc), ctx, arg)
 }
 
-// ListProjectsOrderByCreatorDesc mocks base method.
-func (m *MockListProject) ListProjectsOrderByCreatorDesc(ctx context.Context, arg sqlc.ListProjectsOrderByCreatorDescParams) ([]sqlc.Project, error) {
+// ListProjectsByCreatorDesc mocks base method.
+func (m *MockListProject) ListProjectsByCreatorDesc(ctx context.Context, arg sqlc.ListProjectsByCreatorDescParams) ([]sqlc.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProjectsOrderByCreatorDesc", ctx, arg)
+	ret := m.ctrl.Call(m, "ListProjectsByCreatorDesc", ctx, arg)
 	ret0, _ := ret[0].([]sqlc.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListProjectsOrderByCreatorDesc indicates an expected call of ListProjectsOrderByCreatorDesc.
-func (mr *MockListProjectMockRecorder) ListProjectsOrderByCreatorDesc(ctx, arg any) *gomock.Call {
+// ListProjectsByCreatorDesc indicates an expected call of ListProjectsByCreatorDesc.
+func (mr *MockListProjectMockRecorder) ListProjectsByCreatorDesc(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsOrderByCreatorDesc", reflect.TypeOf((*MockListProject)(nil).ListProjectsOrderByCreatorDesc), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsByCreatorDesc", reflect.TypeOf((*MockListProject)(nil).ListProjectsByCreatorDesc), ctx, arg)
 }
 
-// ListProjectsOrderByNameAsc mocks base method.
-func (m *MockListProject) ListProjectsOrderByNameAsc(ctx context.Context, arg sqlc.ListProjectsOrderByNameAscParams) ([]sqlc.Project, error) {
+// ListProjectsByNameAsc mocks base method.
+func (m *MockListProject) ListProjectsByNameAsc(ctx context.Context, arg sqlc.ListProjectsByNameAscParams) ([]sqlc.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProjectsOrderByNameAsc", ctx, arg)
+	ret := m.ctrl.Call(m, "ListProjectsByNameAsc", ctx, arg)
 	ret0, _ := ret[0].([]sqlc.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListProjectsOrderByNameAsc indicates an expected call of ListProjectsOrderByNameAsc.
-func (mr *MockListProjectMockRecorder) ListProjectsOrderByNameAsc(ctx, arg any) *gomock.Call {
+// ListProjectsByNameAsc indicates an expected call of ListProjectsByNameAsc.
+func (mr *MockListProjectMockRecorder) ListProjectsByNameAsc(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsOrderByNameAsc", reflect.TypeOf((*MockListProject)(nil).ListProjectsOrderByNameAsc), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsByNameAsc", reflect.TypeOf((*MockListProject)(nil).ListProjectsByNameAsc), ctx, arg)
 }
 
-// ListProjectsOrderByNameDesc mocks base method.
-func (m *MockListProject) ListProjectsOrderByNameDesc(ctx context.Context, arg sqlc.ListProjectsOrderByNameDescParams) ([]sqlc.Project, error) {
+// ListProjectsByNameDesc mocks base method.
+func (m *MockListProject) ListProjectsByNameDesc(ctx context.Context, arg sqlc.ListProjectsByNameDescParams) ([]sqlc.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProjectsOrderByNameDesc", ctx, arg)
+	ret := m.ctrl.Call(m, "ListProjectsByNameDesc", ctx, arg)
 	ret0, _ := ret[0].([]sqlc.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListProjectsOrderByNameDesc indicates an expected call of ListProjectsOrderByNameDesc.
-func (mr *MockListProjectMockRecorder) ListProjectsOrderByNameDesc(ctx, arg any) *gomock.Call {
+// ListProjectsByNameDesc indicates an expected call of ListProjectsByNameDesc.
+func (mr *MockListProjectMockRecorder) ListProjectsByNameDesc(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsOrderByNameDesc", reflect.TypeOf((*MockListProject)(nil).ListProjectsOrderByNameDesc), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsByNameDesc", reflect.TypeOf((*MockListProject)(nil).ListProjectsByNameDesc), ctx, arg)
 }
 
-// ListProjectsOrderByUpdatedAtAsc mocks base method.
-func (m *MockListProject) ListProjectsOrderByUpdatedAtAsc(ctx context.Context, arg sqlc.ListProjectsOrderByUpdatedAtAscParams) ([]sqlc.Project, error) {
+// ListProjectsByTimeAsc mocks base method.
+func (m *MockListProject) ListProjectsByTimeAsc(ctx context.Context, arg sqlc.ListProjectsByTimeAscParams) ([]sqlc.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProjectsOrderByUpdatedAtAsc", ctx, arg)
+	ret := m.ctrl.Call(m, "ListProjectsByTimeAsc", ctx, arg)
 	ret0, _ := ret[0].([]sqlc.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListProjectsOrderByUpdatedAtAsc indicates an expected call of ListProjectsOrderByUpdatedAtAsc.
-func (mr *MockListProjectMockRecorder) ListProjectsOrderByUpdatedAtAsc(ctx, arg any) *gomock.Call {
+// ListProjectsByTimeAsc indicates an expected call of ListProjectsByTimeAsc.
+func (mr *MockListProjectMockRecorder) ListProjectsByTimeAsc(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsOrderByUpdatedAtAsc", reflect.TypeOf((*MockListProject)(nil).ListProjectsOrderByUpdatedAtAsc), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsByTimeAsc", reflect.TypeOf((*MockListProject)(nil).ListProjectsByTimeAsc), ctx, arg)
 }
 
-// ListProjectsOrderByUpdatedAtDesc mocks base method.
-func (m *MockListProject) ListProjectsOrderByUpdatedAtDesc(ctx context.Context, arg sqlc.ListProjectsOrderByUpdatedAtDescParams) ([]sqlc.Project, error) {
+// ListProjectsByTimeDesc mocks base method.
+func (m *MockListProject) ListProjectsByTimeDesc(ctx context.Context, arg sqlc.ListProjectsByTimeDescParams) ([]sqlc.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProjectsOrderByUpdatedAtDesc", ctx, arg)
+	ret := m.ctrl.Call(m, "ListProjectsByTimeDesc", ctx, arg)
 	ret0, _ := ret[0].([]sqlc.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListProjectsOrderByUpdatedAtDesc indicates an expected call of ListProjectsOrderByUpdatedAtDesc.
-func (mr *MockListProjectMockRecorder) ListProjectsOrderByUpdatedAtDesc(ctx, arg any) *gomock.Call {
+// ListProjectsByTimeDesc indicates an expected call of ListProjectsByTimeDesc.
+func (mr *MockListProjectMockRecorder) ListProjectsByTimeDesc(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsOrderByUpdatedAtDesc", reflect.TypeOf((*MockListProject)(nil).ListProjectsOrderByUpdatedAtDesc), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsByTimeDesc", reflect.TypeOf((*MockListProject)(nil).ListProjectsByTimeDesc), ctx, arg)
 }
 
 // MockCommand is a mock of Command interface.
@@ -172,18 +173,18 @@ func (m *MockCommand) EXPECT() *MockCommandMockRecorder {
 	return m.recorder
 }
 
-// DeleteWinfittsInformation mocks base method.
-func (m *MockCommand) DeleteWinfittsInformation(ctx context.Context, arg sqlc.DeleteWinfittsInformationParams) error {
+// SoftDeleteWinfittsInformation mocks base method.
+func (m *MockCommand) SoftDeleteWinfittsInformation(ctx context.Context, arg sqlc.SoftDeleteWinfittsInformationParams) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteWinfittsInformation", ctx, arg)
+	ret := m.ctrl.Call(m, "SoftDeleteWinfittsInformation", ctx, arg)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// DeleteWinfittsInformation indicates an expected call of DeleteWinfittsInformation.
-func (mr *MockCommandMockRecorder) DeleteWinfittsInformation(ctx, arg any) *gomock.Call {
+// SoftDeleteWinfittsInformation indicates an expected call of SoftDeleteWinfittsInformation.
+func (mr *MockCommandMockRecorder) SoftDeleteWinfittsInformation(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteWinfittsInformation", reflect.TypeOf((*MockCommand)(nil).DeleteWinfittsInformation), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SoftDeleteWinfittsInformation", reflect.TypeOf((*MockCommand)(nil).SoftDeleteWinfittsInformation), ctx, arg)
 }
 
 // UpsertDevices mocks base method.
@@ -315,124 +316,124 @@ func (mr *MockQueriesMockRecorder) CountProjects(ctx, arg any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountProjects", reflect.TypeOf((*MockQueries)(nil).CountProjects), ctx, arg)
 }
 
-// GetProject mocks base method.
-func (m *MockQueries) GetProject(ctx context.Context, id string) (sqlc.Project, error) {
+// FindProject mocks base method.
+func (m *MockQueries) FindProject(ctx context.Context, id string) (sqlc.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetProject", ctx, id)
+	ret := m.ctrl.Call(m, "FindProject", ctx, id)
 	ret0, _ := ret[0].(sqlc.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetProject indicates an expected call of GetProject.
-func (mr *MockQueriesMockRecorder) GetProject(ctx, id any) *gomock.Call {
+// FindProject indicates an expected call of FindProject.
+func (mr *MockQueriesMockRecorder) FindProject(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProject", reflect.TypeOf((*MockQueries)(nil).GetProject), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindProject", reflect.TypeOf((*MockQueries)(nil).FindProject), ctx, id)
 }
 
-// GetProjectDetailByID mocks base method.
-func (m *MockQueries) GetProjectDetailByID(ctx context.Context, projectID string) ([]sqlc.GetProjectDetailByIDRow, error) {
+// FindProjectDetails mocks base method.
+func (m *MockQueries) FindProjectDetails(ctx context.Context, projectID string) ([]sqlc.FindProjectDetailsRow, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetProjectDetailByID", ctx, projectID)
-	ret0, _ := ret[0].([]sqlc.GetProjectDetailByIDRow)
+	ret := m.ctrl.Call(m, "FindProjectDetails", ctx, projectID)
+	ret0, _ := ret[0].([]sqlc.FindProjectDetailsRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetProjectDetailByID indicates an expected call of GetProjectDetailByID.
-func (mr *MockQueriesMockRecorder) GetProjectDetailByID(ctx, projectID any) *gomock.Call {
+// FindProjectDetails indicates an expected call of FindProjectDetails.
+func (mr *MockQueriesMockRecorder) FindProjectDetails(ctx, projectID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectDetailByID", reflect.TypeOf((*MockQueries)(nil).GetProjectDetailByID), ctx, projectID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindProjectDetails", reflect.TypeOf((*MockQueries)(nil).FindProjectDetails), ctx, projectID)
 }
 
-// ListProjectsOrderByCreatorAsc mocks base method.
-func (m *MockQueries) ListProjectsOrderByCreatorAsc(ctx context.Context, arg sqlc.ListProjectsOrderByCreatorAscParams) ([]sqlc.Project, error) {
+// ListProjectsByCreatorAsc mocks base method.
+func (m *MockQueries) ListProjectsByCreatorAsc(ctx context.Context, arg sqlc.ListProjectsByCreatorAscParams) ([]sqlc.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProjectsOrderByCreatorAsc", ctx, arg)
+	ret := m.ctrl.Call(m, "ListProjectsByCreatorAsc", ctx, arg)
 	ret0, _ := ret[0].([]sqlc.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListProjectsOrderByCreatorAsc indicates an expected call of ListProjectsOrderByCreatorAsc.
-func (mr *MockQueriesMockRecorder) ListProjectsOrderByCreatorAsc(ctx, arg any) *gomock.Call {
+// ListProjectsByCreatorAsc indicates an expected call of ListProjectsByCreatorAsc.
+func (mr *MockQueriesMockRecorder) ListProjectsByCreatorAsc(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsOrderByCreatorAsc", reflect.TypeOf((*MockQueries)(nil).ListProjectsOrderByCreatorAsc), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsByCreatorAsc", reflect.TypeOf((*MockQueries)(nil).ListProjectsByCreatorAsc), ctx, arg)
 }
 
-// ListProjectsOrderByCreatorDesc mocks base method.
-func (m *MockQueries) ListProjectsOrderByCreatorDesc(ctx context.Context, arg sqlc.ListProjectsOrderByCreatorDescParams) ([]sqlc.Project, error) {
+// ListProjectsByCreatorDesc mocks base method.
+func (m *MockQueries) ListProjectsByCreatorDesc(ctx context.Context, arg sqlc.ListProjectsByCreatorDescParams) ([]sqlc.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProjectsOrderByCreatorDesc", ctx, arg)
+	ret := m.ctrl.Call(m, "ListProjectsByCreatorDesc", ctx, arg)
 	ret0, _ := ret[0].([]sqlc.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListProjectsOrderByCreatorDesc indicates an expected call of ListProjectsOrderByCreatorDesc.
-func (mr *MockQueriesMockRecorder) ListProjectsOrderByCreatorDesc(ctx, arg any) *gomock.Call {
+// ListProjectsByCreatorDesc indicates an expected call of ListProjectsByCreatorDesc.
+func (mr *MockQueriesMockRecorder) ListProjectsByCreatorDesc(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsOrderByCreatorDesc", reflect.TypeOf((*MockQueries)(nil).ListProjectsOrderByCreatorDesc), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsByCreatorDesc", reflect.TypeOf((*MockQueries)(nil).ListProjectsByCreatorDesc), ctx, arg)
 }
 
-// ListProjectsOrderByNameAsc mocks base method.
-func (m *MockQueries) ListProjectsOrderByNameAsc(ctx context.Context, arg sqlc.ListProjectsOrderByNameAscParams) ([]sqlc.Project, error) {
+// ListProjectsByNameAsc mocks base method.
+func (m *MockQueries) ListProjectsByNameAsc(ctx context.Context, arg sqlc.ListProjectsByNameAscParams) ([]sqlc.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProjectsOrderByNameAsc", ctx, arg)
+	ret := m.ctrl.Call(m, "ListProjectsByNameAsc", ctx, arg)
 	ret0, _ := ret[0].([]sqlc.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListProjectsOrderByNameAsc indicates an expected call of ListProjectsOrderByNameAsc.
-func (mr *MockQueriesMockRecorder) ListProjectsOrderByNameAsc(ctx, arg any) *gomock.Call {
+// ListProjectsByNameAsc indicates an expected call of ListProjectsByNameAsc.
+func (mr *MockQueriesMockRecorder) ListProjectsByNameAsc(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsOrderByNameAsc", reflect.TypeOf((*MockQueries)(nil).ListProjectsOrderByNameAsc), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsByNameAsc", reflect.TypeOf((*MockQueries)(nil).ListProjectsByNameAsc), ctx, arg)
 }
 
-// ListProjectsOrderByNameDesc mocks base method.
-func (m *MockQueries) ListProjectsOrderByNameDesc(ctx context.Context, arg sqlc.ListProjectsOrderByNameDescParams) ([]sqlc.Project, error) {
+// ListProjectsByNameDesc mocks base method.
+func (m *MockQueries) ListProjectsByNameDesc(ctx context.Context, arg sqlc.ListProjectsByNameDescParams) ([]sqlc.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProjectsOrderByNameDesc", ctx, arg)
+	ret := m.ctrl.Call(m, "ListProjectsByNameDesc", ctx, arg)
 	ret0, _ := ret[0].([]sqlc.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListProjectsOrderByNameDesc indicates an expected call of ListProjectsOrderByNameDesc.
-func (mr *MockQueriesMockRecorder) ListProjectsOrderByNameDesc(ctx, arg any) *gomock.Call {
+// ListProjectsByNameDesc indicates an expected call of ListProjectsByNameDesc.
+func (mr *MockQueriesMockRecorder) ListProjectsByNameDesc(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsOrderByNameDesc", reflect.TypeOf((*MockQueries)(nil).ListProjectsOrderByNameDesc), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsByNameDesc", reflect.TypeOf((*MockQueries)(nil).ListProjectsByNameDesc), ctx, arg)
 }
 
-// ListProjectsOrderByUpdatedAtAsc mocks base method.
-func (m *MockQueries) ListProjectsOrderByUpdatedAtAsc(ctx context.Context, arg sqlc.ListProjectsOrderByUpdatedAtAscParams) ([]sqlc.Project, error) {
+// ListProjectsByTimeAsc mocks base method.
+func (m *MockQueries) ListProjectsByTimeAsc(ctx context.Context, arg sqlc.ListProjectsByTimeAscParams) ([]sqlc.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProjectsOrderByUpdatedAtAsc", ctx, arg)
+	ret := m.ctrl.Call(m, "ListProjectsByTimeAsc", ctx, arg)
 	ret0, _ := ret[0].([]sqlc.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListProjectsOrderByUpdatedAtAsc indicates an expected call of ListProjectsOrderByUpdatedAtAsc.
-func (mr *MockQueriesMockRecorder) ListProjectsOrderByUpdatedAtAsc(ctx, arg any) *gomock.Call {
+// ListProjectsByTimeAsc indicates an expected call of ListProjectsByTimeAsc.
+func (mr *MockQueriesMockRecorder) ListProjectsByTimeAsc(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsOrderByUpdatedAtAsc", reflect.TypeOf((*MockQueries)(nil).ListProjectsOrderByUpdatedAtAsc), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsByTimeAsc", reflect.TypeOf((*MockQueries)(nil).ListProjectsByTimeAsc), ctx, arg)
 }
 
-// ListProjectsOrderByUpdatedAtDesc mocks base method.
-func (m *MockQueries) ListProjectsOrderByUpdatedAtDesc(ctx context.Context, arg sqlc.ListProjectsOrderByUpdatedAtDescParams) ([]sqlc.Project, error) {
+// ListProjectsByTimeDesc mocks base method.
+func (m *MockQueries) ListProjectsByTimeDesc(ctx context.Context, arg sqlc.ListProjectsByTimeDescParams) ([]sqlc.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProjectsOrderByUpdatedAtDesc", ctx, arg)
+	ret := m.ctrl.Call(m, "ListProjectsByTimeDesc", ctx, arg)
 	ret0, _ := ret[0].([]sqlc.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListProjectsOrderByUpdatedAtDesc indicates an expected call of ListProjectsOrderByUpdatedAtDesc.
-func (mr *MockQueriesMockRecorder) ListProjectsOrderByUpdatedAtDesc(ctx, arg any) *gomock.Call {
+// ListProjectsByTimeDesc indicates an expected call of ListProjectsByTimeDesc.
+func (mr *MockQueriesMockRecorder) ListProjectsByTimeDesc(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsOrderByUpdatedAtDesc", reflect.TypeOf((*MockQueries)(nil).ListProjectsOrderByUpdatedAtDesc), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsByTimeDesc", reflect.TypeOf((*MockQueries)(nil).ListProjectsByTimeDesc), ctx, arg)
 }
 
 // MockIDatabase is a mock of IDatabase interface.
@@ -474,138 +475,138 @@ func (mr *MockIDatabaseMockRecorder) CountProjects(ctx, arg any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountProjects", reflect.TypeOf((*MockIDatabase)(nil).CountProjects), ctx, arg)
 }
 
-// DeleteWinfittsInformation mocks base method.
-func (m *MockIDatabase) DeleteWinfittsInformation(ctx context.Context, arg sqlc.DeleteWinfittsInformationParams) error {
+// FindProject mocks base method.
+func (m *MockIDatabase) FindProject(ctx context.Context, id string) (sqlc.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteWinfittsInformation", ctx, arg)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// DeleteWinfittsInformation indicates an expected call of DeleteWinfittsInformation.
-func (mr *MockIDatabaseMockRecorder) DeleteWinfittsInformation(ctx, arg any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteWinfittsInformation", reflect.TypeOf((*MockIDatabase)(nil).DeleteWinfittsInformation), ctx, arg)
-}
-
-// GetProject mocks base method.
-func (m *MockIDatabase) GetProject(ctx context.Context, id string) (sqlc.Project, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetProject", ctx, id)
+	ret := m.ctrl.Call(m, "FindProject", ctx, id)
 	ret0, _ := ret[0].(sqlc.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetProject indicates an expected call of GetProject.
-func (mr *MockIDatabaseMockRecorder) GetProject(ctx, id any) *gomock.Call {
+// FindProject indicates an expected call of FindProject.
+func (mr *MockIDatabaseMockRecorder) FindProject(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProject", reflect.TypeOf((*MockIDatabase)(nil).GetProject), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindProject", reflect.TypeOf((*MockIDatabase)(nil).FindProject), ctx, id)
 }
 
-// GetProjectDetailByID mocks base method.
-func (m *MockIDatabase) GetProjectDetailByID(ctx context.Context, projectID string) ([]sqlc.GetProjectDetailByIDRow, error) {
+// FindProjectDetails mocks base method.
+func (m *MockIDatabase) FindProjectDetails(ctx context.Context, projectID string) ([]sqlc.FindProjectDetailsRow, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetProjectDetailByID", ctx, projectID)
-	ret0, _ := ret[0].([]sqlc.GetProjectDetailByIDRow)
+	ret := m.ctrl.Call(m, "FindProjectDetails", ctx, projectID)
+	ret0, _ := ret[0].([]sqlc.FindProjectDetailsRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetProjectDetailByID indicates an expected call of GetProjectDetailByID.
-func (mr *MockIDatabaseMockRecorder) GetProjectDetailByID(ctx, projectID any) *gomock.Call {
+// FindProjectDetails indicates an expected call of FindProjectDetails.
+func (mr *MockIDatabaseMockRecorder) FindProjectDetails(ctx, projectID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectDetailByID", reflect.TypeOf((*MockIDatabase)(nil).GetProjectDetailByID), ctx, projectID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindProjectDetails", reflect.TypeOf((*MockIDatabase)(nil).FindProjectDetails), ctx, projectID)
 }
 
-// ListProjectsOrderByCreatorAsc mocks base method.
-func (m *MockIDatabase) ListProjectsOrderByCreatorAsc(ctx context.Context, arg sqlc.ListProjectsOrderByCreatorAscParams) ([]sqlc.Project, error) {
+// ListProjectsByCreatorAsc mocks base method.
+func (m *MockIDatabase) ListProjectsByCreatorAsc(ctx context.Context, arg sqlc.ListProjectsByCreatorAscParams) ([]sqlc.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProjectsOrderByCreatorAsc", ctx, arg)
+	ret := m.ctrl.Call(m, "ListProjectsByCreatorAsc", ctx, arg)
 	ret0, _ := ret[0].([]sqlc.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListProjectsOrderByCreatorAsc indicates an expected call of ListProjectsOrderByCreatorAsc.
-func (mr *MockIDatabaseMockRecorder) ListProjectsOrderByCreatorAsc(ctx, arg any) *gomock.Call {
+// ListProjectsByCreatorAsc indicates an expected call of ListProjectsByCreatorAsc.
+func (mr *MockIDatabaseMockRecorder) ListProjectsByCreatorAsc(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsOrderByCreatorAsc", reflect.TypeOf((*MockIDatabase)(nil).ListProjectsOrderByCreatorAsc), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsByCreatorAsc", reflect.TypeOf((*MockIDatabase)(nil).ListProjectsByCreatorAsc), ctx, arg)
 }
 
-// ListProjectsOrderByCreatorDesc mocks base method.
-func (m *MockIDatabase) ListProjectsOrderByCreatorDesc(ctx context.Context, arg sqlc.ListProjectsOrderByCreatorDescParams) ([]sqlc.Project, error) {
+// ListProjectsByCreatorDesc mocks base method.
+func (m *MockIDatabase) ListProjectsByCreatorDesc(ctx context.Context, arg sqlc.ListProjectsByCreatorDescParams) ([]sqlc.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProjectsOrderByCreatorDesc", ctx, arg)
+	ret := m.ctrl.Call(m, "ListProjectsByCreatorDesc", ctx, arg)
 	ret0, _ := ret[0].([]sqlc.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListProjectsOrderByCreatorDesc indicates an expected call of ListProjectsOrderByCreatorDesc.
-func (mr *MockIDatabaseMockRecorder) ListProjectsOrderByCreatorDesc(ctx, arg any) *gomock.Call {
+// ListProjectsByCreatorDesc indicates an expected call of ListProjectsByCreatorDesc.
+func (mr *MockIDatabaseMockRecorder) ListProjectsByCreatorDesc(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsOrderByCreatorDesc", reflect.TypeOf((*MockIDatabase)(nil).ListProjectsOrderByCreatorDesc), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsByCreatorDesc", reflect.TypeOf((*MockIDatabase)(nil).ListProjectsByCreatorDesc), ctx, arg)
 }
 
-// ListProjectsOrderByNameAsc mocks base method.
-func (m *MockIDatabase) ListProjectsOrderByNameAsc(ctx context.Context, arg sqlc.ListProjectsOrderByNameAscParams) ([]sqlc.Project, error) {
+// ListProjectsByNameAsc mocks base method.
+func (m *MockIDatabase) ListProjectsByNameAsc(ctx context.Context, arg sqlc.ListProjectsByNameAscParams) ([]sqlc.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProjectsOrderByNameAsc", ctx, arg)
+	ret := m.ctrl.Call(m, "ListProjectsByNameAsc", ctx, arg)
 	ret0, _ := ret[0].([]sqlc.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListProjectsOrderByNameAsc indicates an expected call of ListProjectsOrderByNameAsc.
-func (mr *MockIDatabaseMockRecorder) ListProjectsOrderByNameAsc(ctx, arg any) *gomock.Call {
+// ListProjectsByNameAsc indicates an expected call of ListProjectsByNameAsc.
+func (mr *MockIDatabaseMockRecorder) ListProjectsByNameAsc(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsOrderByNameAsc", reflect.TypeOf((*MockIDatabase)(nil).ListProjectsOrderByNameAsc), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsByNameAsc", reflect.TypeOf((*MockIDatabase)(nil).ListProjectsByNameAsc), ctx, arg)
 }
 
-// ListProjectsOrderByNameDesc mocks base method.
-func (m *MockIDatabase) ListProjectsOrderByNameDesc(ctx context.Context, arg sqlc.ListProjectsOrderByNameDescParams) ([]sqlc.Project, error) {
+// ListProjectsByNameDesc mocks base method.
+func (m *MockIDatabase) ListProjectsByNameDesc(ctx context.Context, arg sqlc.ListProjectsByNameDescParams) ([]sqlc.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProjectsOrderByNameDesc", ctx, arg)
+	ret := m.ctrl.Call(m, "ListProjectsByNameDesc", ctx, arg)
 	ret0, _ := ret[0].([]sqlc.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListProjectsOrderByNameDesc indicates an expected call of ListProjectsOrderByNameDesc.
-func (mr *MockIDatabaseMockRecorder) ListProjectsOrderByNameDesc(ctx, arg any) *gomock.Call {
+// ListProjectsByNameDesc indicates an expected call of ListProjectsByNameDesc.
+func (mr *MockIDatabaseMockRecorder) ListProjectsByNameDesc(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsOrderByNameDesc", reflect.TypeOf((*MockIDatabase)(nil).ListProjectsOrderByNameDesc), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsByNameDesc", reflect.TypeOf((*MockIDatabase)(nil).ListProjectsByNameDesc), ctx, arg)
 }
 
-// ListProjectsOrderByUpdatedAtAsc mocks base method.
-func (m *MockIDatabase) ListProjectsOrderByUpdatedAtAsc(ctx context.Context, arg sqlc.ListProjectsOrderByUpdatedAtAscParams) ([]sqlc.Project, error) {
+// ListProjectsByTimeAsc mocks base method.
+func (m *MockIDatabase) ListProjectsByTimeAsc(ctx context.Context, arg sqlc.ListProjectsByTimeAscParams) ([]sqlc.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProjectsOrderByUpdatedAtAsc", ctx, arg)
+	ret := m.ctrl.Call(m, "ListProjectsByTimeAsc", ctx, arg)
 	ret0, _ := ret[0].([]sqlc.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListProjectsOrderByUpdatedAtAsc indicates an expected call of ListProjectsOrderByUpdatedAtAsc.
-func (mr *MockIDatabaseMockRecorder) ListProjectsOrderByUpdatedAtAsc(ctx, arg any) *gomock.Call {
+// ListProjectsByTimeAsc indicates an expected call of ListProjectsByTimeAsc.
+func (mr *MockIDatabaseMockRecorder) ListProjectsByTimeAsc(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsOrderByUpdatedAtAsc", reflect.TypeOf((*MockIDatabase)(nil).ListProjectsOrderByUpdatedAtAsc), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsByTimeAsc", reflect.TypeOf((*MockIDatabase)(nil).ListProjectsByTimeAsc), ctx, arg)
 }
 
-// ListProjectsOrderByUpdatedAtDesc mocks base method.
-func (m *MockIDatabase) ListProjectsOrderByUpdatedAtDesc(ctx context.Context, arg sqlc.ListProjectsOrderByUpdatedAtDescParams) ([]sqlc.Project, error) {
+// ListProjectsByTimeDesc mocks base method.
+func (m *MockIDatabase) ListProjectsByTimeDesc(ctx context.Context, arg sqlc.ListProjectsByTimeDescParams) ([]sqlc.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProjectsOrderByUpdatedAtDesc", ctx, arg)
+	ret := m.ctrl.Call(m, "ListProjectsByTimeDesc", ctx, arg)
 	ret0, _ := ret[0].([]sqlc.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListProjectsOrderByUpdatedAtDesc indicates an expected call of ListProjectsOrderByUpdatedAtDesc.
-func (mr *MockIDatabaseMockRecorder) ListProjectsOrderByUpdatedAtDesc(ctx, arg any) *gomock.Call {
+// ListProjectsByTimeDesc indicates an expected call of ListProjectsByTimeDesc.
+func (mr *MockIDatabaseMockRecorder) ListProjectsByTimeDesc(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsOrderByUpdatedAtDesc", reflect.TypeOf((*MockIDatabase)(nil).ListProjectsOrderByUpdatedAtDesc), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsByTimeDesc", reflect.TypeOf((*MockIDatabase)(nil).ListProjectsByTimeDesc), ctx, arg)
+}
+
+// SoftDeleteWinfittsInformation mocks base method.
+func (m *MockIDatabase) SoftDeleteWinfittsInformation(ctx context.Context, arg sqlc.SoftDeleteWinfittsInformationParams) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SoftDeleteWinfittsInformation", ctx, arg)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SoftDeleteWinfittsInformation indicates an expected call of SoftDeleteWinfittsInformation.
+func (mr *MockIDatabaseMockRecorder) SoftDeleteWinfittsInformation(ctx, arg any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SoftDeleteWinfittsInformation", reflect.TypeOf((*MockIDatabase)(nil).SoftDeleteWinfittsInformation), ctx, arg)
 }
 
 // UpsertDevices mocks base method.
@@ -736,32 +737,32 @@ func (m *MockCommandRepository) EXPECT() *MockCommandRepositoryMockRecorder {
 	return m.recorder
 }
 
-// DeleteOrRestoreWinfittsInformation mocks base method.
-func (m *MockCommandRepository) DeleteOrRestoreWinfittsInformation(ctx context.Context, arg sqlc.DeleteWinfittsInformationParams) error {
+// SoftDeleteWinfittsInformation mocks base method.
+func (m *MockCommandRepository) SoftDeleteWinfittsInformation(ctx context.Context, log logger.ILogger, arg sqlc.SoftDeleteWinfittsInformationParams) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteOrRestoreWinfittsInformation", ctx, arg)
+	ret := m.ctrl.Call(m, "SoftDeleteWinfittsInformation", ctx, log, arg)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// DeleteOrRestoreWinfittsInformation indicates an expected call of DeleteOrRestoreWinfittsInformation.
-func (mr *MockCommandRepositoryMockRecorder) DeleteOrRestoreWinfittsInformation(ctx, arg any) *gomock.Call {
+// SoftDeleteWinfittsInformation indicates an expected call of SoftDeleteWinfittsInformation.
+func (mr *MockCommandRepositoryMockRecorder) SoftDeleteWinfittsInformation(ctx, log, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteOrRestoreWinfittsInformation", reflect.TypeOf((*MockCommandRepository)(nil).DeleteOrRestoreWinfittsInformation), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SoftDeleteWinfittsInformation", reflect.TypeOf((*MockCommandRepository)(nil).SoftDeleteWinfittsInformation), ctx, log, arg)
 }
 
 // UpsertExtractWinfittsDetails mocks base method.
-func (m *MockCommandRepository) UpsertExtractWinfittsDetails(ctx context.Context, in models.ProjectSummary, rows []models.WinfittsRawData) error {
+func (m *MockCommandRepository) UpsertExtractWinfittsDetails(ctx context.Context, log logger.ILogger, in models.ProjectSummary, rows []models.WinfittsRawData) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpsertExtractWinfittsDetails", ctx, in, rows)
+	ret := m.ctrl.Call(m, "UpsertExtractWinfittsDetails", ctx, log, in, rows)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpsertExtractWinfittsDetails indicates an expected call of UpsertExtractWinfittsDetails.
-func (mr *MockCommandRepositoryMockRecorder) UpsertExtractWinfittsDetails(ctx, in, rows any) *gomock.Call {
+func (mr *MockCommandRepositoryMockRecorder) UpsertExtractWinfittsDetails(ctx, log, in, rows any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertExtractWinfittsDetails", reflect.TypeOf((*MockCommandRepository)(nil).UpsertExtractWinfittsDetails), ctx, in, rows)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertExtractWinfittsDetails", reflect.TypeOf((*MockCommandRepository)(nil).UpsertExtractWinfittsDetails), ctx, log, in, rows)
 }
 
 // MockQueryRepository is a mock of QueryRepository interface.
@@ -788,49 +789,49 @@ func (m *MockQueryRepository) EXPECT() *MockQueryRepositoryMockRecorder {
 	return m.recorder
 }
 
-// GetProject mocks base method.
-func (m *MockQueryRepository) GetProject(ctx context.Context, id string) (models.Project, error) {
+// FindProject mocks base method.
+func (m *MockQueryRepository) FindProject(ctx context.Context, log logger.ILogger, id string) (models.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetProject", ctx, id)
+	ret := m.ctrl.Call(m, "FindProject", ctx, log, id)
 	ret0, _ := ret[0].(models.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetProject indicates an expected call of GetProject.
-func (mr *MockQueryRepositoryMockRecorder) GetProject(ctx, id any) *gomock.Call {
+// FindProject indicates an expected call of FindProject.
+func (mr *MockQueryRepositoryMockRecorder) FindProject(ctx, log, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProject", reflect.TypeOf((*MockQueryRepository)(nil).GetProject), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindProject", reflect.TypeOf((*MockQueryRepository)(nil).FindProject), ctx, log, id)
 }
 
-// GetProjectDetailByID mocks base method.
-func (m *MockQueryRepository) GetProjectDetailByID(ctx context.Context, projectID string) ([]models.ProjectDetail, error) {
+// FindProjectDetails mocks base method.
+func (m *MockQueryRepository) FindProjectDetails(ctx context.Context, log logger.ILogger, projectID string) ([]models.ProjectDetail, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetProjectDetailByID", ctx, projectID)
+	ret := m.ctrl.Call(m, "FindProjectDetails", ctx, log, projectID)
 	ret0, _ := ret[0].([]models.ProjectDetail)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetProjectDetailByID indicates an expected call of GetProjectDetailByID.
-func (mr *MockQueryRepositoryMockRecorder) GetProjectDetailByID(ctx, projectID any) *gomock.Call {
+// FindProjectDetails indicates an expected call of FindProjectDetails.
+func (mr *MockQueryRepositoryMockRecorder) FindProjectDetails(ctx, log, projectID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectDetailByID", reflect.TypeOf((*MockQueryRepository)(nil).GetProjectDetailByID), ctx, projectID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindProjectDetails", reflect.TypeOf((*MockQueryRepository)(nil).FindProjectDetails), ctx, log, projectID)
 }
 
 // ListProjects mocks base method.
-func (m *MockQueryRepository) ListProjects(ctx context.Context, name, creator, orderBy, direction string, offset, limit int64) (models.ProjectSummaries, error) {
+func (m *MockQueryRepository) ListProjects(ctx context.Context, log logger.ILogger, req models.ListProjectRequest) (models.ProjectSummaries, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProjects", ctx, name, creator, orderBy, direction, offset, limit)
+	ret := m.ctrl.Call(m, "ListProjects", ctx, log, req)
 	ret0, _ := ret[0].(models.ProjectSummaries)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ListProjects indicates an expected call of ListProjects.
-func (mr *MockQueryRepositoryMockRecorder) ListProjects(ctx, name, creator, orderBy, direction, offset, limit any) *gomock.Call {
+func (mr *MockQueryRepositoryMockRecorder) ListProjects(ctx, log, req any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjects", reflect.TypeOf((*MockQueryRepository)(nil).ListProjects), ctx, name, creator, orderBy, direction, offset, limit)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjects", reflect.TypeOf((*MockQueryRepository)(nil).ListProjects), ctx, log, req)
 }
 
 // MockIRepository is a mock of IRepository interface.
@@ -857,75 +858,75 @@ func (m *MockIRepository) EXPECT() *MockIRepositoryMockRecorder {
 	return m.recorder
 }
 
-// DeleteOrRestoreWinfittsInformation mocks base method.
-func (m *MockIRepository) DeleteOrRestoreWinfittsInformation(ctx context.Context, arg sqlc.DeleteWinfittsInformationParams) error {
+// FindProject mocks base method.
+func (m *MockIRepository) FindProject(ctx context.Context, log logger.ILogger, id string) (models.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteOrRestoreWinfittsInformation", ctx, arg)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// DeleteOrRestoreWinfittsInformation indicates an expected call of DeleteOrRestoreWinfittsInformation.
-func (mr *MockIRepositoryMockRecorder) DeleteOrRestoreWinfittsInformation(ctx, arg any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteOrRestoreWinfittsInformation", reflect.TypeOf((*MockIRepository)(nil).DeleteOrRestoreWinfittsInformation), ctx, arg)
-}
-
-// GetProject mocks base method.
-func (m *MockIRepository) GetProject(ctx context.Context, id string) (models.Project, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetProject", ctx, id)
+	ret := m.ctrl.Call(m, "FindProject", ctx, log, id)
 	ret0, _ := ret[0].(models.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetProject indicates an expected call of GetProject.
-func (mr *MockIRepositoryMockRecorder) GetProject(ctx, id any) *gomock.Call {
+// FindProject indicates an expected call of FindProject.
+func (mr *MockIRepositoryMockRecorder) FindProject(ctx, log, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProject", reflect.TypeOf((*MockIRepository)(nil).GetProject), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindProject", reflect.TypeOf((*MockIRepository)(nil).FindProject), ctx, log, id)
 }
 
-// GetProjectDetailByID mocks base method.
-func (m *MockIRepository) GetProjectDetailByID(ctx context.Context, projectID string) ([]models.ProjectDetail, error) {
+// FindProjectDetails mocks base method.
+func (m *MockIRepository) FindProjectDetails(ctx context.Context, log logger.ILogger, projectID string) ([]models.ProjectDetail, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetProjectDetailByID", ctx, projectID)
+	ret := m.ctrl.Call(m, "FindProjectDetails", ctx, log, projectID)
 	ret0, _ := ret[0].([]models.ProjectDetail)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetProjectDetailByID indicates an expected call of GetProjectDetailByID.
-func (mr *MockIRepositoryMockRecorder) GetProjectDetailByID(ctx, projectID any) *gomock.Call {
+// FindProjectDetails indicates an expected call of FindProjectDetails.
+func (mr *MockIRepositoryMockRecorder) FindProjectDetails(ctx, log, projectID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectDetailByID", reflect.TypeOf((*MockIRepository)(nil).GetProjectDetailByID), ctx, projectID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindProjectDetails", reflect.TypeOf((*MockIRepository)(nil).FindProjectDetails), ctx, log, projectID)
 }
 
 // ListProjects mocks base method.
-func (m *MockIRepository) ListProjects(ctx context.Context, name, creator, orderBy, direction string, offset, limit int64) (models.ProjectSummaries, error) {
+func (m *MockIRepository) ListProjects(ctx context.Context, log logger.ILogger, req models.ListProjectRequest) (models.ProjectSummaries, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListProjects", ctx, name, creator, orderBy, direction, offset, limit)
+	ret := m.ctrl.Call(m, "ListProjects", ctx, log, req)
 	ret0, _ := ret[0].(models.ProjectSummaries)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ListProjects indicates an expected call of ListProjects.
-func (mr *MockIRepositoryMockRecorder) ListProjects(ctx, name, creator, orderBy, direction, offset, limit any) *gomock.Call {
+func (mr *MockIRepositoryMockRecorder) ListProjects(ctx, log, req any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjects", reflect.TypeOf((*MockIRepository)(nil).ListProjects), ctx, name, creator, orderBy, direction, offset, limit)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjects", reflect.TypeOf((*MockIRepository)(nil).ListProjects), ctx, log, req)
+}
+
+// SoftDeleteWinfittsInformation mocks base method.
+func (m *MockIRepository) SoftDeleteWinfittsInformation(ctx context.Context, log logger.ILogger, arg sqlc.SoftDeleteWinfittsInformationParams) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SoftDeleteWinfittsInformation", ctx, log, arg)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SoftDeleteWinfittsInformation indicates an expected call of SoftDeleteWinfittsInformation.
+func (mr *MockIRepositoryMockRecorder) SoftDeleteWinfittsInformation(ctx, log, arg any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SoftDeleteWinfittsInformation", reflect.TypeOf((*MockIRepository)(nil).SoftDeleteWinfittsInformation), ctx, log, arg)
 }
 
 // UpsertExtractWinfittsDetails mocks base method.
-func (m *MockIRepository) UpsertExtractWinfittsDetails(ctx context.Context, in models.ProjectSummary, rows []models.WinfittsRawData) error {
+func (m *MockIRepository) UpsertExtractWinfittsDetails(ctx context.Context, log logger.ILogger, in models.ProjectSummary, rows []models.WinfittsRawData) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpsertExtractWinfittsDetails", ctx, in, rows)
+	ret := m.ctrl.Call(m, "UpsertExtractWinfittsDetails", ctx, log, in, rows)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpsertExtractWinfittsDetails indicates an expected call of UpsertExtractWinfittsDetails.
-func (mr *MockIRepositoryMockRecorder) UpsertExtractWinfittsDetails(ctx, in, rows any) *gomock.Call {
+func (mr *MockIRepositoryMockRecorder) UpsertExtractWinfittsDetails(ctx, log, in, rows any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertExtractWinfittsDetails", reflect.TypeOf((*MockIRepository)(nil).UpsertExtractWinfittsDetails), ctx, in, rows)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpsertExtractWinfittsDetails", reflect.TypeOf((*MockIRepository)(nil).UpsertExtractWinfittsDetails), ctx, log, in, rows)
 }

@@ -1,67 +1,73 @@
-import React from 'react';
 
-/**
- * Pagination component for the Summary page
- *
- * @param {Object} props - Component props
- * @param {number} props.currentPageNum - Current page number
- * @param {number} props.totalPages - Total number of pages
- * @param {Function} props.handlePageChange - Function to handle page change
- * @returns {JSX.Element} Pagination component
- */
+const PageButton = ({ page, isActive, onClick, disabled, children }) => (
+  <li className={`page-item ${isActive ? 'active' : ''} ${disabled ? 'disabled' : ''}`}>
+    <button
+      className="page-link"
+      onClick={() => onClick(page)}
+      disabled={disabled}
+    >
+      {children || page}
+    </button>
+  </li>
+);
+
+const getVisiblePages = (currentPageNum, totalPages) => {
+  const pages = [];
+
+  for (let page = 1; page <= totalPages; page++) {
+    const isFirstOrLast = page === 1 || page === totalPages;
+    const isNearCurrent = page >= currentPageNum - 2 && page <= currentPageNum + 2;
+
+    if (isFirstOrLast || isNearCurrent) {
+      pages.push(page);
+    } else if (page === currentPageNum - 3 || page === currentPageNum + 3) {
+      pages.push('...');
+    }
+  }
+
+  return pages;
+};
+
 const Pagination = ({ currentPageNum, totalPages, handlePageChange }) => {
   if (totalPages <= 1) return null;
+
+  const visiblePages = getVisiblePages(currentPageNum, totalPages);
+  const isFirstPage = currentPageNum === 1;
+  const isLastPage = currentPageNum === totalPages;
 
   return (
     <nav className="mt-4" aria-label="Page navigation">
       <ul className="pagination justify-content-center">
-        <li className={`page-item ${currentPageNum === 1 ? 'disabled' : ''}`}>
-          <button
-            className="page-link"
-            onClick={() => handlePageChange(currentPageNum - 1)}
-            disabled={currentPageNum === 1}
-          >
-            Previous
-          </button>
-        </li>
+        <PageButton
+          page={currentPageNum - 1}
+          onClick={handlePageChange}
+          disabled={isFirstPage}
+        >
+          Previous
+        </PageButton>
 
-        {/* 頁碼按鈕 */}
-        {[...Array(totalPages)].map((_, index) => {
-          const page = index + 1;
-          if (
-            page === 1 ||
-            page === totalPages ||
-            (page >= currentPageNum - 2 && page <= currentPageNum + 2)
-          ) {
-            return (
-              <li key={page} className={`page-item ${currentPageNum === page ? 'active' : ''}`}>
-                <button
-                  className="page-link"
-                  onClick={() => handlePageChange(page)}
-                >
-                  {page}
-                </button>
-              </li>
-            );
-          } else if (page === currentPageNum - 3 || page === currentPageNum + 3) {
-            return (
-              <li key={page} className="page-item disabled">
-                <span className="page-link">...</span>
-              </li>
-            );
-          }
-          return null;
-        })}
+        {visiblePages.map((page, index) =>
+          page === '...' ? (
+            <li key={`ellipsis-${index}`} className="page-item disabled">
+              <span className="page-link">...</span>
+            </li>
+          ) : (
+            <PageButton
+              key={page}
+              page={page}
+              isActive={currentPageNum === page}
+              onClick={handlePageChange}
+            />
+          )
+        )}
 
-        <li className={`page-item ${currentPageNum === totalPages ? 'disabled' : ''}`}>
-          <button
-            className="page-link"
-            onClick={() => handlePageChange(currentPageNum + 1)}
-            disabled={currentPageNum === totalPages}
-          >
-            Next
-          </button>
-        </li>
+        <PageButton
+          page={currentPageNum + 1}
+          onClick={handlePageChange}
+          disabled={isLastPage}
+        >
+          Next
+        </PageButton>
       </ul>
     </nav>
   );

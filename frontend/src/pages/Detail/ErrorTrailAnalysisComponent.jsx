@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { detectErrorTrails } from '../../utils/detail/errorTrailUtils';
+import { detectErrorTrails, getUniqueDevices } from '../../utils/detail/errorTrailUtils';
 import ErrorTrailTable from '../../components/detail/ErrorTrailTable';
 
 const ErrorTrailAnalysisComponent = ({
@@ -10,6 +10,8 @@ const ErrorTrailAnalysisComponent = ({
   const [loading, setLoading] = useState(true);
   const [selectedDevice, setSelectedDevice] = useState('');
   const [availableDevices, setAvailableDevices] = useState([]);
+  const [selectedId, setSelectedId] = useState('');
+  const [availableIds, setAvailableIds] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
 
   // Handle double click to go back
@@ -23,25 +25,44 @@ const ErrorTrailAnalysisComponent = ({
       const results = detectErrorTrails(rawData);
       setErrorTrailData(results);
 
-      // Get available devices
-      const devices = Object.keys(results.byDevice || {}).sort();
+      // Get available devices sorted by deviceOrder
+      const devices = getUniqueDevices(results.errorTrails || []);
       setAvailableDevices(devices);
+
+      // Get available IDs from all error trails
+      const ids = [...new Set(results.errorTrails?.map(trail => trail.difficultyId) || [])].sort();
+      setAvailableIds(ids);
 
       // Auto-select first device if not already selected
       if (devices.length > 0 && !selectedDevice) {
         setSelectedDevice(devices[0]);
       }
 
+      // Auto-select 1.6 if available and not already selected
+      if (ids.includes('1.6') && !selectedId) {
+        setSelectedId('1.6');
+      } else if (ids.length > 0 && !selectedId) {
+        // If 1.6 is not available, select first available ID
+        setSelectedId(ids[0]);
+      }
+
       setLoading(false);
     }
-  }, [rawData, selectedDevice]);
+  }, [rawData, selectedDevice, selectedId]);
 
-  // Filter data when device changes
+  // Filter data when device or ID changes
   useEffect(() => {
     if (selectedDevice && errorTrailData.errorTrails) {
-      const filtered = errorTrailData.errorTrails.filter(trail =>
+      let filtered = errorTrailData.errorTrails.filter(trail =>
         trail.deviceName === selectedDevice
       );
+
+      // Apply ID filter (always applied since we removed "All IDs" option)
+      if (selectedId) {
+        filtered = filtered.filter(trail =>
+          trail.difficultyId === selectedId
+        );
+      }
 
       // Sort by participant then trail number
       filtered.sort((a, b) => {
@@ -54,7 +75,7 @@ const ErrorTrailAnalysisComponent = ({
     } else {
       setFilteredData([]);
     }
-  }, [selectedDevice, errorTrailData]);
+  }, [selectedDevice, selectedId, errorTrailData]);
 
   return (
     <div className="card mb-4 border-warning">
@@ -88,6 +109,19 @@ const ErrorTrailAnalysisComponent = ({
                 ))}
               </select>
             </div>
+            <div className="form-group">
+              <label className="form-label fw-bold mb-1">ID (W/D):</label>
+              <select
+                className="form-select form-select-sm"
+                value={selectedId}
+                onChange={(e) => setSelectedId(e.target.value)}
+                style={{ minWidth: '120px' }}
+              >
+                {availableIds.map(id => (
+                  <option key={id} value={id}>{id}</option>
+                ))}
+              </select>
+            </div>
           </div>
           <button
             className="btn btn-sm btn-outline-secondary"
@@ -102,6 +136,10 @@ const ErrorTrailAnalysisComponent = ({
             <div className="badge bg-dark">
               <i className="bi bi-funnel me-1"></i>
               Device: {selectedDevice}
+            </div>
+            <div className="badge bg-secondary">
+              <i className="bi bi-hash me-1"></i>
+              ID: {selectedId}
             </div>
             {filteredData.length > 0 && (
               <>

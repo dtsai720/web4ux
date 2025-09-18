@@ -1,3 +1,9 @@
-export { default as AccordionItem } from './AccordionItem';
-export { default as GuideAccordion } from './GuideAccordion';
-export { default as BackToHomeButton } from './BackToHomeButton';
+import AccordionItem from './AccordionItem';
+import GuideAccordion from './GuideAccordion';
+import BackToHomeButton from './BackToHomeButton';
+
+export {
+  AccordionItem,
+  GuideAccordion,
+  BackToHomeButton
+};

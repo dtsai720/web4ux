@@ -14,6 +14,7 @@ import (
 	"github.com/web4ux/src/logger"
 	"github.com/web4ux/src/request"
 	"go.uber.org/zap"
+	_ "modernc.org/sqlite"
 )
 
 //go:embed all:frontend/dist

@@ -1,20 +1,14 @@
-import React from 'react';
 import { formatMoveTime, getParticipantMoveTime } from '../../utils/detail/moveTimeUtils';
 
-/**
- * Table component for displaying movement time matrix results
- */
 const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
   const { difficulties, participants, participantData, difficultyGroups } = analysisData;
 
-  // Calculate total average move time for each participant across all difficulties
   const calculateParticipantTotal = (participantSerial) => {
     const participant = participantData[participantSerial];
     if (!participant || participant.totalTrails === 0) return null;
     return participant.totalMoveTime / participant.totalTrails;
   };
 
-  // Calculate average move time for each difficulty across all participants
   const calculateDifficultyAverage = (difficultyKey) => {
     const validTimes = participants
       .map(participant => getParticipantMoveTime(analysisData, participant, difficultyKey))
@@ -24,7 +18,6 @@ const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
     return validTimes.reduce((sum, time) => sum + time, 0) / validTimes.length;
   };
 
-  // Calculate overall average across all participants and difficulties
   const calculateOverallAverage = () => {
     const allValidTimes = participants.flatMap(participant =>
       difficulties
@@ -108,7 +101,6 @@ const MovementTimeMatrixTable = ({ deviceName, analysisData }) => {
                 </tr>
               );
             })}
-            {/* Average row */}
             <tr className="table-warning">
               <td className="fw-bold text-center">
                 <i className="bi bi-calculator me-1"></i>

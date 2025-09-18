@@ -11,6 +11,7 @@ import (
 	"github.com/web4ux/models"
 	"github.com/web4ux/repository/sqlc"
 	"github.com/web4ux/src/common"
+	"github.com/web4ux/src/logger"
 	"go.uber.org/mock/gomock"
 )
 
@@ -93,7 +94,8 @@ func TestListSummaries(t *testing.T) {
 
 			mockDB := mock_repository.NewMockIRepository(ctrl)
 			mockClient := mock_src_request.NewMockIClient(ctrl)
-			mockDB.EXPECT().ListProjects(ctx, tt.args.name, tt.args.creator, tt.args.orderBy, tt.args.direction, tt.args.offset, tt.args.limit).
+			log := logger.NewTestLogger()
+			mockDB.EXPECT().ListProjects(ctx, log, gomock.Any()).
 				Return(tt.dbResult.Result, tt.dbResult.Error).Times(tt.dbResult.Count)
 
 			service := analyzer.New(
@@ -101,7 +103,7 @@ func TestListSummaries(t *testing.T) {
 				analyzer.WithClient(mockClient),
 			)
 
-			result, err := service.ListSummaries(ctx, tt.args.name, tt.args.creator, tt.args.orderBy, tt.args.direction, tt.args.offset, tt.args.limit)
+			result, err := service.ListSummaries(ctx, log, tt.args.name, tt.args.creator, tt.args.orderBy, tt.args.direction, tt.args.offset, tt.args.limit)
 			assert.Equal(t, tt.expectError, err != nil)
 
 			if !tt.expectError {
@@ -153,7 +155,8 @@ func TestGetProjectDetailByID(t *testing.T) {
 
 			mockDB := mock_repository.NewMockIRepository(ctrl)
 			mockClient := mock_src_request.NewMockIClient(ctrl)
-			mockDB.EXPECT().GetProjectDetailByID(ctx, tt.projectID).
+			log := logger.NewTestLogger()
+			mockDB.EXPECT().FindProjectDetails(ctx, log, tt.projectID).
 				Return(tt.dbResult.Result, tt.dbResult.Error).Times(tt.dbResult.Count)
 
 			service := analyzer.New(
@@ -161,7 +164,7 @@ func TestGetProjectDetailByID(t *testing.T) {
 				analyzer.WithClient(mockClient),
 			)
 
-			result, err := service.GetProjectDetailByID(ctx, tt.projectID)
+			result, err := service.GetProjectDetailByID(ctx, log, tt.projectID)
 			assert.Equal(t, tt.expectError, err != nil)
 
 			if !tt.expectError {
@@ -217,7 +220,8 @@ func TestDeleteOrRestore(t *testing.T) {
 
 			mockDB := mock_repository.NewMockIRepository(ctrl)
 			mockClient := mock_src_request.NewMockIClient(ctrl)
-			mockDB.EXPECT().DeleteOrRestoreWinfittsInformation(ctx, sqlc.DeleteWinfittsInformationParams{
+			log := logger.NewTestLogger()
+			mockDB.EXPECT().SoftDeleteWinfittsInformation(ctx, log, sqlc.SoftDeleteWinfittsInformationParams{
 				Deleted:       tt.deleted,
 				InformationID: tt.informationID,
 			}).Return(tt.dbResult.Error).Times(tt.dbResult.Count)
@@ -227,7 +231,7 @@ func TestDeleteOrRestore(t *testing.T) {
 				analyzer.WithClient(mockClient),
 			)
 
-			err := service.DeleteOrRestore(ctx, tt.informationID, tt.deleted)
+			err := service.DeleteOrRestore(ctx, log, tt.informationID, tt.deleted)
 			assert.Equal(t, tt.expectError, err != nil)
 		})
 	}

@@ -1,12 +1,3 @@
-import React from 'react';
-
-/**
- * Error message component for the Summary page
- *
- * @param {Object} props - Component props
- * @param {string} props.error - Error message to display
- * @returns {JSX.Element} Error message component
- */
 const ErrorMessage = ({ error }) => {
   if (!error) return null;
 

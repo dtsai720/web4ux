@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS projects (
 
 CREATE TABLE IF NOT EXISTS devices (
     id TEXT PRIMARY KEY,
+    "order" TEXT NOT NULL,
     name TEXT NOT NULL,
     project_id TEXT NOT NULL,
     FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE

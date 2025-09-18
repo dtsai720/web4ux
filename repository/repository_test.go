@@ -6,11 +6,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/web4ux/models"
 	mock_repository "github.com/web4ux/mocks/repository"
 	"github.com/web4ux/repository"
 	"github.com/web4ux/repository/sqlc"
 	"github.com/web4ux/src/common"
 	"github.com/web4ux/src/errs"
+	"github.com/web4ux/src/logger"
 	"go.uber.org/mock/gomock"
 )
 
@@ -41,12 +43,13 @@ func TestDeleteOrRestoreWinfittsInformation(t *testing.T) {
 			t.Parallel()
 
 			q := mock_repository.NewMockIDatabase(ctrl)
-			q.EXPECT().DeleteWinfittsInformation(ctx, gomock.Any()).Return(tc.Error)
+			q.EXPECT().SoftDeleteWinfittsInformation(ctx, gomock.Any()).Return(tc.Error)
 
 			db := new(repository.Repository)
 			db.SetQueries(q)
 
-			err := db.DeleteOrRestoreWinfittsInformation(ctx, sqlc.DeleteWinfittsInformationParams{})
+			log := logger.NewTestLogger()
+			err := db.SoftDeleteWinfittsInformation(ctx, log, sqlc.SoftDeleteWinfittsInformationParams{})
 			assert.Equal(t, tc.HasError, err != nil)
 		})
 	}
@@ -71,21 +74,21 @@ func setupListProjectMocks(q *mock_repository.MockIDatabase, ctx context.Context
 	switch tc.OrderBy {
 	case "name":
 		if tc.Direction == descDirection {
-			q.EXPECT().ListProjectsOrderByNameDesc(ctx, gomock.Any()).Return(tc.MockProjects.Result, tc.MockProjects.Error)
+			q.EXPECT().ListProjectsByNameDesc(ctx, gomock.Any()).Return(tc.MockProjects.Result, tc.MockProjects.Error)
 		} else {
-			q.EXPECT().ListProjectsOrderByNameAsc(ctx, gomock.Any()).Return(tc.MockProjects.Result, tc.MockProjects.Error)
+			q.EXPECT().ListProjectsByNameAsc(ctx, gomock.Any()).Return(tc.MockProjects.Result, tc.MockProjects.Error)
 		}
 	case "creator":
 		if tc.Direction == descDirection {
-			q.EXPECT().ListProjectsOrderByCreatorDesc(ctx, gomock.Any()).Return(tc.MockProjects.Result, tc.MockProjects.Error)
+			q.EXPECT().ListProjectsByCreatorDesc(ctx, gomock.Any()).Return(tc.MockProjects.Result, tc.MockProjects.Error)
 		} else {
-			q.EXPECT().ListProjectsOrderByCreatorAsc(ctx, gomock.Any()).Return(tc.MockProjects.Result, tc.MockProjects.Error)
+			q.EXPECT().ListProjectsByCreatorAsc(ctx, gomock.Any()).Return(tc.MockProjects.Result, tc.MockProjects.Error)
 		}
 	default:
 		if tc.Direction == descDirection {
-			q.EXPECT().ListProjectsOrderByUpdatedAtDesc(ctx, gomock.Any()).Return(tc.MockProjects.Result, tc.MockProjects.Error)
+			q.EXPECT().ListProjectsByTimeDesc(ctx, gomock.Any()).Return(tc.MockProjects.Result, tc.MockProjects.Error)
 		} else {
-			q.EXPECT().ListProjectsOrderByUpdatedAtAsc(ctx, gomock.Any()).Return(tc.MockProjects.Result, tc.MockProjects.Error)
+			q.EXPECT().ListProjectsByTimeAsc(ctx, gomock.Any()).Return(tc.MockProjects.Result, tc.MockProjects.Error)
 		}
 	}
 }
@@ -180,7 +183,15 @@ func TestListProjects(t *testing.T) {
 			db := new(repository.Repository)
 			db.SetQueries(q)
 
-			result, err := db.ListProjects(ctx, tc.Name, tc.Creator, tc.OrderBy, tc.Direction, tc.Offset, tc.Limit)
+			log := logger.NewTestLogger()
+			result, err := db.ListProjects(ctx, log, models.ListProjectRequest{
+				Name:    tc.Name,
+				Creator: tc.Creator,
+				OrderBy: tc.OrderBy,
+				IsASC:   tc.Direction != "desc",
+				Offset:  tc.Offset,
+				Limit:   tc.Limit,
+			})
 
 			assert.Equal(t, tc.HasError, err != nil)
 			if !tc.HasError {
@@ -191,7 +202,7 @@ func TestListProjects(t *testing.T) {
 	}
 }
 
-func TestGetProject(t *testing.T) {
+func TestFindProject(t *testing.T) {
 	t.Parallel()
 
 	ctrl := gomock.NewController(t)
@@ -243,12 +254,13 @@ func TestGetProject(t *testing.T) {
 			t.Parallel()
 
 			q := mock_repository.NewMockIDatabase(ctrl)
-			q.EXPECT().GetProject(ctx, tc.ProjectID).Return(tc.MockProject.Result, tc.MockProject.Error)
+			q.EXPECT().FindProject(ctx, tc.ProjectID).Return(tc.MockProject.Result, tc.MockProject.Error)
 
 			db := new(repository.Repository)
 			db.SetQueries(q)
 
-			result, err := db.GetProject(ctx, tc.ProjectID)
+			log := logger.NewTestLogger()
+			result, err := db.FindProject(ctx, log, tc.ProjectID)
 
 			assert.Equal(t, tc.HasError, err != nil)
 			if !tc.HasError {
@@ -261,7 +273,7 @@ func TestGetProject(t *testing.T) {
 	}
 }
 
-func TestGetProjectDetailByID(t *testing.T) {
+func TestFindProjectDetails(t *testing.T) {
 	t.Parallel()
 
 	ctrl := gomock.NewController(t)
@@ -272,7 +284,7 @@ func TestGetProjectDetailByID(t *testing.T) {
 	testCases := []struct {
 		Title             string
 		ProjectID         string
-		MockDetailRows    common.Item[[]sqlc.GetProjectDetailByIDRow]
+		MockDetailRows    common.Item[[]sqlc.FindProjectDetailsRow]
 		HasError          bool
 		ExpectedCount     int
 		ExpectedProjectID string
@@ -280,8 +292,8 @@ func TestGetProjectDetailByID(t *testing.T) {
 		{
 			Title:     "Happy Path - Get project details",
 			ProjectID: "proj-1",
-			MockDetailRows: common.Item[[]sqlc.GetProjectDetailByIDRow]{
-				Result: []sqlc.GetProjectDetailByIDRow{
+			MockDetailRows: common.Item[[]sqlc.FindProjectDetailsRow]{
+				Result: []sqlc.FindProjectDetailsRow{
 					{
 						ProjectID:         "proj-1",
 						ProjectName:       "Test Project",
@@ -310,13 +322,13 @@ func TestGetProjectDetailByID(t *testing.T) {
 		{
 			Title:          "Happy Path - Empty results",
 			ProjectID:      "empty-proj",
-			MockDetailRows: common.Item[[]sqlc.GetProjectDetailByIDRow]{Result: []sqlc.GetProjectDetailByIDRow{}},
+			MockDetailRows: common.Item[[]sqlc.FindProjectDetailsRow]{Result: []sqlc.FindProjectDetailsRow{}},
 			ExpectedCount:  0,
 		},
 		{
 			Title:     "Database Error",
 			ProjectID: "error-case",
-			MockDetailRows: common.Item[[]sqlc.GetProjectDetailByIDRow]{
+			MockDetailRows: common.Item[[]sqlc.FindProjectDetailsRow]{
 				Error: errs.ErrUnknown,
 			},
 			HasError: true,
@@ -328,12 +340,13 @@ func TestGetProjectDetailByID(t *testing.T) {
 			t.Parallel()
 
 			q := mock_repository.NewMockIDatabase(ctrl)
-			q.EXPECT().GetProjectDetailByID(ctx, tc.ProjectID).Return(tc.MockDetailRows.Result, tc.MockDetailRows.Error)
+			q.EXPECT().FindProjectDetails(ctx, tc.ProjectID).Return(tc.MockDetailRows.Result, tc.MockDetailRows.Error)
 
 			db := new(repository.Repository)
 			db.SetQueries(q)
 
-			result, err := db.GetProjectDetailByID(ctx, tc.ProjectID)
+			log := logger.NewTestLogger()
+			result, err := db.FindProjectDetails(ctx, log, tc.ProjectID)
 
 			assert.Equal(t, tc.HasError, err != nil)
 			if !tc.HasError {

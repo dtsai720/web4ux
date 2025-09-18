@@ -1,9 +1,9 @@
 package repository
 
 import (
-	"context"
 	"database/sql"
 	_ "embed"
+	"fmt"
 
 	"github.com/web4ux/repository/sqlc"
 	_ "modernc.org/sqlite"
@@ -23,17 +23,9 @@ func (r *Repository) SetQueries(queries IDatabase) {
 	r.queries = queries
 }
 
-// DeleteWinfittsInformation implements IRepository.
-func (r *Repository) DeleteOrRestoreWinfittsInformation(ctx context.Context, arg sqlc.DeleteWinfittsInformationParams) error {
-	return r.queries.DeleteWinfittsInformation(ctx, sqlc.DeleteWinfittsInformationParams{
-		Deleted:       arg.Deleted,
-		InformationID: arg.InformationID,
-	})
-}
-
 func New(db *sql.DB) (*Repository, error) {
 	if _, err := db.Exec(createTableQuery); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create database tables: %w", err)
 	}
 
 	return &Repository{db: db, queries: sqlc.New(db)}, nil

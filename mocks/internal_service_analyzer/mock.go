@@ -14,6 +14,7 @@ import (
 	reflect "reflect"
 
 	models "github.com/web4ux/models"
+	logger "github.com/web4ux/src/logger"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -42,45 +43,45 @@ func (m *MockIService) EXPECT() *MockIServiceMockRecorder {
 }
 
 // DeleteOrRestore mocks base method.
-func (m *MockIService) DeleteOrRestore(ctx context.Context, informationID string, deleted bool) error {
+func (m *MockIService) DeleteOrRestore(ctx context.Context, log logger.ILogger, informationID string, deleted bool) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteOrRestore", ctx, informationID, deleted)
+	ret := m.ctrl.Call(m, "DeleteOrRestore", ctx, log, informationID, deleted)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteOrRestore indicates an expected call of DeleteOrRestore.
-func (mr *MockIServiceMockRecorder) DeleteOrRestore(ctx, informationID, deleted any) *gomock.Call {
+func (mr *MockIServiceMockRecorder) DeleteOrRestore(ctx, log, informationID, deleted any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteOrRestore", reflect.TypeOf((*MockIService)(nil).DeleteOrRestore), ctx, informationID, deleted)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteOrRestore", reflect.TypeOf((*MockIService)(nil).DeleteOrRestore), ctx, log, informationID, deleted)
 }
 
 // GetProjectDetailByID mocks base method.
-func (m *MockIService) GetProjectDetailByID(ctx context.Context, projectID string) ([]models.ProjectDetail, error) {
+func (m *MockIService) GetProjectDetailByID(ctx context.Context, log logger.ILogger, projectID string) ([]models.ProjectDetail, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetProjectDetailByID", ctx, projectID)
+	ret := m.ctrl.Call(m, "GetProjectDetailByID", ctx, log, projectID)
 	ret0, _ := ret[0].([]models.ProjectDetail)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetProjectDetailByID indicates an expected call of GetProjectDetailByID.
-func (mr *MockIServiceMockRecorder) GetProjectDetailByID(ctx, projectID any) *gomock.Call {
+func (mr *MockIServiceMockRecorder) GetProjectDetailByID(ctx, log, projectID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectDetailByID", reflect.TypeOf((*MockIService)(nil).GetProjectDetailByID), ctx, projectID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectDetailByID", reflect.TypeOf((*MockIService)(nil).GetProjectDetailByID), ctx, log, projectID)
 }
 
 // ListSummaries mocks base method.
-func (m *MockIService) ListSummaries(ctx context.Context, name, creator, orderBy, direction string, offset, limit int64) (models.ProjectSummaries, error) {
+func (m *MockIService) ListSummaries(ctx context.Context, log logger.ILogger, name, creator, orderBy, direction string, offset, limit int64) (models.ProjectSummaries, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListSummaries", ctx, name, creator, orderBy, direction, offset, limit)
+	ret := m.ctrl.Call(m, "ListSummaries", ctx, log, name, creator, orderBy, direction, offset, limit)
 	ret0, _ := ret[0].(models.ProjectSummaries)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ListSummaries indicates an expected call of ListSummaries.
-func (mr *MockIServiceMockRecorder) ListSummaries(ctx, name, creator, orderBy, direction, offset, limit any) *gomock.Call {
+func (mr *MockIServiceMockRecorder) ListSummaries(ctx, log, name, creator, orderBy, direction, offset, limit any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListSummaries", reflect.TypeOf((*MockIService)(nil).ListSummaries), ctx, name, creator, orderBy, direction, offset, limit)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListSummaries", reflect.TypeOf((*MockIService)(nil).ListSummaries), ctx, log, name, creator, orderBy, direction, offset, limit)
 }

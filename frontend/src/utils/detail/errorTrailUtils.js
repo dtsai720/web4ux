@@ -45,6 +45,7 @@ export const detectErrorTrails = (rawData) => {
 
         const errorTrail = {
           deviceName: firstRecord.deviceName,
+          deviceOrder: firstRecord.deviceOrder,
           participantSerial: firstRecord.participantSerial,
           trailNumber: firstRecord.trailNumber,
           difficulty: difficulty,
@@ -162,6 +163,18 @@ export const getUniqueDifficulties = (errorTrails) => {
  * @returns {Array} Sorted array of unique device names
  */
 export const getUniqueDevices = (errorTrails) => {
+  // 創建 device 到 deviceOrder 的映射
+  const deviceOrderMap = {};
+  errorTrails.forEach(trail => {
+    if (!deviceOrderMap[trail.deviceName]) {
+      deviceOrderMap[trail.deviceName] = trail.deviceOrder;
+    }
+  });
+
   const devices = [...new Set(errorTrails.map(trail => trail.deviceName))];
-  return devices.sort();
+  return devices.sort((a, b) => {
+    const orderA = deviceOrderMap[a] || '';
+    const orderB = deviceOrderMap[b] || '';
+    return orderA.localeCompare(orderB);
+  });
 };

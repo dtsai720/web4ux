@@ -3,6 +3,7 @@ package request
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/cookiejar"
@@ -54,6 +55,12 @@ func (r *Request) Send(ctx context.Context, log logger.ILogger, in *SendParam) (
 		log.With(zap.Error(err)).Error("An error occurred while reading response body")
 
 		return nil, err
+	}
+
+	// Check HTTP status code
+	if response.StatusCode >= 400 {
+		log.With(zap.Int("status_code", response.StatusCode), zap.String("status", response.Status), zap.String("response_body", string(body))).Error("HTTP request returned error status")
+		return nil, fmt.Errorf("HTTP request failed with status %d: %s", response.StatusCode, response.Status)
 	}
 
 	return body, nil

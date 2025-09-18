@@ -9,189 +9,422 @@ import (
 	"context"
 )
 
-const deleteWinfittsInformation = `-- name: DeleteWinfittsInformation :exec
-UPDATE winfitts_information SET deleted = ?1 WHERE id = ?2
+const countProjects = `-- name: CountProjects :one
+SELECT COUNT(1) FROM projects
+WHERE (COALESCE(?1, '') = '' OR name LIKE ?1)
+AND (COALESCE(?2, '') = '' OR creator LIKE ?2)
 `
 
-type DeleteWinfittsInformationParams struct {
-	Deleted       bool
-	InformationID string
+type CountProjectsParams struct {
+	Name    interface{}
+	Creator interface{}
 }
 
-func (q *Queries) DeleteWinfittsInformation(ctx context.Context, arg DeleteWinfittsInformationParams) error {
-	_, err := q.db.ExecContext(ctx, deleteWinfittsInformation, arg.Deleted, arg.InformationID)
-	return err
+func (q *Queries) CountProjects(ctx context.Context, arg CountProjectsParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countProjects, arg.Name, arg.Creator)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
 }
 
-const upsertDevices = `-- name: UpsertDevices :one
-INSERT INTO devices (id, name, project_id)
-VALUES (?1, ?2, ?3)
-ON CONFLICT(name, project_id) DO UPDATE
-    SET name = EXCLUDED.name
-RETURNING id, name, project_id
+const findProject = `-- name: FindProject :one
+SELECT id, name, creator, updated_at FROM projects WHERE id = ?1
 `
 
-type UpsertDevicesParams struct {
-	ID        string
-	Name      string
-	ProjectID string
-}
-
-func (q *Queries) UpsertDevices(ctx context.Context, arg UpsertDevicesParams) (Device, error) {
-	row := q.db.QueryRowContext(ctx, upsertDevices, arg.ID, arg.Name, arg.ProjectID)
-	var i Device
-	err := row.Scan(&i.ID, &i.Name, &i.ProjectID)
-	return i, err
-}
-
-const upsertParticipants = `-- name: UpsertParticipants :one
-INSERT INTO participants (id, name, project_id, serial)
-VALUES (?1, ?2, ?3, ?4)
-ON CONFLICT(name, project_id) DO UPDATE
-    SET name = EXCLUDED.name
-RETURNING id, serial, name, project_id
-`
-
-type UpsertParticipantsParams struct {
-	ID        string
-	Name      string
-	ProjectID string
-	Serial    string
-}
-
-func (q *Queries) UpsertParticipants(ctx context.Context, arg UpsertParticipantsParams) (Participant, error) {
-	row := q.db.QueryRowContext(ctx, upsertParticipants,
-		arg.ID,
-		arg.Name,
-		arg.ProjectID,
-		arg.Serial,
-	)
-	var i Participant
+func (q *Queries) FindProject(ctx context.Context, id string) (Project, error) {
+	row := q.db.QueryRowContext(ctx, findProject, id)
+	var i Project
 	err := row.Scan(
 		&i.ID,
-		&i.Serial,
 		&i.Name,
-		&i.ProjectID,
+		&i.Creator,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
-const upsertWinfitts = `-- name: UpsertWinfitts :one
-INSERT INTO winfitts (id, project_id, device_id, participant_id)
-VALUES (?1, ?2, ?3, ?4)
-ON CONFLICT(project_id, device_id, participant_id) DO UPDATE
-    SET device_id = EXCLUDED.device_id
-RETURNING id, project_id, device_id, participant_id, "foreign"
+const findProjectDetails = `-- name: FindProjectDetails :many
+SELECT projects.name AS project_name,
+	projects.id AS project_id,
+	projects.creator AS project_creator,
+	projects.updated_at AS project_updated_at,
+	devices.name AS device_name,
+	devices."order" AS device_order,
+	participants.name AS participant_name,
+	participants.serial AS participant_serial,
+	winfitts_information.id AS information_id,
+	winfitts_information.deleted,
+	winfitts_information.error_times,
+	winfitts_information.is_failed,
+	winfitts_information.trail_number,
+	winfitts_information.width,
+	winfitts_information.distance,
+	winfitts_details.mark,
+	winfitts_details.timestamp,
+	winfitts_details.x,
+	winfitts_details.y
+FROM projects
+INNER JOIN devices ON projects.id = devices.project_id
+INNER JOIN participants ON projects.id  = participants.project_id
+INNER JOIN winfitts ON
+	projects.id = winfitts.project_id
+	AND devices.id = winfitts.device_id
+	AND participants.id = winfitts.participant_id
+INNER JOIN winfitts_information ON winfitts.id = winfitts_information.winfitts_id
+INNER JOIN winfitts_details ON winfitts_information.id = winfitts_details.information_id
+WHERE projects.id = ?1
+ORDER BY device_name, participant_name, trail_number ASC
 `
 
-type UpsertWinfittsParams struct {
-	ID            string
-	ProjectID     string
-	DeviceID      string
-	ParticipantID string
+type FindProjectDetailsRow struct {
+	ProjectName       string
+	ProjectID         string
+	ProjectCreator    string
+	ProjectUpdatedAt  string
+	DeviceName        string
+	DeviceOrder       string
+	ParticipantName   string
+	ParticipantSerial string
+	InformationID     string
+	Deleted           bool
+	ErrorTimes        int64
+	IsFailed          bool
+	TrailNumber       int64
+	Width             int64
+	Distance          int64
+	Mark              string
+	Timestamp         int64
+	X                 int64
+	Y                 int64
 }
 
-func (q *Queries) UpsertWinfitts(ctx context.Context, arg UpsertWinfittsParams) (Winfitt, error) {
-	row := q.db.QueryRowContext(ctx, upsertWinfitts,
-		arg.ID,
-		arg.ProjectID,
-		arg.DeviceID,
-		arg.ParticipantID,
-	)
-	var i Winfitt
-	err := row.Scan(
-		&i.ID,
-		&i.ProjectID,
-		&i.DeviceID,
-		&i.ParticipantID,
-		&i.Foreign,
-	)
-	return i, err
+func (q *Queries) FindProjectDetails(ctx context.Context, projectID string) ([]FindProjectDetailsRow, error) {
+	rows, err := q.db.QueryContext(ctx, findProjectDetails, projectID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FindProjectDetailsRow
+	for rows.Next() {
+		var i FindProjectDetailsRow
+		if err := rows.Scan(
+			&i.ProjectName,
+			&i.ProjectID,
+			&i.ProjectCreator,
+			&i.ProjectUpdatedAt,
+			&i.DeviceName,
+			&i.DeviceOrder,
+			&i.ParticipantName,
+			&i.ParticipantSerial,
+			&i.InformationID,
+			&i.Deleted,
+			&i.ErrorTimes,
+			&i.IsFailed,
+			&i.TrailNumber,
+			&i.Width,
+			&i.Distance,
+			&i.Mark,
+			&i.Timestamp,
+			&i.X,
+			&i.Y,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
-const upsertWinfittsDetail = `-- name: UpsertWinfittsDetail :one
-INSERT INTO winfitts_details (id, information_id, mark, x, y, timestamp)
-VALUES (?1, ?2, ?3, ?4, ?5, ?6)
-ON CONFLICT(information_id, timestamp) DO UPDATE
-    SET timestamp = EXCLUDED.timestamp
-RETURNING id, information_id, mark, x, y, timestamp
+const listProjectsByCreatorAsc = `-- name: ListProjectsByCreatorAsc :many
+SELECT id, name, creator, updated_at FROM projects
+WHERE (COALESCE(?1, '') = '' OR name LIKE ?1)
+AND (COALESCE(?2, '') = '' OR creator LIKE ?2)
+ORDER BY creator ASC, updated_at DESC
+LIMIT ?4 OFFSET ?3
 `
 
-type UpsertWinfittsDetailParams struct {
-	ID            string
-	InformationID string
-	Mark          string
-	X             int64
-	Y             int64
-	Timestamp     int64
+type ListProjectsByCreatorAscParams struct {
+	Name    interface{}
+	Creator interface{}
+	Offset  int64
+	Limit   int64
 }
 
-func (q *Queries) UpsertWinfittsDetail(ctx context.Context, arg UpsertWinfittsDetailParams) (WinfittsDetail, error) {
-	row := q.db.QueryRowContext(ctx, upsertWinfittsDetail,
-		arg.ID,
-		arg.InformationID,
-		arg.Mark,
-		arg.X,
-		arg.Y,
-		arg.Timestamp,
+func (q *Queries) ListProjectsByCreatorAsc(ctx context.Context, arg ListProjectsByCreatorAscParams) ([]Project, error) {
+	rows, err := q.db.QueryContext(ctx, listProjectsByCreatorAsc,
+		arg.Name,
+		arg.Creator,
+		arg.Offset,
+		arg.Limit,
 	)
-	var i WinfittsDetail
-	err := row.Scan(
-		&i.ID,
-		&i.InformationID,
-		&i.Mark,
-		&i.X,
-		&i.Y,
-		&i.Timestamp,
-	)
-	return i, err
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Project
+	for rows.Next() {
+		var i Project
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Creator,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
-const upsertWinfittsInformation = `-- name: UpsertWinfittsInformation :one
-INSERT INTO winfitts_information (id, winfitts_id, trail_number, width, distance, angle, is_failed, error_times, deleted)
-VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
-ON CONFLICT(winfitts_id, trail_number) DO UPDATE
-    SET is_failed = EXCLUDED.is_failed,
-    error_times = EXCLUDED.error_times,
-    deleted = EXCLUDED.deleted
-RETURNING id, winfitts_id, trail_number, width, distance, angle, is_failed, error_times, deleted
+const listProjectsByCreatorDesc = `-- name: ListProjectsByCreatorDesc :many
+SELECT id, name, creator, updated_at FROM projects
+WHERE (COALESCE(?1, '') = '' OR name LIKE ?1)
+AND (COALESCE(?2, '') = '' OR creator LIKE ?2)
+ORDER BY creator DESC, updated_at DESC
+LIMIT ?4 OFFSET ?3
 `
 
-type UpsertWinfittsInformationParams struct {
-	ID          string
-	WinfittsID  string
-	TrailNumber int64
-	Width       int64
-	Distance    int64
-	Angle       int64
-	IsFailed    bool
-	ErrorTimes  int64
-	Deleted     bool
+type ListProjectsByCreatorDescParams struct {
+	Name    interface{}
+	Creator interface{}
+	Offset  int64
+	Limit   int64
 }
 
-func (q *Queries) UpsertWinfittsInformation(ctx context.Context, arg UpsertWinfittsInformationParams) (WinfittsInformation, error) {
-	row := q.db.QueryRowContext(ctx, upsertWinfittsInformation,
-		arg.ID,
-		arg.WinfittsID,
-		arg.TrailNumber,
-		arg.Width,
-		arg.Distance,
-		arg.Angle,
-		arg.IsFailed,
-		arg.ErrorTimes,
-		arg.Deleted,
+func (q *Queries) ListProjectsByCreatorDesc(ctx context.Context, arg ListProjectsByCreatorDescParams) ([]Project, error) {
+	rows, err := q.db.QueryContext(ctx, listProjectsByCreatorDesc,
+		arg.Name,
+		arg.Creator,
+		arg.Offset,
+		arg.Limit,
 	)
-	var i WinfittsInformation
-	err := row.Scan(
-		&i.ID,
-		&i.WinfittsID,
-		&i.TrailNumber,
-		&i.Width,
-		&i.Distance,
-		&i.Angle,
-		&i.IsFailed,
-		&i.ErrorTimes,
-		&i.Deleted,
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Project
+	for rows.Next() {
+		var i Project
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Creator,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listProjectsByNameAsc = `-- name: ListProjectsByNameAsc :many
+SELECT id, name, creator, updated_at FROM projects
+WHERE (COALESCE(?1, '') = '' OR name LIKE ?1)
+AND (COALESCE(?2, '') = '' OR creator LIKE ?2)
+ORDER BY name ASC, updated_at DESC
+LIMIT ?4 OFFSET ?3
+`
+
+type ListProjectsByNameAscParams struct {
+	Name    interface{}
+	Creator interface{}
+	Offset  int64
+	Limit   int64
+}
+
+func (q *Queries) ListProjectsByNameAsc(ctx context.Context, arg ListProjectsByNameAscParams) ([]Project, error) {
+	rows, err := q.db.QueryContext(ctx, listProjectsByNameAsc,
+		arg.Name,
+		arg.Creator,
+		arg.Offset,
+		arg.Limit,
 	)
-	return i, err
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Project
+	for rows.Next() {
+		var i Project
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Creator,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listProjectsByNameDesc = `-- name: ListProjectsByNameDesc :many
+SELECT id, name, creator, updated_at FROM projects
+WHERE (COALESCE(?1, '') = '' OR name LIKE ?1)
+AND (COALESCE(?2, '') = '' OR creator LIKE ?2)
+ORDER BY name DESC, updated_at DESC
+LIMIT ?4 OFFSET ?3
+`
+
+type ListProjectsByNameDescParams struct {
+	Name    interface{}
+	Creator interface{}
+	Offset  int64
+	Limit   int64
+}
+
+func (q *Queries) ListProjectsByNameDesc(ctx context.Context, arg ListProjectsByNameDescParams) ([]Project, error) {
+	rows, err := q.db.QueryContext(ctx, listProjectsByNameDesc,
+		arg.Name,
+		arg.Creator,
+		arg.Offset,
+		arg.Limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Project
+	for rows.Next() {
+		var i Project
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Creator,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listProjectsByTimeAsc = `-- name: ListProjectsByTimeAsc :many
+SELECT id, name, creator, updated_at FROM projects
+WHERE (COALESCE(?1, '') = '' OR name LIKE ?1)
+AND (COALESCE(?2, '') = '' OR creator LIKE ?2)
+ORDER BY updated_at ASC
+LIMIT ?4 OFFSET ?3
+`
+
+type ListProjectsByTimeAscParams struct {
+	Name    interface{}
+	Creator interface{}
+	Offset  int64
+	Limit   int64
+}
+
+func (q *Queries) ListProjectsByTimeAsc(ctx context.Context, arg ListProjectsByTimeAscParams) ([]Project, error) {
+	rows, err := q.db.QueryContext(ctx, listProjectsByTimeAsc,
+		arg.Name,
+		arg.Creator,
+		arg.Offset,
+		arg.Limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Project
+	for rows.Next() {
+		var i Project
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Creator,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listProjectsByTimeDesc = `-- name: ListProjectsByTimeDesc :many
+SELECT id, name, creator, updated_at FROM projects
+WHERE (COALESCE(?1, '') = '' OR name LIKE ?1)
+AND (COALESCE(?2, '') = '' OR creator LIKE ?2)
+ORDER BY updated_at DESC
+LIMIT ?4 OFFSET ?3
+`
+
+type ListProjectsByTimeDescParams struct {
+	Name    interface{}
+	Creator interface{}
+	Offset  int64
+	Limit   int64
+}
+
+func (q *Queries) ListProjectsByTimeDesc(ctx context.Context, arg ListProjectsByTimeDescParams) ([]Project, error) {
+	rows, err := q.db.QueryContext(ctx, listProjectsByTimeDesc,
+		arg.Name,
+		arg.Creator,
+		arg.Offset,
+		arg.Limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Project
+	for rows.Next() {
+		var i Project
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Creator,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

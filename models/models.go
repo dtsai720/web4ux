@@ -138,6 +138,7 @@ func (w *WinfittsSummary) Load(slice []string) error {
 type WinfittsRawData struct {
 	ParticipantSerial string
 	Participant       string
+	DeviceOrder       string
 	DeviceName        string
 	Items             []WinfittsSummary
 }
@@ -160,6 +161,8 @@ func (w *WinfittsRawData) Load(slice []string) error {
 			if len(matches) != 2 || len(matches[1]) != 2 {
 				return errs.ErrRegexMismatch
 			}
+
+			w.DeviceOrder = matches[0][1]
 			w.DeviceName = matches[1][1]
 			builder.Reset()
 		}
@@ -188,6 +191,7 @@ type ProjectDetail struct {
 	ProjectCreator    string `json:"projectCreator"`
 	ProjectUpdatedAt  string `json:"projectUpdatedAt"`
 	DeviceName        string `json:"deviceName"`
+	DeviceOrder       string `json:"deviceOrder"`
 	ParticipantName   string `json:"participantName"`
 	ParticipantSerial string `json:"participantSerial"`
 	InformationID     string `json:"informationId"`

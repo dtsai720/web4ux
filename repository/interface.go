@@ -6,16 +6,17 @@ import (
 
 	"github.com/web4ux/models"
 	"github.com/web4ux/repository/sqlc"
+	"github.com/web4ux/src/logger"
 )
 
 type ListProject interface {
 	CountProjects(ctx context.Context, arg sqlc.CountProjectsParams) (int64, error)
-	ListProjectsOrderByCreatorAsc(ctx context.Context, arg sqlc.ListProjectsOrderByCreatorAscParams) ([]sqlc.Project, error)
-	ListProjectsOrderByCreatorDesc(ctx context.Context, arg sqlc.ListProjectsOrderByCreatorDescParams) ([]sqlc.Project, error)
-	ListProjectsOrderByNameAsc(ctx context.Context, arg sqlc.ListProjectsOrderByNameAscParams) ([]sqlc.Project, error)
-	ListProjectsOrderByNameDesc(ctx context.Context, arg sqlc.ListProjectsOrderByNameDescParams) ([]sqlc.Project, error)
-	ListProjectsOrderByUpdatedAtAsc(ctx context.Context, arg sqlc.ListProjectsOrderByUpdatedAtAscParams) ([]sqlc.Project, error)
-	ListProjectsOrderByUpdatedAtDesc(ctx context.Context, arg sqlc.ListProjectsOrderByUpdatedAtDescParams) ([]sqlc.Project, error)
+	ListProjectsByCreatorAsc(ctx context.Context, arg sqlc.ListProjectsByCreatorAscParams) ([]sqlc.Project, error)
+	ListProjectsByCreatorDesc(ctx context.Context, arg sqlc.ListProjectsByCreatorDescParams) ([]sqlc.Project, error)
+	ListProjectsByNameAsc(ctx context.Context, arg sqlc.ListProjectsByNameAscParams) ([]sqlc.Project, error)
+	ListProjectsByNameDesc(ctx context.Context, arg sqlc.ListProjectsByNameDescParams) ([]sqlc.Project, error)
+	ListProjectsByTimeAsc(ctx context.Context, arg sqlc.ListProjectsByTimeAscParams) ([]sqlc.Project, error)
+	ListProjectsByTimeDesc(ctx context.Context, arg sqlc.ListProjectsByTimeDescParams) ([]sqlc.Project, error)
 }
 
 type Command interface {
@@ -25,13 +26,13 @@ type Command interface {
 	UpsertWinfitts(ctx context.Context, arg sqlc.UpsertWinfittsParams) (sqlc.Winfitt, error)
 	UpsertWinfittsDetail(ctx context.Context, arg sqlc.UpsertWinfittsDetailParams) (sqlc.WinfittsDetail, error)
 	UpsertWinfittsInformation(ctx context.Context, arg sqlc.UpsertWinfittsInformationParams) (sqlc.WinfittsInformation, error)
-	DeleteWinfittsInformation(ctx context.Context, arg sqlc.DeleteWinfittsInformationParams) error
+	SoftDeleteWinfittsInformation(ctx context.Context, arg sqlc.SoftDeleteWinfittsInformationParams) error
 }
 
 type Queries interface {
 	ListProject
-	GetProject(ctx context.Context, id string) (sqlc.Project, error)
-	GetProjectDetailByID(ctx context.Context, projectID string) ([]sqlc.GetProjectDetailByIDRow, error)
+	FindProject(ctx context.Context, id string) (sqlc.Project, error)
+	FindProjectDetails(ctx context.Context, projectID string) ([]sqlc.FindProjectDetailsRow, error)
 }
 
 type IDatabase interface {
@@ -41,14 +42,14 @@ type IDatabase interface {
 }
 
 type CommandRepository interface {
-	UpsertExtractWinfittsDetails(ctx context.Context, in models.ProjectSummary, rows []models.WinfittsRawData) error
-	DeleteOrRestoreWinfittsInformation(ctx context.Context, arg sqlc.DeleteWinfittsInformationParams) error
+	UpsertExtractWinfittsDetails(ctx context.Context, log logger.ILogger, in models.ProjectSummary, rows []models.WinfittsRawData) error
+	SoftDeleteWinfittsInformation(ctx context.Context, log logger.ILogger, arg sqlc.SoftDeleteWinfittsInformationParams) error
 }
 
 type QueryRepository interface {
-	GetProject(ctx context.Context, id string) (models.Project, error)
-	ListProjects(ctx context.Context, name, creator, orderBy, direction string, offset, limit int64) (models.ProjectSummaries, error)
-	GetProjectDetailByID(ctx context.Context, projectID string) ([]models.ProjectDetail, error)
+	FindProject(ctx context.Context, log logger.ILogger, id string) (models.Project, error)
+	ListProjects(ctx context.Context, log logger.ILogger, req models.ListProjectRequest) (models.ProjectSummaries, error)
+	FindProjectDetails(ctx context.Context, log logger.ILogger, projectID string) ([]models.ProjectDetail, error)
 }
 
 type IRepository interface {

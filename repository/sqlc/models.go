@@ -6,6 +6,7 @@ package sqlc
 
 type Device struct {
 	ID        string
+	Order     string
 	Name      string
 	ProjectID string
 }
