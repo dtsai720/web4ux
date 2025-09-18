@@ -1,18 +1,36 @@
-import React from 'react';
 import { getSortIcon, formatDate } from '../../utils/summary';
 
-/**
- * Summary table component for displaying summary data
- *
- * @param {Object} props - Component props
- * @param {Array} props.summaries - Array of summary objects to display
- * @param {number} props.totalItems - Total number of items
- * @param {string} props.orderBy - Current sort field
- * @param {string} props.orderDirection - Current sort direction
- * @param {Function} props.handleSort - Function to handle sorting
- * @param {Function} props.handleItemClick - Function to handle item click
- * @returns {JSX.Element} Summary table component
- */
+const SortableHeader = ({ field, label, orderBy, orderDirection, onSort }) => (
+  <th
+    scope="col"
+    className="user-select-none"
+    style={{ cursor: 'pointer' }}
+    onClick={() => onSort(field)}
+  >
+    {label} {getSortIcon(field, orderBy, orderDirection)}
+  </th>
+);
+
+const TableRow = ({ summary, onClick }) => (
+  <tr
+    style={{ cursor: 'pointer' }}
+    onClick={() => onClick(summary.id)}
+    className="table-row-hover"
+  >
+    <td><strong>{summary.name}</strong></td>
+    <td className="text-muted">{summary.creator}</td>
+    <td className="text-muted"><small>{formatDate(summary.updatedAt)}</small></td>
+  </tr>
+);
+
+const EmptyState = () => (
+  <div className="text-center py-5">
+    <div className="mb-3" style={{ fontSize: '3rem' }}>🔍</div>
+    <h5 className="text-muted">No Projects Found</h5>
+    <p className="text-muted">Try adjusting your search criteria or check if projects have been synced</p>
+  </div>
+);
+
 const SummaryTable = ({
   summaries,
   totalItems,
@@ -23,83 +41,27 @@ const SummaryTable = ({
 }) => {
   return (
     <div className="card shadow-sm">
-      {/* 表格標題和計數 */}
-      <div className="card-header bg-light d-flex justify-content-between align-items-center">
+      <div className="card-header bg-light">
         <h5 className="card-title mb-0">Projects ({totalItems} items)</h5>
       </div>
-
       <div className="card-body p-0">
         {summaries.length > 0 ? (
-          <div className="table-responsive">
-            <table className="table table-hover mb-0">
-              <thead className="table-light">
-                <tr>
-                  <th
-                    scope="col"
-                    className="user-select-none"
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => handleSort('name')}
-                  >
-                    <div className="d-flex align-items-center">
-                      Name
-                      {getSortIcon('name', orderBy, orderDirection)}
-                    </div>
-                  </th>
-                  <th
-                    scope="col"
-                    className="user-select-none"
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => handleSort('creator')}
-                  >
-                    <div className="d-flex align-items-center">
-                      Creator
-                      {getSortIcon('creator', orderBy, orderDirection)}
-                    </div>
-                  </th>
-                  <th
-                    scope="col"
-                    className="user-select-none"
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => handleSort('updatedAt')}
-                  >
-                    <div className="d-flex align-items-center">
-                      Updated At
-                      {getSortIcon('updatedAt', orderBy, orderDirection)}
-                    </div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {summaries.map((summary) => (
-                  <tr
-                    key={summary.id}
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => handleItemClick(summary.id)}
-                    className="table-row-hover"
-                  >
-                    <td>
-                      <strong>{summary.name}</strong>
-                    </td>
-                    <td className="text-muted">
-                      {summary.creator}
-                    </td>
-                    <td className="text-muted">
-                      <small>{formatDate(summary.updatedAt)}</small>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="text-center py-5">
-            <div className="mb-3" style={{ fontSize: '3rem' }}>🔍</div>
-            <h5 className="text-muted">No Projects Found</h5>
-            <p className="text-muted">Try adjusting your search criteria or check if projects have been synced</p>
-          </div>
-        )}
+          <table className="table table-hover mb-0">
+            <thead className="table-light">
+              <tr>
+                <SortableHeader field="name" label="Name" orderBy={orderBy} orderDirection={orderDirection} onSort={handleSort} />
+                <SortableHeader field="creator" label="Creator" orderBy={orderBy} orderDirection={orderDirection} onSort={handleSort} />
+                <SortableHeader field="updatedAt" label="Updated At" orderBy={orderBy} orderDirection={orderDirection} onSort={handleSort} />
+              </tr>
+            </thead>
+            <tbody>
+              {summaries.map((summary) => (
+                <TableRow key={summary.id} summary={summary} onClick={handleItemClick} />
+              ))}
+            </tbody>
+          </table>
+        ) : <EmptyState />}
       </div>
-
       <style jsx>{`
         .table-row-hover:hover {
           background-color: #f8f9fa !important;
