@@ -26,7 +26,6 @@ const SyncPage = ({ setCurrentPage }) => {
   useEffect(() => {
     // 監聽同步進度事件
     EventsOn('sync:progress', (progress) => {
-      console.log('Received sync progress:', progress);
       setSyncProgress(progress);
 
       if (progress.isCompleted) {

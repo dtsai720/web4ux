@@ -48,7 +48,7 @@ const ErrorTrailAnalysisComponent = ({
 
       setLoading(false);
     }
-  }, [rawData, selectedDevice]);
+  }, [rawData, selectedDevice, selectedId]);
 
   // Filter data when device or ID changes
   useEffect(() => {

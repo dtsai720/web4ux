@@ -67,14 +67,12 @@ export const toggleParticipantDelete = async (deviceKey, participantKey, rawData
     );
 
     if (recordsToUpdate.length === 0) {
-      console.log(`No records found to ${isDelete ? 'delete' : 'restore'} for participant: ${participantKey}`);
       return;
     }
 
     // Call delete/restore API
     for (const record of removeDuplicates(recordsToUpdate)) {
       await DeleteOrRestore(record.projectId, record.informationId, isDelete);
-      console.log(`${isDelete ? 'Deleted' : 'Restored'} participant record: ${record.informationId}`);
     }
 
     return true;
@@ -104,14 +102,12 @@ export const toggleTrailDelete = async (deviceKey, participantKey, trailKey, raw
     );
 
     if (recordsToUpdate.length === 0) {
-      console.log(`No records found to ${isDelete ? 'delete' : 'restore'} for trail: ${trailKey}`);
       return;
     }
 
     // Call delete/restore API
     for (const record of removeDuplicates(recordsToUpdate)) {
       await DeleteOrRestore(record.projectId, record.informationId, isDelete);
-      console.log(`${isDelete ? 'Deleted' : 'Restored'} trail record: ${record.informationId}`);
     }
 
     return true;

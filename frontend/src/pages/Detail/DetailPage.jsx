@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import OutlierAnalysisComponent from './OutlierAnalysisComponent';
 import DeleteItemComponent from './DeleteItemComponent';
 import MovementTimeMatrixComponent from './MoveTimeAnalysisComponent';
@@ -25,8 +25,6 @@ import DetailPageHeader from '../../components/detail/DetailPageHeader';
 const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
   // State management
   const [data, setData] = useState(DEFAULT_STATE.data);
-  const [loading, setLoading] = useState(DEFAULT_STATE.loading);
-  const [error, setError] = useState(DEFAULT_STATE.error);
   const [summaryInfo, setSummaryInfo] = useState(DEFAULT_STATE.summaryInfo);
   const [outlierMode, setOutlierMode] = useState(DEFAULT_STATE.outlierMode);
   const [outlierData, setOutlierData] = useState(DEFAULT_STATE.outlierData);
@@ -34,21 +32,15 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
   const [selectedOutlierParticipant, setSelectedOutlierParticipant] = useState(DEFAULT_STATE.selectedOutlierParticipant);
   const [selectedOutlierTrail, setSelectedOutlierTrail] = useState(DEFAULT_STATE.selectedOutlierTrail);
   const [rawData, setRawData] = useState(DEFAULT_STATE.rawData);
-  const [deletedTrails, setDeletedTrails] = useState(DEFAULT_STATE.deletedTrails);
   const [deletedParticipants, setDeletedParticipants] = useState(DEFAULT_STATE.deletedParticipants);
   const [deleteMode, setDeleteMode] = useState(DEFAULT_STATE.deleteMode);
   const [movementTimeMatrixMode, setMovementTimeMatrixMode] = useState(DEFAULT_STATE.movementTimeMatrixMode || false);
   const [errorTrailMode, setErrorTrailMode] = useState(DEFAULT_STATE.errorTrailMode || false);
 
   // Load data from API
-  const loadData = async () => {
-    if (!selectedSummaryId) {
-      setError('No summary ID provided');
-      return;
-    }
+  const loadData = useCallback(async () => {
+    if (!selectedSummaryId) return;
 
-    setLoading(true);
-    setError('');
 
     try {
       const result = await loadProjectData(selectedSummaryId);
@@ -61,18 +53,14 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
 
       // Collect deleted items
       const deletedItems = collectDeletedItems(result.rawData);
-      setDeletedTrails(deletedItems.deletedTrails);
       setDeletedParticipants(deletedItems.deletedParticipants);
 
       // Set summary info
       setSummaryInfo(result.summaryInfo);
     } catch (err) {
       console.error('Load data error:', err);
-      setError(err.message || 'An error occurred while loading data');
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [selectedSummaryId]);
 
   // Handle participant delete/restore
   const handleToggleParticipantDelete = async (deviceKey, participantKey, isDelete = true) => {
@@ -169,14 +157,14 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
     setOutlierMode(true);
     setMovementTimeMatrixMode(false);
     setErrorTrailMode(false);
-  }, [selectedSummaryId]);
+  }, [selectedSummaryId, loadData]);
 
   // Calculate outliers when outlierMode is activated
   useEffect(() => {
     if (outlierMode && rawData.length > 0) {
       // Calculate outliers for by_device grouped data
       const timer = setTimeout(() => {
-        const outliers = calculateOutlierData(data, rawData);
+        const outliers = calculateOutlierData(data);
         setOutlierData(outliers);
       }, 100);
 
@@ -190,19 +178,23 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
         <div className="col-12">
           <DetailPageHeader
             setCurrentPage={setCurrentPage}
-            deleteMode={deleteMode}
-            outlierMode={outlierMode}
-            movementTimeMatrixMode={movementTimeMatrixMode}
-            errorTrailMode={errorTrailMode}
-            setDeleteMode={setDeleteMode}
-            setOutlierMode={setOutlierMode}
-            setMovementTimeMatrixMode={setMovementTimeMatrixMode}
-            setErrorTrailMode={setErrorTrailMode}
-            calculateOutliers={calculateOutliers}
-            closeOutlierMode={closeOutlierMode}
-            closeDeleteMode={closeDeleteMode}
-            closeMovementTimeMatrixMode={closeMovementTimeMatrixMode}
-            closeErrorTrailMode={closeErrorTrailMode}
+            modeState={{
+              deleteMode,
+              outlierMode,
+              movementTimeMatrixMode,
+              errorTrailMode
+            }}
+            modeHandlers={{
+              setDeleteMode,
+              setOutlierMode,
+              setMovementTimeMatrixMode,
+              setErrorTrailMode,
+              calculateOutliers,
+              closeOutlierMode,
+              closeDeleteMode,
+              closeMovementTimeMatrixMode,
+              closeErrorTrailMode
+            }}
           />
 
           {/* Summary Information */}

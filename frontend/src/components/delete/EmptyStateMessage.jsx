@@ -1,10 +1,4 @@
-import React from 'react';
 
-/**
- * Displays an empty state message with an icon
- * @param {string} message - The message to display
- * @returns {JSX.Element} - The empty state component
- */
 const EmptyStateMessage = ({ message }) => {
   return (
     <div className="text-center py-4">

@@ -44,7 +44,7 @@ const MovementTimeMatrixComponent = ({
 
       setLoading(false);
     }
-  }, [rawData]);
+  }, [rawData, selectedDevice]);
 
   // Handle device selection
   const handleDeviceChange = (deviceName) => {

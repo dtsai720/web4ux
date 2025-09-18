@@ -1,10 +1,4 @@
-import React from 'react';
 
-/**
- * Component for navigation buttons
- * @param {Object} props - Component props
- * @param {Function} props.setCurrentPage - Function to set the current page
- */
 const NavigationButtons = ({ setCurrentPage }) => {
   return (
     <div className="d-flex">

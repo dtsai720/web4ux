@@ -1,6 +1,3 @@
-/**
- * Export all delete-related components
- */
 import DeletedItemsContainer from './DeletedItemsContainer';
 import DeletedItemsTabs from './DeletedItemsTabs';
 import DeletedParticipantsList from './DeletedParticipantsList';
