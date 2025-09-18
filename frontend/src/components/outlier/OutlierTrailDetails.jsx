@@ -1,4 +1,3 @@
-import React from 'react';
 import { BADGE_CLASSES } from '../../constants/outlierConstants';
 
 const TABLE_HEADERS = [
@@ -31,35 +30,29 @@ const OutlierTrailDetails = ({ data, deviceKey, participantKey, trailKey, format
   const trailData = data[deviceKey]?.[participantKey]?.[trailKey] || [];
 
   return (
-    <div className="card">
-      <div className="card-header bg-light">
-        <h6 className="mb-0">Trail Details</h6>
-      </div>
-      <div className="card-body">
-        <div className="table-responsive">
-          <table className="table table-sm table-striped">
-            <thead className="table-dark">
-              <tr>
-                {TABLE_HEADERS.map(({ icon, text }) => (
-                  <th key={text}>
-                    <i className={`bi ${icon} me-1`}></i>{text}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {trailData.map((record, idx) => (
-                <TrailRecord
-                  key={idx}
-                  record={record}
-                  formatDateTime={formatDateTime}
-                />
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+    <>
+      <h6 className="border-bottom pb-2 mb-3 bg-light p-2 rounded">Trail Details</h6>
+      <table className="table table-sm table-striped table-responsive">
+        <thead className="table-dark">
+          <tr>
+            {TABLE_HEADERS.map(({ icon, text }) => (
+              <th key={text}>
+                <i className={`bi ${icon} me-1`}></i>{text}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {trailData.map((record, idx) => (
+            <TrailRecord
+              key={idx}
+              record={record}
+              formatDateTime={formatDateTime}
+            />
+          ))}
+        </tbody>
+      </table>
+    </>
   );
 };
 

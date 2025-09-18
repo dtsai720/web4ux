@@ -83,29 +83,23 @@ const FilterBadge = ({ type, isActive, count, onClick, title, icon, children }) 
 
 // Statistics card component
 const StatsCard = ({ deviceStats }) => (
-  <div className="text-end">
-    <div className="card border-primary bg-light" style={{ minWidth: '200px' }}>
-      <div className="card-body py-2 px-3">
-        <h6 className="card-title text-primary mb-2 text-center">
-          <i className="bi bi-graph-up me-1"></i>
-          Error Count Statistics
-        </h6>
-        <div className="row text-center">
-          <div className="col-6">
-            <div className="border-end">
-              <small className="text-muted d-block mb-1">Average</small>
-              <span className="badge bg-primary fs-6 px-2 py-1">
-                {deviceStats?.avgErrorCount?.toFixed(2) || '0.00'}
-              </span>
-            </div>
-          </div>
-          <div className="col-6">
-            <small className="text-muted d-block mb-1">Std Dev</small>
-            <span className="badge bg-warning text-dark fs-6 px-2 py-1">
-              {deviceStats?.stdDevErrorCount?.toFixed(2) || '0.00'}
-            </span>
-          </div>
-        </div>
+  <div className="text-end border border-primary bg-light rounded p-3" style={{ minWidth: '200px' }}>
+    <h6 className="text-primary mb-2 text-center">
+      <i className="bi bi-graph-up me-1"></i>
+      Error Count Statistics
+    </h6>
+    <div className="d-flex justify-content-around text-center">
+      <div className="border-end pe-3">
+        <small className="text-muted d-block mb-1">Average</small>
+        <span className="badge bg-primary fs-6 px-2 py-1">
+          {deviceStats?.avgErrorCount?.toFixed(2) || '0.00'}
+        </span>
+      </div>
+      <div className="ps-3">
+        <small className="text-muted d-block mb-1">Std Dev</small>
+        <span className="badge bg-warning text-dark fs-6 px-2 py-1">
+          {deviceStats?.stdDevErrorCount?.toFixed(2) || '0.00'}
+        </span>
       </div>
     </div>
   </div>
@@ -314,8 +308,8 @@ const OutlierParticipantTable = ({
   };
 
   return (
-    <div className="card mb-4">
-      <div className="card-header bg-light">
+    <div className="mb-4">
+      <div className="border border-light rounded bg-light p-3 mb-3">
         <div className="d-flex justify-content-between align-items-start">
           <div>
             <h6 className="mb-1">Participants</h6>
@@ -362,52 +356,48 @@ const OutlierParticipantTable = ({
         </div>
       </div>
 
-      <div className="card-body">
-        {sortedParticipants.length === 0 ? (
-          <EmptyState
-            showOutliersOnly={showOutliersOnly}
-            showDoubleClickOnly={showDoubleClickOnly}
-          />
-        ) : (
-          <div className="table-responsive">
-            <table className="table table-bordered table-sm">
-              <thead className="table-secondary">
-                <tr>
-                  {TABLE_HEADERS.map(({ text, width }, index) => (
-                    <th key={index} className="text-center" style={width ? { width } : undefined}>
-                      {text}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {sortedParticipants.map(participantKey => {
-                  const participant = participants[participantKey];
-                  const isExpanded = expandedParticipants.has(participantKey);
-                  const canExpand = participant.isOutlier || participant.doubleClickCount > 0;
+      {sortedParticipants.length === 0 ? (
+        <EmptyState
+          showOutliersOnly={showOutliersOnly}
+          showDoubleClickOnly={showDoubleClickOnly}
+        />
+      ) : (
+        <table className="table table-bordered table-sm table-responsive">
+          <thead className="table-secondary">
+            <tr>
+              {TABLE_HEADERS.map(({ text, width }, index) => (
+                <th key={index} className="text-center" style={width ? { width } : undefined}>
+                  {text}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {sortedParticipants.map(participantKey => {
+              const participant = participants[participantKey];
+              const isExpanded = expandedParticipants.has(participantKey);
+              const canExpand = participant.isOutlier || participant.doubleClickCount > 0;
 
-                  return (
-                    <ParticipantRow
-                      key={participantKey}
-                      participantKey={participantKey}
-                      participant={participant}
-                      isExpanded={isExpanded}
-                      canExpand={canExpand}
-                      onToggleExpansion={toggleParticipantExpansion}
-                      onDelete={(e) => {
-                        e.stopPropagation();
-                        onToggleParticipantDelete(deviceKey, participantKey, true);
-                      }}
-                      deviceKey={deviceKey}
-                      data={data}
-                    />
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+              return (
+                <ParticipantRow
+                  key={participantKey}
+                  participantKey={participantKey}
+                  participant={participant}
+                  isExpanded={isExpanded}
+                  canExpand={canExpand}
+                  onToggleExpansion={toggleParticipantExpansion}
+                  onDelete={(e) => {
+                    e.stopPropagation();
+                    onToggleParticipantDelete(deviceKey, participantKey, true);
+                  }}
+                  deviceKey={deviceKey}
+                  data={data}
+                />
+              );
+            })}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 };

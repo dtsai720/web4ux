@@ -114,7 +114,6 @@ const OutlierAnalysis = ({
         {viewMode === 'overview' ? (
           // Overview Mode: Device vs Difficulty Analysis
           <OutlierDeviceDifficultyTable
-            outlierData={outlierData}
             data={data}
           />
         ) : (
@@ -189,7 +188,6 @@ const OutlierAnalysis = ({
             {participantViewMode === 'participant-overview' ? (
               // Participant Overview: Participant vs Difficulty Matrix
               <OutlierDeviceDifficultyTable
-                outlierData={outlierData}
                 data={data}
                 selectedDevice={currentDevice}
                 deviceStats={outlierData[currentDevice]?.stats}

@@ -61,34 +61,29 @@ const EventLogRecord = ({ record }) => (
 
 const EventLogExpansion = ({ trailData, participantKey, trailKey }) => (
   <tr>
-    <td colSpan="6" className="p-0">
-      <div className="bg-light p-3 border-top">
-        <h6 className="mb-3">
-          <i className="bi bi-list-ul text-primary me-2"></i>
-          <span className="badge bg-primary me-2">Participant {participantKey}</span>
-          <span className="badge bg-secondary me-2">Trail {trailKey}</span>
-          Event Log
-        </h6>
-
-        <div className="table-responsive">
-          <table className="table table-sm table-striped table-hover">
-            <thead className="table-dark">
-              <tr>
-                {EVENT_HEADERS.map(({ icon, text, width }) => (
-                  <th key={text} style={{ width }}>
-                    <i className={`bi ${icon} me-1`}></i>{text}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {Array.isArray(trailData) && trailData.map((record, index) => (
-                <EventLogRecord key={index} record={record} />
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+    <td colSpan="6" className="bg-light p-3 border-top">
+      <h6 className="mb-3">
+        <i className="bi bi-list-ul text-primary me-2"></i>
+        <span className="badge bg-primary me-2">Participant {participantKey}</span>
+        <span className="badge bg-secondary me-2">Trail {trailKey}</span>
+        Event Log
+      </h6>
+      <table className="table table-sm table-striped table-hover">
+        <thead className="table-dark">
+          <tr>
+            {EVENT_HEADERS.map(({ icon, text, width }) => (
+              <th key={text} style={{ width }}>
+                <i className={`bi ${icon} me-1`}></i>{text}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {Array.isArray(trailData) && trailData.map((record, index) => (
+            <EventLogRecord key={index} record={record} />
+          ))}
+        </tbody>
+      </table>
     </td>
   </tr>
 );
@@ -151,47 +146,44 @@ const OutlierTrailTable = ({ errorTrails, data, deviceKey, participantKey }) => 
   };
 
   return (
-    <div>
+    <>
       <h6 className="border-bottom pb-2 mb-3">
         <i className="bi bi-person-fill text-primary me-2"></i>
         <span className="badge bg-primary me-2">Participant {participantKey}</span>
         <i className="bi bi-exclamation-triangle-fill text-warning me-2"></i>
         Error Trails Analysis
       </h6>
+      <table className="table table-hover table-responsive">
+        <thead className="table-secondary">
+          <tr>
+            {MAIN_HEADERS.map(({ text, width }, index) => (
+              <th key={index} style={width ? { width } : undefined}>{text}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {errorTrails?.map(trailKey => {
+            const trailData = data[deviceKey]?.[participantKey]?.[trailKey];
+            const trailStats = trailData?.stats;
+            const hasDoubleClick = Array.isArray(trailData) ? trailHasDoubleClick(trailData) : false;
+            const isExpanded = expandedRows.has(trailKey);
 
-      <div className="table-responsive">
-        <table className="table table-hover">
-          <thead className="table-secondary">
-            <tr>
-              {MAIN_HEADERS.map(({ text, width }, index) => (
-                <th key={index} style={width ? { width } : undefined}>{text}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {errorTrails?.map(trailKey => {
-              const trailData = data[deviceKey]?.[participantKey]?.[trailKey];
-              const trailStats = trailData?.stats;
-              const hasDoubleClick = Array.isArray(trailData) ? trailHasDoubleClick(trailData) : false;
-              const isExpanded = expandedRows.has(trailKey);
-
-              return (
-                <TrailRow
-                  key={trailKey}
-                  trailKey={trailKey}
-                  trailData={trailData}
-                  trailStats={trailStats}
-                  hasDoubleClick={hasDoubleClick}
-                  isExpanded={isExpanded}
-                  onToggle={() => toggleRowExpansion(trailKey)}
-                  participantKey={participantKey}
-                />
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
+            return (
+              <TrailRow
+                key={trailKey}
+                trailKey={trailKey}
+                trailData={trailData}
+                trailStats={trailStats}
+                hasDoubleClick={hasDoubleClick}
+                isExpanded={isExpanded}
+                onToggle={() => toggleRowExpansion(trailKey)}
+                participantKey={participantKey}
+              />
+            );
+          })}
+        </tbody>
+      </table>
+    </>
   );
 };
 

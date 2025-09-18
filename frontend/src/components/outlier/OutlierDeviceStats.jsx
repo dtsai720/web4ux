@@ -1,5 +1,40 @@
 import React from 'react';
 
+const STAT_ITEMS = [
+  {
+    label: 'Avg Error Count',
+    key: 'avgErrorCount',
+    formatValue: (value) => value?.toFixed(2) || '0.00'
+  },
+  {
+    label: 'StdDev Error Count',
+    key: 'stdDevErrorCount',
+    formatValue: (value) => value?.toFixed(2) || '0.00'
+  },
+  {
+    label: 'Avg Extra Clicks',
+    key: 'avgErrorTime',
+    formatValue: (value) => value?.toFixed(2) || '0.00'
+  },
+  {
+    label: 'StdDev Extra Clicks',
+    key: 'stdDevErrorTime',
+    formatValue: (value) => value?.toFixed(2) || '0.00'
+  }
+];
+
+// Stat card component
+const StatCard = ({ label, value }) => (
+  <div className="col-md-3">
+    <div className="card bg-light">
+      <div className="card-body text-center">
+        <h6 className="text-muted">{label}</h6>
+        <h4>{value}</h4>
+      </div>
+    </div>
+  </div>
+);
+
 const OutlierDeviceStats = ({ deviceStats }) => {
   return (
     <div className="card mb-4">
@@ -8,38 +43,13 @@ const OutlierDeviceStats = ({ deviceStats }) => {
       </div>
       <div className="card-body">
         <div className="row">
-          <div className="col-md-3">
-            <div className="card bg-light">
-              <div className="card-body text-center">
-                <h6 className="text-muted">Avg Error Count</h6>
-                <h4>{deviceStats?.avgErrorCount?.toFixed(2) || '0.00'}</h4>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-3">
-            <div className="card bg-light">
-              <div className="card-body text-center">
-                <h6 className="text-muted">StdDev Error Count</h6>
-                <h4>{deviceStats?.stdDevErrorCount?.toFixed(2) || '0.00'}</h4>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-3">
-            <div className="card bg-light">
-              <div className="card-body text-center">
-                <h6 className="text-muted">Avg Extra Clicks</h6>
-                <h4>{deviceStats?.avgErrorTime?.toFixed(2) || '0.00'}</h4>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-3">
-            <div className="card bg-light">
-              <div className="card-body text-center">
-                <h6 className="text-muted">StdDev Extra Clicks</h6>
-                <h4>{deviceStats?.stdDevErrorTime?.toFixed(2) || '0.00'}</h4>
-              </div>
-            </div>
-          </div>
+          {STAT_ITEMS.map(({ label, key, formatValue }) => (
+            <StatCard
+              key={key}
+              label={label}
+              value={formatValue(deviceStats?.[key])}
+            />
+          ))}
         </div>
       </div>
     </div>
