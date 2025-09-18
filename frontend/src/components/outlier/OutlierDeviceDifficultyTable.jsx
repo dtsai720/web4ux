@@ -46,13 +46,11 @@ const isErrorTrail = (trailRecords) => {
 
 // Stat item component
 const StatItem = ({ label, value, variant = 'primary' }) => (
-  <div className="col-6">
-    <div className={variant === 'primary' ? 'border-end' : ''}>
-      <small className="text-muted d-block mb-1">{label}</small>
-      <span className={`badge bg-${variant} ${variant === 'warning' ? 'text-dark' : ''} fs-6 px-2 py-1`}>
-        {value}
-      </span>
-    </div>
+  <div className={variant === 'primary' ? 'border-end pe-3' : 'ps-3'}>
+    <small className="text-muted d-block mb-1">{label}</small>
+    <span className={`badge bg-${variant} ${variant === 'warning' ? 'text-dark' : ''} fs-6 px-2 py-1`}>
+      {value}
+    </span>
   </div>
 );
 
@@ -62,18 +60,14 @@ const StatsCard = ({ deviceStats }) => {
   const stdDevValue = deviceStats?.stdDevErrorCount?.toFixed(2) || '0.00';
 
   return (
-    <div className="text-end">
-      <div className="card border-primary bg-light" style={{ minWidth: '200px' }}>
-        <div className="card-body py-2 px-3">
-          <h6 className="card-title text-primary mb-2 text-center">
-            <i className="bi bi-graph-up me-1"></i>
-            Error Count Statistics
-          </h6>
-          <div className="row text-center">
-            <StatItem label="Average" value={avgValue} variant="primary" />
-            <StatItem label="Std Dev" value={stdDevValue} variant="warning" />
-          </div>
-        </div>
+    <div className="text-end border border-primary bg-light rounded p-3" style={{ minWidth: '200px' }}>
+      <h6 className="text-primary mb-2 text-center">
+        <i className="bi bi-graph-up me-1"></i>
+        Error Count Statistics
+      </h6>
+      <div className="d-flex justify-content-around text-center">
+        <StatItem label="Average" value={avgValue} variant="primary" />
+        <StatItem label="Std Dev" value={stdDevValue} variant="warning" />
       </div>
     </div>
   );

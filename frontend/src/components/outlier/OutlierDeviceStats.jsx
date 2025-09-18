@@ -26,31 +26,25 @@ const STAT_ITEMS = [
 // Stat card component
 const StatCard = ({ label, value }) => (
   <div className="col-md-3">
-    <div className="card bg-light">
-      <div className="card-body text-center">
-        <h6 className="text-muted">{label}</h6>
-        <h4>{value}</h4>
-      </div>
+    <div className="border bg-light rounded p-3 text-center">
+      <h6 className="text-muted">{label}</h6>
+      <h4>{value}</h4>
     </div>
   </div>
 );
 
 const OutlierDeviceStats = ({ deviceStats }) => {
   return (
-    <div className="card mb-4">
-      <div className="card-header bg-light">
-        <h6 className="mb-0">Device Statistics</h6>
-      </div>
-      <div className="card-body">
-        <div className="row">
-          {STAT_ITEMS.map(({ label, key, formatValue }) => (
-            <StatCard
-              key={key}
-              label={label}
-              value={formatValue(deviceStats?.[key])}
-            />
-          ))}
-        </div>
+    <div className="mb-4">
+      <h6 className="border-bottom pb-2 mb-3 bg-light p-2 rounded">Device Statistics</h6>
+      <div className="row">
+        {STAT_ITEMS.map(({ label, key, formatValue }) => (
+          <StatCard
+            key={key}
+            label={label}
+            value={formatValue(deviceStats?.[key])}
+          />
+        ))}
       </div>
     </div>
   );
