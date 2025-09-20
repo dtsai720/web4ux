@@ -89,14 +89,19 @@ export const calculateAggregatedStats = (trailsData) => {
 
     stats.totalTrails++;
 
-    if (trailStats.availableStatus === DATA_ANALYSIS.AVAILABLE_STATUS.UNAVAILABLE) {
-      stats.unavailableTrails++;
-    }
-    if (trailStats.availableStatus === DATA_ANALYSIS.AVAILABLE_STATUS.AVAILABLE) {
-      stats.availableTrails++;
-    }
-    if (trailStats.availableStatus === DATA_ANALYSIS.AVAILABLE_STATUS.CALCULABLE) {
-      stats.calculableTrails++;
+    switch (trailStats.availableStatus) {
+      case DATA_ANALYSIS.AVAILABLE_STATUS.UNAVAILABLE:
+        stats.unavailableTrails++;
+        break;
+      case DATA_ANALYSIS.AVAILABLE_STATUS.AVAILABLE:
+        stats.availableTrails++;
+        break;
+      case DATA_ANALYSIS.AVAILABLE_STATUS.CALCULABLE:
+        stats.calculableTrails++;
+        break;
+      default:
+        // Handle unexpected status values
+        break;
     }
 
     if (trailStats.has_error) {
