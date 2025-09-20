@@ -182,7 +182,7 @@ export const calculateMoveTimeAnalysis = (rawData) => {
     });
 
     return analysisData;
-  } catch (error) {
+  } catch {
     // Silently handle error - return empty analysis instead of logging
     return {};
   }

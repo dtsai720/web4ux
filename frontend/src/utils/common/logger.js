@@ -1,5 +1,6 @@
 // Production-safe logging utility
 // In development, logs to console. In production, can be configured to send to logging service.
+/* eslint-disable no-console */
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
