@@ -23,21 +23,27 @@ func New(options ...common.OptionalFn[Service]) *Service {
 
 	// Initialize default processor registry if not provided
 	if service.processorRegistry == nil {
-		service.processorRegistry = NewProjectProcessorRegistry()
-
-		// Register default processors
-		winfittsProcessor := NewWinfittsProcessor(
-			service.db,
-			service.extractRawDataLinks,
-			service.extractWinfittsDetails,
-		)
-		skipProcessor := NewSkipProcessor()
-
-		service.processorRegistry.Register(winfittsProcessor)
-		service.processorRegistry.Register(skipProcessor)
+		service.processorRegistry = service.createDefaultProcessorRegistry()
 	}
 
 	return service
+}
+
+func (s *Service) createDefaultProcessorRegistry() *ProjectProcessorRegistry {
+	registry := NewProjectProcessorRegistry()
+
+	// Register default processors
+	winfittsProcessor := NewWinfittsProcessor(
+		WithWinfittsDatabase(s.db),
+		WithRawDataLinksExtractor(s.extractRawDataLinks),
+		WithWinfittsDetailsExtractor(s.extractWinfittsDetails),
+	)
+	skipProcessor := NewSkipProcessor()
+
+	registry.Register(winfittsProcessor)
+	registry.Register(skipProcessor)
+
+	return registry
 }
 
 var _ IService = (*Service)(nil)

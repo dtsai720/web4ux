@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ListSummaries } from '../../../wailsjs/go/pkg/App';
 import { loadSummaries, handleSort } from '../../utils/summary';
+import { PAGINATION } from '../../utils/common';
 import {
   BackToHomeButton,
   ErrorMessage,
@@ -16,18 +17,18 @@ const SummaryPage = ({ setCurrentPage, setSelectedSummaryId }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // 搜尋和排序狀態
+  // Search and sort state
   const [searchName, setSearchName] = useState('');
   const [searchCreator, setSearchCreator] = useState('');
   const [orderBy, setOrderBy] = useState('updatedAt');
   const [orderDirection, setOrderDirection] = useState('desc');
 
-  // 分頁狀態
-  const [currentPageNum, setCurrentPageNum] = useState(1);
+  // Pagination state
+  const [currentPageNum, setCurrentPageNum] = useState(PAGINATION.DEFAULT_PAGE);
   const [totalItems, setTotalItems] = useState(0);
-  const itemsPerPage = 6; // 減少每頁顯示數量以便演示
+  const itemsPerPage = PAGINATION.ITEMS_PER_PAGE;
 
-  // 載入資料的函數，使用從 utils 導入的函數
+  // Function to load data, using imported utils function
   const fetchSummaries = useCallback(async () => {
     await loadSummaries({
       searchName,
@@ -42,14 +43,14 @@ const SummaryPage = ({ setCurrentPage, setSelectedSummaryId }) => {
       setError,
       ListSummaries
     });
-  }, [searchName, searchCreator, orderBy, orderDirection, currentPageNum]);
+  }, [searchName, searchCreator, orderBy, orderDirection, currentPageNum, itemsPerPage]);
 
-  // 初始載入和依賴更新時重新載入
+  // Initial load and reload when dependencies update
   useEffect(() => {
     fetchSummaries();
   }, [fetchSummaries]);
 
-  // 重置搜尋
+  // Reset search
   const handleReset = () => {
     setSearchName('');
     setSearchCreator('');
@@ -58,18 +59,18 @@ const SummaryPage = ({ setCurrentPage, setSelectedSummaryId }) => {
     setCurrentPageNum(1);
   };
 
-  // 處理排序，使用從 utils 導入的函數
+  // Handle sorting, using imported utils function
   const handleSortClick = (field) => {
     handleSort(field, orderBy, setOrderBy, orderDirection, setOrderDirection, setCurrentPageNum);
   };
 
-  // 處理分頁
+  // Handle pagination
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const handlePageChange = (page) => {
     setCurrentPageNum(page);
   };
 
-  // 處理點擊項目
+  // Handle item click
   const handleItemClick = (summaryId) => {
     setSelectedSummaryId(summaryId);
     setCurrentPage('detail');
@@ -78,10 +79,10 @@ const SummaryPage = ({ setCurrentPage, setSelectedSummaryId }) => {
   return (
     <div className="container-fluid py-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
       <div className="container">
-        {/* 標題區域 */}
+        {/* Header section */}
         <SummaryHeader />
 
-        {/* 搜尋和篩選區域 */}
+        {/* Search and filter section */}
         <SearchFilterCard
           searchName={searchName}
           setSearchName={setSearchName}
@@ -90,13 +91,13 @@ const SummaryPage = ({ setCurrentPage, setSelectedSummaryId }) => {
           handleReset={handleReset}
         />
 
-        {/* 載入狀態 */}
+        {/* Loading state */}
         {loading && <LoadingIndicator />}
 
-        {/* 錯誤訊息 */}
+        {/* Error message */}
         <ErrorMessage error={error} />
 
-        {/* 資料表格 */}
+        {/* Data table */}
         {!loading && !error && (
           <>
             <SummaryTable
@@ -108,7 +109,7 @@ const SummaryPage = ({ setCurrentPage, setSelectedSummaryId }) => {
               handleItemClick={handleItemClick}
             />
 
-            {/* 分頁控制 */}
+            {/* Pagination control */}
             <Pagination
               currentPageNum={currentPageNum}
               totalPages={totalPages}
@@ -117,7 +118,7 @@ const SummaryPage = ({ setCurrentPage, setSelectedSummaryId }) => {
           </>
         )}
 
-        {/* 返回按鈕 */}
+        {/* Back button */}
         <BackToHomeButton setCurrentPage={setCurrentPage} />
       </div>
     </div>

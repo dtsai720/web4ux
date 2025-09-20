@@ -17,19 +17,57 @@ type WinfittsProcessor struct {
 	db                     repository.IRepository
 	extractRawDataLinks    func(context.Context, logger.ILogger, *htmlparser.ProjectSummary) ([]string, error)
 	extractWinfittsDetails func(context.Context, logger.ILogger, string) ([]models.WinfittsRawData, error)
+	detector               ProjectTypeDetector
 }
 
-// NewWinfittsProcessor creates a new Winfitts processor
-func NewWinfittsProcessor(
+// WinfittsProcessorOption configures a WinfittsProcessor
+type WinfittsProcessorOption func(*WinfittsProcessor)
+
+// WithDatabase sets the database repository
+func WithWinfittsDatabase(db repository.IRepository) WinfittsProcessorOption {
+	return func(w *WinfittsProcessor) { w.db = db }
+}
+
+// WithRawDataLinksExtractor sets the raw data links extraction function
+func WithRawDataLinksExtractor(fn func(context.Context, logger.ILogger, *htmlparser.ProjectSummary) ([]string, error)) WinfittsProcessorOption {
+	return func(w *WinfittsProcessor) { w.extractRawDataLinks = fn }
+}
+
+// WithWinfittsDetailsExtractor sets the winfitts details extraction function
+func WithWinfittsDetailsExtractor(fn func(context.Context, logger.ILogger, string) ([]models.WinfittsRawData, error)) WinfittsProcessorOption {
+	return func(w *WinfittsProcessor) { w.extractWinfittsDetails = fn }
+}
+
+// WithWinfittsDetector sets a custom project type detector
+func WithWinfittsDetector(detector ProjectTypeDetector) WinfittsProcessorOption {
+	return func(w *WinfittsProcessor) { w.detector = detector }
+}
+
+// NewWinfittsProcessor creates a new Winfitts processor with options
+func NewWinfittsProcessor(options ...WinfittsProcessorOption) *WinfittsProcessor {
+	processor := &WinfittsProcessor{
+		detector: NewDefaultProjectTypeDetector(), // Default detector
+	}
+
+	for _, option := range options {
+		option(processor)
+	}
+
+	return processor
+}
+
+// NewWinfittsProcessorLegacy creates a new Winfitts processor using the legacy approach
+// Deprecated: Use NewWinfittsProcessor with options instead
+func NewWinfittsProcessorLegacy(
 	db repository.IRepository,
 	extractRawDataLinks func(context.Context, logger.ILogger, *htmlparser.ProjectSummary) ([]string, error),
 	extractWinfittsDetails func(context.Context, logger.ILogger, string) ([]models.WinfittsRawData, error),
 ) *WinfittsProcessor {
-	return &WinfittsProcessor{
-		db:                     db,
-		extractRawDataLinks:    extractRawDataLinks,
-		extractWinfittsDetails: extractWinfittsDetails,
-	}
+	return NewWinfittsProcessor(
+		WithWinfittsDatabase(db),
+		WithRawDataLinksExtractor(extractRawDataLinks),
+		WithWinfittsDetailsExtractor(extractWinfittsDetails),
+	)
 }
 
 // Name returns the processor name
@@ -39,7 +77,7 @@ func (w *WinfittsProcessor) Name() string {
 
 // CanProcess determines if this processor can handle the project
 func (w *WinfittsProcessor) CanProcess(project htmlparser.ProjectSummary) bool {
-	return strings.Contains(strings.ToLower(project.Link), "winfitts")
+	return w.detector.IsWinfittsProject(project)
 }
 
 // Process handles the complete processing workflow for Winfitts projects

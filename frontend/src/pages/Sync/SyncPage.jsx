@@ -24,7 +24,7 @@ const SyncPage = ({ setCurrentPage }) => {
   const [syncData, setSyncData] = useState(null);
 
   useEffect(() => {
-    // 監聽同步進度事件
+    // Listen to sync progress events
     EventsOn('sync:progress', (progress) => {
       setSyncProgress(progress);
 
@@ -36,10 +36,10 @@ const SyncPage = ({ setCurrentPage }) => {
       }
     });
 
-    // 檢查同步狀態
+    // Check sync status
     checkSyncStatusAndUpdate();
 
-    // 清理函數
+    // Cleanup function
     return () => {
       EventsOff('sync:progress');
     };
@@ -63,7 +63,7 @@ const SyncPage = ({ setCurrentPage }) => {
         const response = await loginUtil(email, password);
         if (response.success) {
           setIsLoggedIn(true);
-          // 登入成功後立即開始同步
+          // Start sync immediately after successful login
           handleStartSync();
         } else {
           setLoginError(response.message);

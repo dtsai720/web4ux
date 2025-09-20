@@ -97,11 +97,18 @@ func (r *Repository) ListProjects(ctx context.Context, log logger.ILogger, req m
 
 	result.Total = count
 	result.Data = sliceutils.Map(projects, func(in sqlc.Project) models.Project {
+		updatedAt, err := common.ParseTimeRFC3339(in.UpdatedAt)
+		if err != nil {
+			log.Error("failed to parse project updated_at", err, "project_id", in.ID, "updated_at", in.UpdatedAt)
+			// Use zero time as fallback
+			updatedAt = time.Time{}
+		}
+
 		return models.Project{
 			ID:        in.ID,
 			Name:      in.Name,
 			Creator:   in.Creator,
-			UpdatedAt: common.Must(time.Parse(time.RFC3339, in.UpdatedAt)),
+			UpdatedAt: updatedAt,
 		}
 	})
 
@@ -121,11 +128,18 @@ func (r *Repository) FindProject(ctx context.Context, log logger.ILogger, id str
 		return models.Project{}, err
 	}
 
+	updatedAt, err := common.ParseTimeRFC3339(output.UpdatedAt)
+	if err != nil {
+		log.Error("failed to parse project updated_at", err, "project_id", output.ID, "updated_at", output.UpdatedAt)
+		// Use zero time as fallback
+		updatedAt = time.Time{}
+	}
+
 	return models.Project{
 		ID:        output.ID,
 		Name:      output.Name,
 		Creator:   output.Creator,
-		UpdatedAt: common.Must(time.Parse(time.RFC3339, output.UpdatedAt)),
+		UpdatedAt: updatedAt,
 	}, nil
 }
 

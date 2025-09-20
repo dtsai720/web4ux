@@ -2,8 +2,8 @@ package fetcher
 
 import (
 	"context"
+	"fmt"
 
-	"github.com/web4ux/src/errs"
 	"github.com/web4ux/src/htmlparser"
 	"github.com/web4ux/src/logger"
 	"go.uber.org/zap"
@@ -17,20 +17,15 @@ func (s *Service) FetchDataAndSave(ctx context.Context, logger logger.ILogger, i
 	processor := s.processorRegistry.FindProcessor(in)
 	if processor == nil {
 		log.Info("No processor found for project", zap.String("link", in.Link))
-		return errs.ErrNotWinfittsProject
+		return fmt.Errorf("no processor available for project: %s", in.Link)
 	}
 
 	log.Info("Using processor",
 		zap.String("processor_name", processor.Name()),
 		zap.String("project_link", in.Link))
 
-	err := processor.Process(ctx, log, in)
-	if err == errs.ErrNotWinfittsProject {
-		// This is expected for non-winfitts projects, not an actual error
-		return nil
-	}
-
-	return err
+	// Process the project - both successful processing and skipping return nil
+	return processor.Process(ctx, log, in)
 }
 
 // All processing logic has been moved to Strategy Pattern implementations.

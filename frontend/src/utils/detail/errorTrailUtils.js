@@ -86,13 +86,8 @@ export const detectErrorTrails = (rawData) => {
       totalErrorTrails: errorTrails.length
     };
   } catch (error) {
-    console.error('Error detecting error trails:', error);
-    return {
-      errorTrails: [],
-      byDevice: {},
-      byDifficulty: {},
-      totalErrorTrails: 0
-    };
+    // Log error and return empty result for graceful degradation
+    throw new Error(`Error detecting error trails: ${error.message}`);
   }
 };
 
@@ -163,7 +158,7 @@ export const getUniqueDifficulties = (errorTrails) => {
  * @returns {Array} Sorted array of unique device names
  */
 export const getUniqueDevices = (errorTrails) => {
-  // 創建 device 到 deviceOrder 的映射
+  // Create device to deviceOrder mapping
   const deviceOrderMap = {};
   errorTrails.forEach(trail => {
     if (!deviceOrderMap[trail.deviceName]) {

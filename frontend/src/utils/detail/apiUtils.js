@@ -55,7 +55,7 @@ export const loadProjectData = async (selectedSummaryId) => {
  * @param {String} participantKey - The participant key
  * @param {Array} rawData - The raw data array
  * @param {Boolean} isDelete - Whether to delete (true) or restore (false)
- * @returns {Promise<void>}
+ * @returns {Promise<{success: boolean, recordsUpdated: number}>} Promise resolving to operation result
  */
 export const toggleParticipantDelete = async (deviceKey, participantKey, rawData, isDelete = true) => {
   try {
@@ -67,15 +67,16 @@ export const toggleParticipantDelete = async (deviceKey, participantKey, rawData
     );
 
     if (recordsToUpdate.length === 0) {
-      return;
+      return { success: true, recordsUpdated: 0 };
     }
 
     // Call delete/restore API
-    for (const record of removeDuplicates(recordsToUpdate)) {
+    const uniqueRecords = removeDuplicates(recordsToUpdate);
+    for (const record of uniqueRecords) {
       await DeleteOrRestore(record.projectId, record.informationId, isDelete);
     }
 
-    return true;
+    return { success: true, recordsUpdated: uniqueRecords.length };
   } catch (err) {
     console.error(`Toggle participant ${isDelete ? 'delete' : 'restore'} failed:`, err);
     throw err;
@@ -89,7 +90,7 @@ export const toggleParticipantDelete = async (deviceKey, participantKey, rawData
  * @param {String} trailKey - The trail key
  * @param {Array} rawData - The raw data array
  * @param {Boolean} isDelete - Whether to delete (true) or restore (false)
- * @returns {Promise<void>}
+ * @returns {Promise<{success: boolean, recordsUpdated: number}>} Promise resolving to operation result
  */
 export const toggleTrailDelete = async (deviceKey, participantKey, trailKey, rawData, isDelete = true) => {
   try {
@@ -102,15 +103,16 @@ export const toggleTrailDelete = async (deviceKey, participantKey, trailKey, raw
     );
 
     if (recordsToUpdate.length === 0) {
-      return;
+      return { success: true, recordsUpdated: 0 };
     }
 
     // Call delete/restore API
-    for (const record of removeDuplicates(recordsToUpdate)) {
+    const uniqueRecords = removeDuplicates(recordsToUpdate);
+    for (const record of uniqueRecords) {
       await DeleteOrRestore(record.projectId, record.informationId, isDelete);
     }
 
-    return true;
+    return { success: true, recordsUpdated: uniqueRecords.length };
   } catch (err) {
     console.error(`Toggle trail ${isDelete ? 'delete' : 'restore'} failed:`, err);
     throw err;

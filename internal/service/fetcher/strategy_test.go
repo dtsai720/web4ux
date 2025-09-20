@@ -78,7 +78,7 @@ func TestSkipProcessor(t *testing.T) {
 		assert.False(t, processor.CanProcess(winfittsProject))
 	})
 
-	t.Run("Process returns correct error for non-winfitts projects", func(t *testing.T) {
+	t.Run("Process handles non-winfitts projects successfully", func(t *testing.T) {
 		t.Parallel()
 
 		ctx := context.Background()
@@ -91,8 +91,7 @@ func TestSkipProcessor(t *testing.T) {
 		}
 
 		err := processor.Process(ctx, log, project)
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "project is not a winfitts project")
+		assert.NoError(t, err, "SkipProcessor should successfully handle (skip) non-winfitts projects")
 	})
 
 	t.Run("Name returns correct processor name", func(t *testing.T) {
