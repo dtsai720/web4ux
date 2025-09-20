@@ -17,6 +17,7 @@ import {
   toggleTrailDelete
 } from '../../utils/detail/apiUtils';
 import { DEFAULT_STATE } from '../../utils/detail/constants';
+import { handleError } from '../../utils/common';
 
 // Import UI components
 import SummaryInfoCard from '../../components/detail/SummaryInfoCard';
@@ -58,7 +59,7 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
       // Set summary info
       setSummaryInfo(result.summaryInfo);
     } catch (err) {
-      console.error('Load data error:', err);
+      handleError(err, 'Load data error');
     }
   }, [selectedSummaryId]);
 
@@ -71,7 +72,7 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
         await loadData();
       }
     } catch (err) {
-      console.error(`Toggle participant ${isDelete ? 'delete' : 'restore'} failed:`, err);
+      handleError(err, `Toggle participant ${isDelete ? 'delete' : 'restore'} failed`);
     }
   };
 
@@ -84,7 +85,7 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
         await loadData();
       }
     } catch (err) {
-      console.error(`Toggle trail ${isDelete ? 'delete' : 'restore'} failed:`, err);
+      handleError(err, `Toggle trail ${isDelete ? 'delete' : 'restore'} failed`);
     }
   };
 

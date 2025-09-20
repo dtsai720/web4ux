@@ -8,6 +8,7 @@ import {
   getInitialSyncProgress,
   formatSyncData
 } from '../../utils/sync';
+import { handleError } from '../../utils/common';
 import {
   SyncCard,
   BackToHomeButton
@@ -50,7 +51,7 @@ const SyncPage = ({ setCurrentPage }) => {
       const status = await checkSyncStatus();
       setIsSyncing(status.isSyncing);
     } catch (error) {
-      console.error('Failed to get sync status:', error);
+      handleError(error, 'Failed to get sync status');
     }
   };
 
@@ -69,7 +70,7 @@ const SyncPage = ({ setCurrentPage }) => {
           setLoginError(response.message);
         }
       } catch (error) {
-        console.error("Login failed:", error);
+        handleError(error, "Login failed");
         setLoginError('Login failed. Please check your credentials.');
       }
 
@@ -89,7 +90,7 @@ const SyncPage = ({ setCurrentPage }) => {
       });
       await startSyncUtil();
     } catch (error) {
-      console.error("Failed to start sync:", error);
+      handleError(error, "Failed to start sync");
       setIsSyncing(false);
     }
   };
@@ -103,7 +104,7 @@ const SyncPage = ({ setCurrentPage }) => {
         isCancelled: true
       }));
     } catch (error) {
-      console.error("Failed to cancel sync:", error);
+      handleError(error, "Failed to cancel sync");
     }
   };
 

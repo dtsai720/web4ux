@@ -2,6 +2,7 @@
  * API utility functions for detail page
  */
 import { GetProjectDetailByID, DeleteOrRestore } from '../../../wailsjs/go/pkg/App';
+import { handleError } from '../common';
 
 const removeDuplicates = (data) => {
   const unique = data.filter((item, index, self) =>
@@ -44,7 +45,7 @@ export const loadProjectData = async (selectedSummaryId) => {
       throw new Error('Invalid data format received');
     }
   } catch (err) {
-    console.error('Load data error:', err);
+    handleError(err, 'Load data error');
     throw err;
   }
 };
@@ -78,7 +79,7 @@ export const toggleParticipantDelete = async (deviceKey, participantKey, rawData
 
     return { success: true, recordsUpdated: uniqueRecords.length };
   } catch (err) {
-    console.error(`Toggle participant ${isDelete ? 'delete' : 'restore'} failed:`, err);
+    handleError(err, `Toggle participant ${isDelete ? 'delete' : 'restore'} failed`);
     throw err;
   }
 };
@@ -114,7 +115,7 @@ export const toggleTrailDelete = async (deviceKey, participantKey, trailKey, raw
 
     return { success: true, recordsUpdated: uniqueRecords.length };
   } catch (err) {
-    console.error(`Toggle trail ${isDelete ? 'delete' : 'restore'} failed:`, err);
+    handleError(err, `Toggle trail ${isDelete ? 'delete' : 'restore'} failed`);
     throw err;
   }
 };
