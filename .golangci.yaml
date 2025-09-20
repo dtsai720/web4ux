@@ -14,8 +14,6 @@ linters:
     - unused
   disable:
     # Disable style-heavy linters that cause CI failures
-    - noinlineerr
-    - wsl_v5
     - wsl
   exclusions:
     generated: lax
