@@ -1,0 +1,59 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [ main, setup_ci ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-ci.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-ci.yml'
+
+jobs:
+  frontend-quality:
+    name: React Frontend - Tests & Linting
+    runs-on: ubuntu-latest
+    outputs:
+      frontend-coverage: ${{ steps.frontend-coverage.outputs.coverage }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install React dependencies
+      run: cd frontend && npm ci
+
+    - name: Run ESLint (TypeScript/React)
+      run: make lint-frontend
+
+    - name: Run Vitest unit tests with coverage
+      run: make test-frontend-coverage
+
+    - name: Generate frontend coverage summary
+      id: frontend-coverage
+      run: |
+        FRONTEND_COVERAGE=$(cd frontend && node -e "
+          const fs = require('fs');
+          try {
+            const coverage = JSON.parse(fs.readFileSync('coverage/coverage-summary.json', 'utf8'));
+            const totalPct = coverage.total.lines.pct;
+            console.log(totalPct + '%');
+          } catch (e) {
+            console.log('0%');
+          }
+        ")
+        echo "coverage=$FRONTEND_COVERAGE" >> $GITHUB_OUTPUT
+        echo "Frontend Coverage: $FRONTEND_COVERAGE"
+
+    # Skip frontend build in CI - requires Wails runtime generation
+    # - name: Build frontend
+    #   run: cd frontend && npm run build
