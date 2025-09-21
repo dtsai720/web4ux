@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -43,20 +45,70 @@ type Position struct {
 	Y int
 }
 
+func NewPosition(x, y int) Position {
+	return Position{X: x, Y: y}
+}
+
+func (p Position) IsZero() bool {
+	return p.X == 0 && p.Y == 0
+}
+
+func (p Position) Distance(other Position) float64 {
+	dx := float64(p.X - other.X)
+	dy := float64(p.Y - other.Y)
+	return math.Sqrt(dx*dx + dy*dy)
+}
+
+func (p Position) String() string {
+	return fmt.Sprintf("(%d,%d)", p.X, p.Y)
+}
+
 type WinfittsDetail struct {
 	Mark      string
 	Position  Position
 	Timestamp int
 }
 
+func NewWinfittsDetail(mark string, position Position, timestamp int) *WinfittsDetail {
+	return &WinfittsDetail{
+		Mark:      mark,
+		Position:  position,
+		Timestamp: timestamp,
+	}
+}
+
+func (w *WinfittsDetail) IsValid() bool {
+	return w.Mark != "" && w.Timestamp > 0
+}
+
+func (w *WinfittsDetail) TimestampDuration() time.Duration {
+	return time.Duration(w.Timestamp) * time.Millisecond
+}
+
+func (w *WinfittsDetail) String() string {
+	return fmt.Sprintf("Mark: %s, Position: %s, Timestamp: %d", w.Mark, w.Position.String(), w.Timestamp)
+}
+
 func (w *WinfittsDetail) Load(slice []string) error {
+	if len(slice) < 4 {
+		return errs.ErrInsufficientCoordinateNumbers
+	}
+
 	w.Mark = slice[1]
-	numbers := sliceutils.MapFilter(strings.Split(slice[2], ","), func(in string) (int, bool) {
+
+	if err := w.loadPosition(slice[2]); err != nil {
+		return err
+	}
+
+	return w.loadTimestamp(slice[3])
+}
+
+func (w *WinfittsDetail) loadPosition(coordinateStr string) error {
+	numbers := sliceutils.MapFilter(strings.Split(coordinateStr, ","), func(in string) (int, bool) {
 		num, err := strconv.Atoi(in)
 		if err != nil {
 			return -1, false
 		}
-
 		return num, true
 	})
 
@@ -64,14 +116,16 @@ func (w *WinfittsDetail) Load(slice []string) error {
 		return errs.ErrInsufficientCoordinateNumbers
 	}
 
-	w.Position.X = numbers[0]
-	w.Position.Y = numbers[1]
-	timestamp, err := strconv.Atoi(slice[3])
+	w.Position = NewPosition(numbers[0], numbers[1])
+	return nil
+}
+
+func (w *WinfittsDetail) loadTimestamp(timestampStr string) error {
+	timestamp, err := strconv.Atoi(timestampStr)
 	if err != nil {
-		return err
+		return fmt.Errorf("invalid timestamp: %w", err)
 	}
 	w.Timestamp = timestamp
-
 	return nil
 }
 
@@ -83,6 +137,61 @@ type WinfittsSummary struct {
 	Angle       int
 	ErrorTimes  int
 	Details     []WinfittsDetail
+}
+
+func NewWinfittsSummary(trailNumber int) *WinfittsSummary {
+	return &WinfittsSummary{
+		TrailNumber: trailNumber,
+		Details:     make([]WinfittsDetail, 0),
+	}
+}
+
+func (w *WinfittsSummary) IsSuccessful() bool {
+	return !w.IsFailed
+}
+
+func (w *WinfittsSummary) HasErrors() bool {
+	return w.ErrorTimes > 0
+}
+
+func (w *WinfittsSummary) DetailCount() int {
+	return len(w.Details)
+}
+
+func (w *WinfittsSummary) AddDetail(detail WinfittsDetail) {
+	w.Details = append(w.Details, detail)
+}
+
+func (w *WinfittsSummary) GetValidDetails() []WinfittsDetail {
+	validDetails := make([]WinfittsDetail, 0)
+	for _, detail := range w.Details {
+		if detail.IsValid() {
+			validDetails = append(validDetails, detail)
+		}
+	}
+	return validDetails
+}
+
+func (w *WinfittsSummary) CalculateAveragePosition() Position {
+	if len(w.Details) == 0 {
+		return Position{}
+	}
+
+	var totalX, totalY int
+	for _, detail := range w.Details {
+		totalX += detail.Position.X
+		totalY += detail.Position.Y
+	}
+
+	return NewPosition(totalX/len(w.Details), totalY/len(w.Details))
+}
+
+func (w *WinfittsSummary) String() string {
+	status := "Success"
+	if w.IsFailed {
+		status = "Failed"
+	}
+	return fmt.Sprintf("Trail %d: %s (Errors: %d, Details: %d)", w.TrailNumber, status, w.ErrorTimes, len(w.Details))
 }
 
 func (w *WinfittsSummary) Load(slice []string) error {
@@ -141,6 +250,70 @@ type WinfittsRawData struct {
 	DeviceOrder       string
 	DeviceName        string
 	Items             []WinfittsSummary
+}
+
+func NewWinfittsRawData(participantSerial, participant, deviceOrder, deviceName string) *WinfittsRawData {
+	return &WinfittsRawData{
+		ParticipantSerial: participantSerial,
+		Participant:       participant,
+		DeviceOrder:       deviceOrder,
+		DeviceName:        deviceName,
+		Items:             make([]WinfittsSummary, 0),
+	}
+}
+
+func (w *WinfittsRawData) IsValid() error {
+	if w.ParticipantSerial == "" {
+		return fmt.Errorf("participant serial is required")
+	}
+	if w.Participant == "" {
+		return fmt.Errorf("participant name is required")
+	}
+	if w.DeviceName == "" {
+		return fmt.Errorf("device name is required")
+	}
+	return nil
+}
+
+func (w *WinfittsRawData) AddItem(item WinfittsSummary) {
+	w.Items = append(w.Items, item)
+}
+
+func (w *WinfittsRawData) ItemCount() int {
+	return len(w.Items)
+}
+
+func (w *WinfittsRawData) GetSuccessfulItems() []WinfittsSummary {
+	successful := make([]WinfittsSummary, 0)
+	for _, item := range w.Items {
+		if item.IsSuccessful() {
+			successful = append(successful, item)
+		}
+	}
+	return successful
+}
+
+func (w *WinfittsRawData) GetFailedItems() []WinfittsSummary {
+	failed := make([]WinfittsSummary, 0)
+	for _, item := range w.Items {
+		if item.IsFailed {
+			failed = append(failed, item)
+		}
+	}
+	return failed
+}
+
+func (w *WinfittsRawData) CalculateSuccessRate() float64 {
+	if len(w.Items) == 0 {
+		return 0.0
+	}
+	successful := len(w.GetSuccessfulItems())
+	return float64(successful) / float64(len(w.Items))
+}
+
+func (w *WinfittsRawData) String() string {
+	return fmt.Sprintf("Participant: %s (%s), Device: %s (%s), Items: %d",
+		w.Participant, w.ParticipantSerial, w.DeviceName, w.DeviceOrder, len(w.Items))
 }
 
 //nolint:cyclop
@@ -205,4 +378,28 @@ type ProjectDetail struct {
 	Distance          int64  `json:"distance"`
 	X                 int64  `json:"x"`
 	Y                 int64  `json:"y"`
+}
+
+func (p *ProjectDetail) IsActive() bool {
+	return !p.Deleted
+}
+
+func (p *ProjectDetail) IsSuccessful() bool {
+	return !p.IsFailed
+}
+
+func (p *ProjectDetail) GetPosition() Position {
+	return NewPosition(int(p.X), int(p.Y))
+}
+
+func (p *ProjectDetail) HasErrors() bool {
+	return p.ErrorTimes > 0
+}
+
+func (p *ProjectDetail) GetTimestampDuration() time.Duration {
+	return time.Duration(p.Timestamp) * time.Millisecond
+}
+
+func (p *ProjectDetail) GetUniqueKey() string {
+	return fmt.Sprintf("%s-%s-%s-%d", p.ProjectID, p.DeviceOrder, p.ParticipantSerial, p.TrailNumber)
 }

@@ -30,7 +30,7 @@ type Winfitt struct {
 	ProjectID     string
 	DeviceID      string
 	ParticipantID string
-	Foreign       interface{}
+	Foreign       any
 }
 
 type WinfittsDetail struct {

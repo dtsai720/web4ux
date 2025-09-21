@@ -16,8 +16,8 @@ AND (COALESCE(?2, '') = '' OR creator LIKE ?2)
 `
 
 type CountProjectsParams struct {
-	Name    interface{}
-	Creator interface{}
+	Name    any
+	Creator any
 }
 
 func (q *Queries) CountProjects(ctx context.Context, arg CountProjectsParams) (int64, error) {
@@ -150,8 +150,8 @@ LIMIT ?4 OFFSET ?3
 `
 
 type ListProjectsByCreatorAscParams struct {
-	Name    interface{}
-	Creator interface{}
+	Name    any
+	Creator any
 	Offset  int64
 	Limit   int64
 }
@@ -198,8 +198,8 @@ LIMIT ?4 OFFSET ?3
 `
 
 type ListProjectsByCreatorDescParams struct {
-	Name    interface{}
-	Creator interface{}
+	Name    any
+	Creator any
 	Offset  int64
 	Limit   int64
 }
@@ -246,8 +246,8 @@ LIMIT ?4 OFFSET ?3
 `
 
 type ListProjectsByNameAscParams struct {
-	Name    interface{}
-	Creator interface{}
+	Name    any
+	Creator any
 	Offset  int64
 	Limit   int64
 }
@@ -294,8 +294,8 @@ LIMIT ?4 OFFSET ?3
 `
 
 type ListProjectsByNameDescParams struct {
-	Name    interface{}
-	Creator interface{}
+	Name    any
+	Creator any
 	Offset  int64
 	Limit   int64
 }
@@ -342,8 +342,8 @@ LIMIT ?4 OFFSET ?3
 `
 
 type ListProjectsByTimeAscParams struct {
-	Name    interface{}
-	Creator interface{}
+	Name    any
+	Creator any
 	Offset  int64
 	Limit   int64
 }
@@ -390,8 +390,8 @@ LIMIT ?4 OFFSET ?3
 `
 
 type ListProjectsByTimeDescParams struct {
-	Name    interface{}
-	Creator interface{}
+	Name    any
+	Creator any
 	Offset  int64
 	Limit   int64
 }

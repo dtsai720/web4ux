@@ -11,4 +11,5 @@ type IService interface {
 	Login(ctx context.Context, log logger.ILogger, email, password string) error
 	ListAllProjects(ctx context.Context, log logger.ILogger) ([]htmlparser.ProjectSummary, error)
 	FetchDataAndSave(ctx context.Context, log logger.ILogger, in htmlparser.ProjectSummary) error
+	GetProcessorRegistry() *ProjectProcessorRegistry
 }

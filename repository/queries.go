@@ -13,65 +13,10 @@ import (
 	"github.com/web4ux/src/sliceutils"
 )
 
-const defaultSortDirection = "desc"
-
 func (r *Repository) listProjects(ctx context.Context, req models.ListProjectRequest) ([]sqlc.Project, error) {
-	nameFilter := req.Name + "%"
-	creatorFilter := req.Creator + "%"
-	sortDirection := "desc"
-	if req.IsASC {
-		sortDirection = "asc"
-	}
-	switch req.OrderBy {
-	case "name":
-		if sortDirection == defaultSortDirection {
-			return r.queries.ListProjectsByNameDesc(ctx, sqlc.ListProjectsByNameDescParams{
-				Name:    nameFilter,
-				Creator: creatorFilter,
-				Offset:  req.Offset,
-				Limit:   req.Limit,
-			})
-		}
-
-		return r.queries.ListProjectsByNameAsc(ctx, sqlc.ListProjectsByNameAscParams{
-			Name:    nameFilter,
-			Creator: creatorFilter,
-			Offset:  req.Offset,
-			Limit:   req.Limit,
-		})
-	case "creator":
-		if sortDirection == defaultSortDirection {
-			return r.queries.ListProjectsByCreatorDesc(ctx, sqlc.ListProjectsByCreatorDescParams{
-				Name:    nameFilter,
-				Creator: creatorFilter,
-				Offset:  req.Offset,
-				Limit:   req.Limit,
-			})
-		}
-
-		return r.queries.ListProjectsByCreatorAsc(ctx, sqlc.ListProjectsByCreatorAscParams{
-			Name:    nameFilter,
-			Creator: creatorFilter,
-			Offset:  req.Offset,
-			Limit:   req.Limit,
-		})
-	}
-
-	if sortDirection == defaultSortDirection {
-		return r.queries.ListProjectsByTimeDesc(ctx, sqlc.ListProjectsByTimeDescParams{
-			Name:    nameFilter,
-			Creator: creatorFilter,
-			Offset:  req.Offset,
-			Limit:   req.Limit,
-		})
-	}
-
-	return r.queries.ListProjectsByTimeAsc(ctx, sqlc.ListProjectsByTimeAscParams{
-		Name:    nameFilter,
-		Creator: creatorFilter,
-		Offset:  req.Offset,
-		Limit:   req.Limit,
-	})
+	strategyFactory := NewQueryStrategyFactory(r.queries)
+	strategy := strategyFactory.CreateStrategy(req.OrderBy, req.IsASC)
+	return strategy.Execute(ctx, req)
 }
 
 // ListProjects implements QueryRepository.

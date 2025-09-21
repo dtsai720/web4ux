@@ -53,3 +53,7 @@ type Service struct {
 	db                repository.IRepository
 	processorRegistry *ProjectProcessorRegistry
 }
+
+func (s *Service) GetProcessorRegistry() *ProjectProcessorRegistry {
+	return s.processorRegistry
+}
