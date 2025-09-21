@@ -1,7 +1,10 @@
 /**
  * Statistics calculation utilities for trail data
+ * Legacy functions maintained for backward compatibility
  */
 import { DATA_ANALYSIS } from '../common';
+import { TrailStats } from './TrailStats';
+import { StatsAggregator } from './StatsAggregator';
 
 /**
  * Calculates statistics for a single trail
@@ -118,3 +121,45 @@ export const calculateAggregatedStats = (trailsData) => {
 
   return stats;
 };
+
+// === OOP-based Modern API ===
+
+/**
+ * Create a TrailStats instance for calculating trail statistics
+ * @param {Array} records - Trail records
+ * @returns {TrailStats} TrailStats instance
+ */
+export const createTrailStats = (records) => {
+  return new TrailStats(records);
+};
+
+/**
+ * Create a StatsAggregator instance for aggregating multiple trail statistics
+ * @returns {StatsAggregator} StatsAggregator instance
+ */
+export const createStatsAggregator = () => {
+  return new StatsAggregator();
+};
+
+/**
+ * Calculate aggregated statistics using OOP approach
+ * @param {Object} trailsData - Object containing trail data with stats
+ * @returns {Object} Aggregated statistics
+ */
+export const calculateAggregatedStatsOOP = (trailsData) => {
+  const aggregator = createStatsAggregator();
+
+  Object.keys(trailsData).forEach(trailKey => {
+    if (trailKey === 'stats') return; // Skip existing stats
+
+    const trailStats = trailsData[trailKey].stats;
+    if (!trailStats) return;
+
+    aggregator.addTrail(trailKey, trailStats);
+  });
+
+  return aggregator.getAggregatedStats();
+};
+
+// Export the classes for direct use
+export { TrailStats, StatsAggregator };
