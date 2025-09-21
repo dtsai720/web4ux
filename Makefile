@@ -45,6 +45,12 @@ test-frontend-watch:
 	@echo "Running frontend tests in watch mode..."
 	@cd frontend && npm run test
 
+.PHONY: test-frontend-coverage
+test-frontend-coverage:
+	@echo "Running frontend tests with coverage..."
+	@cd frontend && npm run test:coverage
+	@echo "Frontend coverage report generated in frontend/coverage/"
+
 .PHONY: deps
 deps:
 	@echo "Installing dependencies..."

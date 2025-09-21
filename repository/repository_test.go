@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/web4ux/models"
 	mock_repository "github.com/web4ux/mocks/repository"
+	"github.com/web4ux/models"
 	"github.com/web4ux/repository"
 	"github.com/web4ux/repository/sqlc"
 	"github.com/web4ux/src/common"

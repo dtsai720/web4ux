@@ -165,9 +165,9 @@ func TestMust_WithDifferentTypes(t *testing.T) {
 type ternaryTestCase struct {
 	name       string
 	condition  bool
-	trueValue  interface{}
-	falseValue interface{}
-	expected   interface{}
+	trueValue  any
+	falseValue any
+	expected   any
 }
 
 var ternaryTestCases = []ternaryTestCase{ //nolint:gochecknoglobals

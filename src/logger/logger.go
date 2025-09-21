@@ -1,14 +1,27 @@
 package logger
 
 import (
-	"github.com/web4ux/src/common"
 	"go.uber.org/zap"
 )
 
 func New(l *zap.Logger) ILogger { return &logger{l} }
 
 func NewTestLogger() ILogger {
-	return New(common.Must(zap.NewDevelopment()))
+	logger, err := zap.NewDevelopment()
+	if err != nil {
+		// For test environments, panic is acceptable as it indicates a configuration issue
+		panic("failed to create test logger: " + err.Error())
+	}
+	return New(logger)
+}
+
+// NewTestLoggerSafe creates a test logger that doesn't panic on error
+func NewTestLoggerSafe() (ILogger, error) {
+	logger, err := zap.NewDevelopment()
+	if err != nil {
+		return nil, err
+	}
+	return New(logger), nil
 }
 
 var _ ILogger = (*logger)(nil)

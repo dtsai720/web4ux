@@ -13,14 +13,14 @@ export const formatDate = (dateString) => {
   const pad = (n) => n.toString().padStart(2, '0');
 
   const year = date.getFullYear();
-  const month = pad(date.getMonth() + 1); // 月份從 0 開始
+  const month = pad(date.getMonth() + 1); // Month starts from 0
   const day = pad(date.getDate());
 
   const hours = pad(date.getHours());
   const minutes = pad(date.getMinutes());
   const seconds = pad(date.getSeconds());
 
-  // 計算時區偏移（分鐘）
+  // Calculate timezone offset (minutes)
   const offsetMinutes = date.getTimezoneOffset();
   const offsetHours = Math.floor(Math.abs(offsetMinutes) / 60);
   const offsetMinutesRemainder = Math.abs(offsetMinutes) % 60;
@@ -78,7 +78,7 @@ export const loadSummaries = async ({
   setError('');
 
   try {
-    // 計算分頁
+    // Calculate pagination
     const limit = itemsPerPage;
     const offset = (currentPageNum - 1) * limit;
 
@@ -108,9 +108,9 @@ export const handleSort = (field, orderBy, setOrderBy, orderDirection, setOrderD
     setOrderDirection(orderDirection === 'asc' ? 'desc' : 'asc');
   } else {
     setOrderBy(field);
-    setOrderDirection('desc'); // 預設降序
+    setOrderDirection('desc'); // Default descending
   }
-  setCurrentPageNum(1); // 重置到第一頁
+  setCurrentPageNum(1); // Reset to first page
 };
 
 /**

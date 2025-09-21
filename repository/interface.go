@@ -9,14 +9,10 @@ import (
 	"github.com/web4ux/src/logger"
 )
 
+// ListProject interface is kept for backward compatibility
+// New code should use more specific interfaces from segregated_interfaces.go
 type ListProject interface {
-	CountProjects(ctx context.Context, arg sqlc.CountProjectsParams) (int64, error)
-	ListProjectsByCreatorAsc(ctx context.Context, arg sqlc.ListProjectsByCreatorAscParams) ([]sqlc.Project, error)
-	ListProjectsByCreatorDesc(ctx context.Context, arg sqlc.ListProjectsByCreatorDescParams) ([]sqlc.Project, error)
-	ListProjectsByNameAsc(ctx context.Context, arg sqlc.ListProjectsByNameAscParams) ([]sqlc.Project, error)
-	ListProjectsByNameDesc(ctx context.Context, arg sqlc.ListProjectsByNameDescParams) ([]sqlc.Project, error)
-	ListProjectsByTimeAsc(ctx context.Context, arg sqlc.ListProjectsByTimeAscParams) ([]sqlc.Project, error)
-	ListProjectsByTimeDesc(ctx context.Context, arg sqlc.ListProjectsByTimeDescParams) ([]sqlc.Project, error)
+	ProjectLister
 }
 
 type Command interface {

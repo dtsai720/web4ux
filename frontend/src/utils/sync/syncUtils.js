@@ -1,4 +1,5 @@
 import { LoginAndSync, StartSync, CancelSync, GetSyncStatus } from '../../../wailsjs/go/pkg/App';
+import { handleError } from '../common';
 
 /**
  * Checks the current synchronization status
@@ -9,7 +10,7 @@ export const checkSyncStatus = async () => {
     const status = await GetSyncStatus();
     return status;
   } catch (error) {
-    console.error('Failed to get sync status:', error);
+    handleError(error, 'Failed to get sync status');
     throw error;
   }
 };
@@ -29,7 +30,7 @@ export const handleLogin = async (email, password) => {
     const response = await LoginAndSync(email, password);
     return response;
   } catch (error) {
-    console.error("Login failed:", error);
+    handleError(error, "Login failed");
     return {
       success: false,
       message: 'Login failed. Please check your credentials.'
@@ -46,7 +47,7 @@ export const handleStartSync = async () => {
     await StartSync();
     return { success: true };
   } catch (error) {
-    console.error("Failed to start sync:", error);
+    handleError(error, "Failed to start sync");
     throw error;
   }
 };
@@ -60,7 +61,7 @@ export const handleCancelSync = async () => {
     await CancelSync();
     return { success: true };
   } catch (error) {
-    console.error("Failed to cancel sync:", error);
+    handleError(error, "Failed to cancel sync");
     throw error;
   }
 };

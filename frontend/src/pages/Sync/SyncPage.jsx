@@ -8,6 +8,7 @@ import {
   getInitialSyncProgress,
   formatSyncData
 } from '../../utils/sync';
+import { handleError } from '../../utils/common';
 import {
   SyncCard,
   BackToHomeButton
@@ -24,7 +25,7 @@ const SyncPage = ({ setCurrentPage }) => {
   const [syncData, setSyncData] = useState(null);
 
   useEffect(() => {
-    // 監聽同步進度事件
+    // Listen to sync progress events
     EventsOn('sync:progress', (progress) => {
       setSyncProgress(progress);
 
@@ -36,10 +37,10 @@ const SyncPage = ({ setCurrentPage }) => {
       }
     });
 
-    // 檢查同步狀態
+    // Check sync status
     checkSyncStatusAndUpdate();
 
-    // 清理函數
+    // Cleanup function
     return () => {
       EventsOff('sync:progress');
     };
@@ -50,7 +51,7 @@ const SyncPage = ({ setCurrentPage }) => {
       const status = await checkSyncStatus();
       setIsSyncing(status.isSyncing);
     } catch (error) {
-      console.error('Failed to get sync status:', error);
+      handleError(error, 'Failed to get sync status');
     }
   };
 
@@ -63,13 +64,13 @@ const SyncPage = ({ setCurrentPage }) => {
         const response = await loginUtil(email, password);
         if (response.success) {
           setIsLoggedIn(true);
-          // 登入成功後立即開始同步
+          // Start sync immediately after successful login
           handleStartSync();
         } else {
           setLoginError(response.message);
         }
       } catch (error) {
-        console.error("Login failed:", error);
+        handleError(error, "Login failed");
         setLoginError('Login failed. Please check your credentials.');
       }
 
@@ -89,7 +90,7 @@ const SyncPage = ({ setCurrentPage }) => {
       });
       await startSyncUtil();
     } catch (error) {
-      console.error("Failed to start sync:", error);
+      handleError(error, "Failed to start sync");
       setIsSyncing(false);
     }
   };
@@ -103,7 +104,7 @@ const SyncPage = ({ setCurrentPage }) => {
         isCancelled: true
       }));
     } catch (error) {
-      console.error("Failed to cancel sync:", error);
+      handleError(error, "Failed to cancel sync");
     }
   };
 
