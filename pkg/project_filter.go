@@ -42,3 +42,31 @@ func (f *CompositeProjectFilter) ShouldProcess(project htmlparser.ProjectSummary
 	}
 	return true
 }
+
+type NamePatternFilter struct {
+	pattern string
+}
+
+func NewNamePatternFilter(pattern string) *NamePatternFilter {
+	return &NamePatternFilter{
+		pattern: pattern,
+	}
+}
+
+func (f *NamePatternFilter) ShouldProcess(project htmlparser.ProjectSummary) bool {
+	return project.Name != "" && len(project.Name) > 0
+}
+
+type LinkPatternFilter struct {
+	pattern string
+}
+
+func NewLinkPatternFilter(pattern string) *LinkPatternFilter {
+	return &LinkPatternFilter{
+		pattern: pattern,
+	}
+}
+
+func (f *LinkPatternFilter) ShouldProcess(project htmlparser.ProjectSummary) bool {
+	return project.Link != "" && len(project.Link) > 0
+}

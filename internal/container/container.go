@@ -3,6 +3,7 @@ package container
 import (
 	"database/sql"
 
+	"github.com/web4ux/internal/config"
 	"github.com/web4ux/internal/service/analyzer"
 	"github.com/web4ux/internal/service/fetcher"
 	"github.com/web4ux/pkg"
@@ -12,29 +13,52 @@ import (
 	"go.uber.org/zap"
 )
 
+// LegacyConfig is deprecated - use config.AppConfig instead
+// Kept for backward compatibility
 type Config struct {
 	DatabasePath string
 }
 
 type Container struct {
-	config     Config
-	db         *sql.DB
-	repository repository.IRepository
-	logger     logger.ILogger
-	fetcher    fetcher.IService
-	analyzer   analyzer.IService
-	app        *pkg.App
+	appConfig    config.AppConfig
+	legacyConfig Config // Deprecated: for backward compatibility
+	db           *sql.DB
+	repository   repository.IRepository
+	logger       logger.ILogger
+	fetcher      fetcher.IService
+	analyzer     analyzer.IService
+	app          *pkg.App
 }
 
-func New(config Config) *Container {
+// New creates a new container with legacy config (deprecated)
+// Use NewWithConfig instead
+func New(legacyConfig Config) *Container {
+	// Convert legacy config to new config interface
+	appConfig := config.NewStandardConfig()
 	return &Container{
-		config: config,
+		appConfig:    appConfig,
+		legacyConfig: legacyConfig,
+	}
+}
+
+// NewWithConfig creates a new container with the new config interface
+func NewWithConfig(appConfig config.AppConfig) *Container {
+	return &Container{
+		appConfig: appConfig,
 	}
 }
 
 func (c *Container) GetDatabase() (*sql.DB, error) {
 	if c.db == nil {
-		db, err := sql.Open("sqlite", c.config.DatabasePath)
+		// Use new config interface if available, fallback to legacy config
+		var databasePath string
+		if c.appConfig != nil {
+			databasePath = c.appConfig.GetDatabasePath()
+		} else {
+			databasePath = c.legacyConfig.DatabasePath
+		}
+
+		db, err := sql.Open("sqlite", databasePath)
 		if err != nil {
 			return nil, err
 		}
@@ -132,6 +156,16 @@ func (c *Container) GetApp() (*pkg.App, error) {
 		)
 	}
 	return c.app, nil
+}
+
+// GetConfig returns the application configuration
+func (c *Container) GetConfig() config.AppConfig {
+	return c.appConfig
+}
+
+// GetLegacyConfig returns the legacy configuration (deprecated)
+func (c *Container) GetLegacyConfig() Config {
+	return c.legacyConfig
 }
 
 func (c *Container) Close() error {

@@ -76,15 +76,35 @@ func (ae *AppError) Is(target error) bool {
 	return false
 }
 
-type ErrorHandler struct {
-	log logger.ILogger
+// StandardErrorHandler implements the ErrorService interface
+type StandardErrorHandler struct {
+	log        logger.ILogger
+	classifier ErrorClassifier
+	reporter   ErrorReporter
 }
 
-func NewErrorHandler(log logger.ILogger) *ErrorHandler {
-	return &ErrorHandler{log: log}
+// NewStandardErrorHandler creates a new error handler with all components
+func NewStandardErrorHandler(log logger.ILogger, classifier ErrorClassifier, reporter ErrorReporter) *StandardErrorHandler {
+	return &StandardErrorHandler{
+		log:        log,
+		classifier: classifier,
+		reporter:   reporter,
+	}
 }
 
-func (eh *ErrorHandler) Handle(ctx context.Context, err error) {
+// NewBasicErrorHandler creates a basic error handler with default components
+func NewBasicErrorHandler(log logger.ILogger) *StandardErrorHandler {
+	return &StandardErrorHandler{
+		log:        log,
+		classifier: NewDefaultErrorClassifier(),
+		reporter:   NewLoggingErrorReporter(log),
+	}
+}
+
+// Ensure StandardErrorHandler implements ErrorService
+var _ ErrorService = (*StandardErrorHandler)(nil)
+
+func (eh *StandardErrorHandler) Handle(ctx context.Context, err error) {
 	if err == nil {
 		return
 	}
@@ -96,7 +116,7 @@ func (eh *ErrorHandler) Handle(ctx context.Context, err error) {
 	}
 }
 
-func (eh *ErrorHandler) handleAppError(ctx context.Context, appErr *AppError) {
+func (eh *StandardErrorHandler) handleAppError(_ context.Context, appErr *AppError) {
 	fields := []zap.Field{
 		zap.String("error_type", appErr.Type.String()),
 		zap.String("message", appErr.Message),
@@ -126,37 +146,81 @@ func (eh *ErrorHandler) handleAppError(ctx context.Context, appErr *AppError) {
 	}
 }
 
-func (eh *ErrorHandler) handleGenericError(ctx context.Context, err error) {
+func (eh *StandardErrorHandler) handleGenericError(_ context.Context, err error) {
 	eh.log.With(zap.Error(err)).Error("Generic error occurred")
 }
 
-func (eh *ErrorHandler) WrapValidationError(message string, cause error) *AppError {
+func (eh *StandardErrorHandler) WrapValidationError(message string, cause error) *AppError {
 	return NewAppError(ValidationError, message, cause)
 }
 
-func (eh *ErrorHandler) WrapDatabaseError(message string, cause error) *AppError {
+func (eh *StandardErrorHandler) WrapDatabaseError(message string, cause error) *AppError {
 	return NewAppError(DatabaseError, message, cause)
 }
 
-func (eh *ErrorHandler) WrapNetworkError(message string, cause error) *AppError {
+func (eh *StandardErrorHandler) WrapNetworkError(message string, cause error) *AppError {
 	return NewAppError(NetworkError, message, cause)
 }
 
-func (eh *ErrorHandler) WrapProcessingError(message string, cause error) *AppError {
+func (eh *StandardErrorHandler) WrapProcessingError(message string, cause error) *AppError {
 	return NewAppError(ProcessingError, message, cause)
 }
 
-func (eh *ErrorHandler) WrapAuthenticationError(message string, cause error) *AppError {
+func (eh *StandardErrorHandler) WrapAuthenticationError(message string, cause error) *AppError {
 	return NewAppError(AuthenticationError, message, cause)
 }
 
+// WrapError creates a typed application error with context
+func (eh *StandardErrorHandler) WrapError(errorType ErrorType, message string, cause error) *AppError {
+	return NewAppError(errorType, message, cause)
+}
+
+// WrapWithContext creates an error with additional context information
+func (eh *StandardErrorHandler) WrapWithContext(errorType ErrorType, message string, cause error, context map[string]any) *AppError {
+	appErr := NewAppError(errorType, message, cause)
+	for key, value := range context {
+		_ = appErr.WithContext(key, value)
+	}
+	return appErr
+}
+
+// Execute runs a function and handles any errors
+func (eh *StandardErrorHandler) Execute(ctx context.Context, fn func(ctx context.Context) error) error {
+	err := fn(ctx)
+	if err != nil {
+		eh.Handle(ctx, err)
+	}
+	return err
+}
+
+// ExecuteWithResult runs a function that returns a result and handles errors
+func (eh *StandardErrorHandler) ExecuteWithResult(ctx context.Context, fn func(ctx context.Context) (any, error)) (any, error) {
+	result, err := fn(ctx)
+	if err != nil {
+		eh.Handle(ctx, err)
+	}
+	return result, err
+}
+
+// ExecuteWithRecovery runs a function with panic recovery
+func (eh *StandardErrorHandler) ExecuteWithRecovery(ctx context.Context, fn func(ctx context.Context) error) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = NewAppError(UnknownError, "panic occurred during execution", fmt.Errorf("%v", r))
+			eh.Handle(ctx, err)
+		}
+	}()
+
+	return eh.Execute(ctx, fn)
+}
+
 type ErrorHandlerDecorator[T any] struct {
-	handler ErrorHandler
+	handler ErrorService
 }
 
 func NewErrorHandlerDecorator[T any](log logger.ILogger) *ErrorHandlerDecorator[T] {
 	return &ErrorHandlerDecorator[T]{
-		handler: *NewErrorHandler(log),
+		handler: NewBasicErrorHandler(log),
 	}
 }
 

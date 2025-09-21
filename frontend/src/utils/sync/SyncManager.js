@@ -1,11 +1,15 @@
 /**
  * SyncManager class for managing synchronization operations
+ * Implements ISyncManager interface following SOLID principles
  */
 import { LoginAndSync, StartSync, CancelSync, GetSyncStatus } from '../../../wailsjs/go/pkg/App';
 import { handleError } from '../common';
+import { logger } from '../common/logger';
+import { ISyncManager } from './ISyncManager.js';
 
-export class SyncManager {
+export class SyncManager extends ISyncManager {
   constructor() {
+    super();
     this.status = {
       isSyncing: false,
       isLoggedIn: false,
@@ -260,7 +264,7 @@ export class SyncManager {
         try {
           callback(data);
         } catch (error) {
-          console.error(`Error in event listener for ${event}:`, error);
+          logger.error(`Error in event listener for ${event}:`, error);
         }
       });
     }
@@ -275,5 +279,40 @@ export class SyncManager {
     if (this.status.progress.isCancelled) return 'Cancelled';
     if (this.status.isSyncing) return 'Syncing...';
     return 'Ready';
+  }
+
+  /**
+   * Cleanup resources and prepare for destruction
+   * Implementation of ISyncManager.dispose()
+   * @returns {Promise<void>}
+   */
+  async dispose() {
+    try {
+      // Cancel any ongoing sync operation
+      if (this.status.isSyncing) {
+        await this.cancelSync();
+      }
+
+      // Remove all event listeners to prevent memory leaks
+      this.removeAllListeners();
+
+      // Reset status to initial state
+      this.status = {
+        isSyncing: false,
+        isLoggedIn: false,
+        progress: {
+          current: 0,
+          total: 0,
+          percentage: 0,
+          isCompleted: false,
+          isCancelled: false
+        }
+      };
+
+      logger.info('SyncManager disposed successfully');
+    } catch (error) {
+      logger.error('Error during SyncManager disposal:', error);
+      throw error;
+    }
   }
 }

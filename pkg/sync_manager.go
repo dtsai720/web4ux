@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/web4ux/internal/service/fetcher"
+	"github.com/web4ux/src/errs"
 	"github.com/web4ux/src/htmlparser"
 	"github.com/web4ux/src/logger"
 	"github.com/web4ux/src/sliceutils"
@@ -74,7 +75,12 @@ func (sm *SyncManager) fetchProjectList(ctx context.Context) ([]htmlparser.Proje
 	projectList, err := sm.fetcher.ListAllProjects(ctx, sm.log)
 	if err != nil {
 		sm.log.Errorf("Failed to fetch project list: %v", err)
-		return nil, err
+		wrappedErr := errs.NewAppError(errs.NetworkError, "failed to fetch project list from remote server", err)
+		wrappedErr.Context = map[string]any{
+			"operation": "fetchProjectList",
+			"component": "SyncManager",
+		}
+		return nil, wrappedErr
 	}
 	return projectList, nil
 }
@@ -109,7 +115,16 @@ func (sm *SyncManager) processSyncProjects(ctx context.Context, projects []htmlp
 func (sm *SyncManager) processProject(ctx context.Context, project htmlparser.ProjectSummary, currentIndex, totalProjects int) error {
 	if err := sm.fetcher.FetchDataAndSave(ctx, sm.log, project); err != nil {
 		sm.log.Errorf("Failed to process project %s: %v", project.Name, err)
-		return err
+		wrappedErr := errs.NewAppError(errs.ProcessingError, "failed to fetch and save project data", err)
+		wrappedErr.Context = map[string]any{
+			"operation":     "processProject",
+			"component":     "SyncManager",
+			"projectName":   project.Name,
+			"projectLink":   project.Link,
+			"currentIndex":  currentIndex,
+			"totalProjects": totalProjects,
+		}
+		return wrappedErr
 	}
 
 	progress := (currentIndex * 100) / totalProjects
