@@ -13,6 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	fetcher "github.com/web4ux/internal/service/fetcher"
 	htmlparser "github.com/web4ux/src/htmlparser"
 	logger "github.com/web4ux/src/logger"
 	gomock "go.uber.org/mock/gomock"
@@ -54,6 +55,20 @@ func (m *MockIService) FetchDataAndSave(ctx context.Context, log logger.ILogger,
 func (mr *MockIServiceMockRecorder) FetchDataAndSave(ctx, log, in any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchDataAndSave", reflect.TypeOf((*MockIService)(nil).FetchDataAndSave), ctx, log, in)
+}
+
+// GetProcessorRegistry mocks base method.
+func (m *MockIService) GetProcessorRegistry() *fetcher.ProjectProcessorRegistry {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetProcessorRegistry")
+	ret0, _ := ret[0].(*fetcher.ProjectProcessorRegistry)
+	return ret0
+}
+
+// GetProcessorRegistry indicates an expected call of GetProcessorRegistry.
+func (mr *MockIServiceMockRecorder) GetProcessorRegistry() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProcessorRegistry", reflect.TypeOf((*MockIService)(nil).GetProcessorRegistry))
 }
 
 // ListAllProjects mocks base method.

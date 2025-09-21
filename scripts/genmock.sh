@@ -17,6 +17,9 @@ SOURCE=(
     "github.com/web4ux/repository:CommandRepository"
     "github.com/web4ux/repository:QueryRepository"
     "github.com/web4ux/repository:IRepository"
+    "github.com/web4ux/pkg:ISyncManager"
+    "github.com/web4ux/pkg:IProgressReporter"
+    "github.com/web4ux/pkg:IProjectFilter"
 )
 
 # Create mocks directory if it doesn't exist

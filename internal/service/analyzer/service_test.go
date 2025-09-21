@@ -10,8 +10,8 @@ import (
 	mock_src_request "github.com/web4ux/mocks/src_request"
 	"github.com/web4ux/models"
 	"github.com/web4ux/repository/sqlc"
-	"github.com/web4ux/src/common"
 	"github.com/web4ux/src/logger"
+	"github.com/web4ux/src/types"
 	"go.uber.org/mock/gomock"
 )
 
@@ -21,59 +21,52 @@ var (
 	errDatabaseUpdateFailed     = errors.New("database update failed")
 )
 
-type listSummariesArgs struct {
-	name      string
-	creator   string
-	orderBy   string
-	direction string
-	offset    int64
-	limit     int64
-}
-
 type listSummariesTestCase struct {
-	name        string
-	args        listSummariesArgs
-	dbResult    common.Item[models.ProjectSummaries]
-	expectError bool
+	name         string
+	request      models.ListSummariesRequest
+	mockResponse types.MockItem[models.ProjectSummaries]
+	expectError  bool
 }
 
 func getListSummariesTestCases() []listSummariesTestCase {
 	return []listSummariesTestCase{
 		{
 			name: "successful list summaries",
-			args: listSummariesArgs{
-				name:      "test project",
-				creator:   "test user",
-				orderBy:   "name",
-				direction: "asc",
-				offset:    0,
-				limit:     10,
+			request: models.ListSummariesRequest{
+				Name:      "test project",
+				Creator:   "test user",
+				OrderBy:   "name",
+				Direction: "asc",
+				Offset:    0,
+				Limit:     10,
 			},
-			dbResult: common.Item[models.ProjectSummaries]{
-				Result: models.ProjectSummaries{
+			mockResponse: types.MockItem[models.ProjectSummaries]{
+				Count: 1,
+				Error: nil,
+				Item: models.ProjectSummaries{
 					Total: 2,
 					Data: []models.Project{
 						{ID: "1", Name: "Test Project 1"},
 						{ID: "2", Name: "Test Project 2"},
 					},
 				},
-				Count: 1,
 			},
 			expectError: false,
 		},
 		{
 			name: "database error",
-			args: listSummariesArgs{
-				name:      "",
-				creator:   "",
-				orderBy:   "name",
-				direction: "asc",
-				offset:    0,
-				limit:     10,
+			request: models.ListSummariesRequest{
+				Name:      "",
+				Creator:   "",
+				OrderBy:   "name",
+				Direction: "asc",
+				Offset:    0,
+				Limit:     10,
 			},
-			dbResult: common.Item[models.ProjectSummaries]{
-				Error: errDatabaseConnectionFailed,
+			mockResponse: types.MockItem[models.ProjectSummaries]{
 				Count: 1,
+				Error: errDatabaseConnectionFailed,
+				Item:  models.ProjectSummaries{},
 			},
 			expectError: true,
 		},
@@ -96,18 +89,18 @@ func TestListSummaries(t *testing.T) {
 			mockClient := mock_src_request.NewMockIClient(ctrl)
 			log := logger.NewTestLogger()
 			mockDB.EXPECT().ListProjects(ctx, log, gomock.Any()).
-				Return(tt.dbResult.Result, tt.dbResult.Error).Times(tt.dbResult.Count)
+				Return(tt.mockResponse.Item, tt.mockResponse.Error).Times(tt.mockResponse.Count)
 
 			service := analyzer.New(
 				analyzer.WithDatabase(mockDB),
 				analyzer.WithClient(mockClient),
 			)
 
-			result, err := service.ListSummaries(ctx, log, tt.args.name, tt.args.creator, tt.args.orderBy, tt.args.direction, tt.args.offset, tt.args.limit)
+			result, err := service.ListSummaries(ctx, log, tt.request)
 			assert.Equal(t, tt.expectError, err != nil)
 
 			if !tt.expectError {
-				assert.Equal(t, tt.dbResult.Result, result)
+				assert.Equal(t, tt.mockResponse.Item, result)
 			}
 		})
 	}
@@ -121,29 +114,31 @@ func TestGetProjectDetailByID(t *testing.T) {
 	ctx := t.Context()
 
 	tests := []struct {
-		name        string
-		projectID   string
-		dbResult    common.Item[[]models.ProjectDetail]
-		expectError bool
+		name         string
+		projectID    string
+		mockResponse types.MockItem[[]models.ProjectDetail]
+		expectError  bool
 	}{
 		{
 			name:      "successful get project detail",
 			projectID: "project-123",
-			dbResult: common.Item[[]models.ProjectDetail]{
-				Result: []models.ProjectDetail{
+			mockResponse: types.MockItem[[]models.ProjectDetail]{
+				Count: 1,
+				Error: nil,
+				Item: []models.ProjectDetail{
 					{ProjectID: "project-123", ProjectName: "Test Project"},
 					{ProjectID: "project-123", ProjectName: "Test Project"},
 				},
-				Count: 1,
 			},
 			expectError: false,
 		},
 		{
 			name:      "project not found",
 			projectID: "non-existent",
-			dbResult: common.Item[[]models.ProjectDetail]{
-				Error: errProjectNotFound,
+			mockResponse: types.MockItem[[]models.ProjectDetail]{
 				Count: 1,
+				Error: errProjectNotFound,
+				Item:  nil,
 			},
 			expectError: true,
 		},
@@ -157,7 +152,7 @@ func TestGetProjectDetailByID(t *testing.T) {
 			mockClient := mock_src_request.NewMockIClient(ctrl)
 			log := logger.NewTestLogger()
 			mockDB.EXPECT().FindProjectDetails(ctx, log, tt.projectID).
-				Return(tt.dbResult.Result, tt.dbResult.Error).Times(tt.dbResult.Count)
+				Return(tt.mockResponse.Item, tt.mockResponse.Error).Times(tt.mockResponse.Count)
 
 			service := analyzer.New(
 				analyzer.WithDatabase(mockDB),
@@ -168,7 +163,7 @@ func TestGetProjectDetailByID(t *testing.T) {
 			assert.Equal(t, tt.expectError, err != nil)
 
 			if !tt.expectError {
-				assert.Equal(t, tt.dbResult.Result, result)
+				assert.Equal(t, tt.mockResponse.Item, result)
 			}
 		})
 	}
@@ -185,30 +180,31 @@ func TestDeleteOrRestore(t *testing.T) {
 		name          string
 		informationID string
 		deleted       bool
-		dbResult      common.Item[any]
+		mockResponse  types.MockItem[any]
 		expectError   bool
 	}{
 		{
 			name:          "successful delete",
 			informationID: "info-123",
 			deleted:       true,
-			dbResult:      common.Item[any]{Count: 1},
+			mockResponse:  types.MockItem[any]{Count: 1, Error: nil, Item: nil},
 			expectError:   false,
 		},
 		{
 			name:          "successful restore",
 			informationID: "info-456",
 			deleted:       false,
-			dbResult:      common.Item[any]{Count: 1},
+			mockResponse:  types.MockItem[any]{Count: 1, Error: nil, Item: nil},
 			expectError:   false,
 		},
 		{
 			name:          "database error",
 			informationID: "info-error",
 			deleted:       true,
-			dbResult: common.Item[any]{
-				Error: errDatabaseUpdateFailed,
+			mockResponse: types.MockItem[any]{
 				Count: 1,
+				Error: errDatabaseUpdateFailed,
+				Item:  nil,
 			},
 			expectError: true,
 		},
@@ -224,7 +220,7 @@ func TestDeleteOrRestore(t *testing.T) {
 			mockDB.EXPECT().SoftDeleteWinfittsInformation(ctx, log, sqlc.SoftDeleteWinfittsInformationParams{
 				Deleted:       tt.deleted,
 				InformationID: tt.informationID,
-			}).Return(tt.dbResult.Error).Times(tt.dbResult.Count)
+			}).Return(tt.mockResponse.Error).Times(tt.mockResponse.Count)
 
 			service := analyzer.New(
 				analyzer.WithDatabase(mockDB),

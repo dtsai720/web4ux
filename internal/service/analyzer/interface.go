@@ -8,7 +8,7 @@ import (
 )
 
 type IService interface {
-	ListSummaries(ctx context.Context, log logger.ILogger, name, creator, orderBy, direction string, offset, limit int64) (models.ProjectSummaries, error)
+	ListSummaries(ctx context.Context, log logger.ILogger, req models.ListSummariesRequest) (models.ProjectSummaries, error)
 	GetProjectDetailByID(ctx context.Context, log logger.ILogger, projectID string) ([]models.ProjectDetail, error)
 	DeleteOrRestore(ctx context.Context, log logger.ILogger, informationID string, deleted bool) error
 }

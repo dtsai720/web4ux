@@ -72,16 +72,16 @@ func (mr *MockIServiceMockRecorder) GetProjectDetailByID(ctx, log, projectID any
 }
 
 // ListSummaries mocks base method.
-func (m *MockIService) ListSummaries(ctx context.Context, log logger.ILogger, name, creator, orderBy, direction string, offset, limit int64) (models.ProjectSummaries, error) {
+func (m *MockIService) ListSummaries(ctx context.Context, log logger.ILogger, req models.ListSummariesRequest) (models.ProjectSummaries, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListSummaries", ctx, log, name, creator, orderBy, direction, offset, limit)
+	ret := m.ctrl.Call(m, "ListSummaries", ctx, log, req)
 	ret0, _ := ret[0].(models.ProjectSummaries)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ListSummaries indicates an expected call of ListSummaries.
-func (mr *MockIServiceMockRecorder) ListSummaries(ctx, log, name, creator, orderBy, direction, offset, limit any) *gomock.Call {
+func (mr *MockIServiceMockRecorder) ListSummaries(ctx, log, req any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListSummaries", reflect.TypeOf((*MockIService)(nil).ListSummaries), ctx, log, name, creator, orderBy, direction, offset, limit)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListSummaries", reflect.TypeOf((*MockIService)(nil).ListSummaries), ctx, log, req)
 }

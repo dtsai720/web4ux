@@ -21,18 +21,42 @@ func WithLogger(log logger.ILogger) common.OptionalFn[App] {
 	return func(s *App) { s.log = log }
 }
 
+func WithSyncManager(syncManager ISyncManager) common.OptionalFn[App] {
+	return func(s *App) { s.syncManager = syncManager }
+}
+
 //nolint:containedctx
 type App struct {
 	ctx         context.Context
 	log         logger.ILogger
 	fetcher     fetcher.IService
 	analyzer    analyzer.IService
-	syncManager *SyncManager
+	syncManager ISyncManager
 }
 
 // NewApp creates a new App application struct.
 func New(options ...common.OptionalFn[App]) *App {
 	return common.WithOptions(new(App), options...)
+}
+
+func (a *App) GetContext() context.Context {
+	return a.ctx
+}
+
+func (a *App) GetLogger() logger.ILogger {
+	return a.log
+}
+
+func (a *App) GetFetcher() fetcher.IService {
+	return a.fetcher
+}
+
+func (a *App) GetAnalyzer() analyzer.IService {
+	return a.analyzer
+}
+
+func (a *App) GetSyncManager() ISyncManager {
+	return a.syncManager
 }
 
 // startup is called when the app starts. The context is saved
@@ -41,7 +65,7 @@ func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
 
 	// Initialize sync manager with progress reporter and project filter
-	progressReporter := NewProgressReporter(ctx, a.log)
+	progressReporter := NewProgressReporter()
 
 	// Create processor-based filter using the fetcher's processor registry
 	processorRegistry := a.fetcher.GetProcessorRegistry()

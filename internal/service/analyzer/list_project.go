@@ -8,15 +8,15 @@ import (
 )
 
 // ListProjects implements IService.
-func (s *Service) ListSummaries(ctx context.Context, log logger.ILogger, name string, creator string, orderBy string, direction string, offset, limit int64) (models.ProjectSummaries, error) {
-	isASC := direction == "asc"
-	req := models.ListProjectRequest{
-		Name:    name,
-		Creator: creator,
-		OrderBy: orderBy,
+func (s *Service) ListSummaries(ctx context.Context, log logger.ILogger, req models.ListSummariesRequest) (models.ProjectSummaries, error) {
+	isASC := req.Direction == "asc"
+	dbReq := models.ListProjectRequest{
+		Name:    req.Name,
+		Creator: req.Creator,
+		OrderBy: req.OrderBy,
 		IsASC:   isASC,
-		Offset:  offset,
-		Limit:   limit,
+		Offset:  req.Offset,
+		Limit:   req.Limit,
 	}
-	return s.db.ListProjects(ctx, log, req)
+	return s.db.ListProjects(ctx, log, dbReq)
 }

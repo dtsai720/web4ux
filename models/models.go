@@ -1,6 +1,7 @@
 package models
 
 import (
+	"context"
 	"fmt"
 	"math"
 	"strconv"
@@ -8,6 +9,7 @@ import (
 	"time"
 
 	"github.com/web4ux/src/errs"
+	"github.com/web4ux/src/logger"
 	"github.com/web4ux/src/sliceutils"
 )
 
@@ -31,6 +33,26 @@ type ListProjectRequest struct {
 	IsASC   bool
 	Offset  int64
 	Limit   int64
+}
+
+type ListSummariesRequest struct {
+	Name      string
+	Creator   string
+	OrderBy   string
+	Direction string
+	Offset    int64
+	Limit     int64
+}
+
+type WinfittsProcessParams struct {
+	Project   ProjectSummary
+	Link      string
+	DetailsFn func(context.Context, logger.ILogger, string) ([]WinfittsRawData, error)
+}
+
+type WinfittsExtractParams struct {
+	TaskID    string
+	DetailsFn func(context.Context, logger.ILogger, string) ([]WinfittsRawData, error)
 }
 
 type Project struct {
