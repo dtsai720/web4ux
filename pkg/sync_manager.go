@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"context"
+	"sync"
 
 	"github.com/web4ux/internal/service/fetcher"
 	"github.com/web4ux/src/errs"
@@ -15,6 +16,7 @@ type SyncManager struct {
 	log              logger.ILogger
 	progressReporter IProgressReporter
 	projectFilter    IProjectFilter
+	mu               sync.RWMutex
 	isRunning        bool
 	cancelFunc       context.CancelFunc
 }
@@ -30,10 +32,15 @@ func NewSyncManager(fetcher fetcher.IService, log logger.ILogger, progressReport
 }
 
 func (sm *SyncManager) IsRunning() bool {
+	sm.mu.RLock()
+	defer sm.mu.RUnlock()
 	return sm.isRunning
 }
 
 func (sm *SyncManager) StartSync(ctx context.Context) error {
+	sm.mu.Lock()
+	defer sm.mu.Unlock()
+
 	if sm.isRunning {
 		return errSyncAlreadyInProgress
 	}
@@ -47,6 +54,9 @@ func (sm *SyncManager) StartSync(ctx context.Context) error {
 }
 
 func (sm *SyncManager) CancelSync() error {
+	sm.mu.Lock()
+	defer sm.mu.Unlock()
+
 	if !sm.isRunning || sm.cancelFunc == nil {
 		return errNoSyncOperationInProgress
 	}
@@ -57,8 +67,10 @@ func (sm *SyncManager) CancelSync() error {
 
 func (sm *SyncManager) performSync(ctx context.Context) {
 	defer func() {
+		sm.mu.Lock()
 		sm.isRunning = false
 		sm.cancelFunc = nil
+		sm.mu.Unlock()
 	}()
 
 	projectList, err := sm.fetchProjectList(ctx)
