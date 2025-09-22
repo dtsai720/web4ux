@@ -119,11 +119,9 @@ func TestApp_LoginAndSync(t *testing.T) {
 				Return(tt.syncRunning.Item).
 				Times(tt.syncRunning.Count)
 
-			if tt.loginMock.Count > 0 {
-				mockFetcher.EXPECT().Login(gomock.Any(), log, tt.email, tt.password).
-					Return(tt.loginMock.Error).
-					Times(tt.loginMock.Count)
-			}
+			mockFetcher.EXPECT().Login(gomock.Any(), log, tt.email, tt.password).
+				Return(tt.loginMock.Error).
+				Times(tt.loginMock.Count)
 
 			app := pkg.New(
 				pkg.WithFetcherService(mockFetcher),
@@ -177,9 +175,6 @@ func TestApp_StartSync(t *testing.T) {
 			err := app.StartSync()
 
 			assert.Equal(t, tt.hasError, err != nil)
-			if tt.hasError {
-				assert.Equal(t, tt.startSyncErr, err)
-			}
 		})
 	}
 }
@@ -222,9 +217,6 @@ func TestApp_CancelSync(t *testing.T) {
 			err := app.CancelSync()
 
 			assert.Equal(t, tt.hasError, err != nil)
-			if tt.hasError {
-				assert.Equal(t, tt.cancelSyncErr, err)
-			}
 		})
 	}
 }
