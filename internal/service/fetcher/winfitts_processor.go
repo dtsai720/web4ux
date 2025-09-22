@@ -145,7 +145,12 @@ func (w *WinfittsProcessor) processWinfittsLinks(ctx context.Context, log logger
 	for i, link := range links {
 		linkLogger := log.With(zap.Int("link_index", i+1), zap.String("link", link))
 
-		if err := w.processWinfittsLink(ctx, linkLogger, project, link, detailFn); err != nil {
+		processParams := models.WinfittsProcessParams{
+			Project:   project,
+			Link:      link,
+			DetailsFn: detailFn,
+		}
+		if err := w.processWinfittsLink(ctx, linkLogger, processParams); err != nil {
 			return err
 		}
 
@@ -159,21 +164,25 @@ func (w *WinfittsProcessor) processWinfittsLinks(ctx context.Context, log logger
 	return nil
 }
 
-func (w *WinfittsProcessor) processWinfittsLink(ctx context.Context, log logger.ILogger, project htmlparser.ProjectSummary, link string, detailFn func(context.Context, logger.ILogger, string) ([]models.WinfittsRawData, error)) error {
-	if !strings.Contains(strings.ToLower(link), "winfitts") {
+func (w *WinfittsProcessor) processWinfittsLink(ctx context.Context, log logger.ILogger, params models.WinfittsProcessParams) error {
+	if !strings.Contains(strings.ToLower(params.Link), "winfitts") {
 		log.Info("Skipping non-winfitts link")
 		return nil
 	}
 
 	log.Info("Processing winfitts link")
-	taskID := w.extractTaskID(link)
+	taskID := w.extractTaskID(params.Link)
 
-	rows, err := w.extractWinfittsData(ctx, log, taskID, detailFn)
+	extractParams := models.WinfittsExtractParams{
+		TaskID:    taskID,
+		DetailsFn: params.DetailsFn,
+	}
+	rows, err := w.extractWinfittsData(ctx, log, extractParams)
 	if err != nil {
 		return err
 	}
 
-	return w.saveWinfittsData(ctx, log, project, taskID, rows)
+	return w.saveWinfittsData(ctx, log, params.Project, taskID, rows)
 }
 
 func (w *WinfittsProcessor) extractTaskID(link string) string {
@@ -181,12 +190,12 @@ func (w *WinfittsProcessor) extractTaskID(link string) string {
 	return array[len(array)-1]
 }
 
-func (w *WinfittsProcessor) extractWinfittsData(ctx context.Context, log logger.ILogger, taskID string, detailFn func(context.Context, logger.ILogger, string) ([]models.WinfittsRawData, error)) ([]models.WinfittsRawData, error) {
-	log.Info("Extracting winfitts details", zap.String("task_id", taskID))
-	rows, err := detailFn(ctx, log, taskID)
+func (w *WinfittsProcessor) extractWinfittsData(ctx context.Context, log logger.ILogger, params models.WinfittsExtractParams) ([]models.WinfittsRawData, error) {
+	log.Info("Extracting winfitts details", zap.String("task_id", params.TaskID))
+	rows, err := params.DetailsFn(ctx, log, params.TaskID)
 	if err != nil {
 		log.Error("Failed to extract winfitts details",
-			zap.String("task_id", taskID),
+			zap.String("task_id", params.TaskID),
 			zap.Error(err))
 		return nil, err
 	}

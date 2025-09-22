@@ -31,15 +31,19 @@ func (c *DefaultErrorClassifier) Classify(err error) ErrorType {
 	}
 
 	// Check for known error types
+	// Note: Order matters - more specific checks should come first
+	errorStr := strings.ToLower(err.Error())
 	switch {
-	case c.isValidationError(err):
-		return ValidationError
-	case c.isDatabaseError(err):
+	case c.isAuthenticationError(err):
+		return AuthenticationError
+	case (strings.Contains(errorStr, "database") || strings.Contains(errorStr, "sql") || strings.Contains(errorStr, "sqlite") || strings.Contains(errorStr, "postgres")) && c.isDatabaseError(err):
 		return DatabaseError
 	case c.isNetworkError(err):
 		return NetworkError
-	case c.isAuthenticationError(err):
-		return AuthenticationError
+	case c.isDatabaseError(err):
+		return DatabaseError
+	case c.isValidationError(err):
+		return ValidationError
 	default:
 		return ProcessingError
 	}
@@ -68,6 +72,11 @@ func (c *DefaultErrorClassifier) IsRetryable(err error) bool {
 func (c *DefaultErrorClassifier) IsCritical(err error) bool {
 	if err == nil {
 		return false
+	}
+
+	// Check for general critical error indicators first
+	if c.isCriticalDatabaseError(err) {
+		return true
 	}
 
 	switch c.Classify(err) {
@@ -104,6 +113,7 @@ func (c *DefaultErrorClassifier) isDatabaseError(err error) bool {
 	dbKeywords := []string{
 		"sql", "database", "connection", "constraint", "duplicate",
 		"foreign key", "table", "column", "sqlite", "postgres",
+		"deadlock",
 	}
 
 	for _, keyword := range dbKeywords {
@@ -131,6 +141,7 @@ func (c *DefaultErrorClassifier) isNetworkError(err error) bool {
 	networkKeywords := []string{
 		"network", "connection", "timeout", "dns", "tls", "ssl",
 		"http", "tcp", "udp", "socket", "dial", "refused",
+		"service unavailable", "too many requests",
 	}
 
 	for _, keyword := range networkKeywords {

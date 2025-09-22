@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"context"
+	"sync"
 
 	"github.com/web4ux/internal/service/fetcher"
 	"github.com/web4ux/src/errs"
@@ -13,13 +14,14 @@ import (
 type SyncManager struct {
 	fetcher          fetcher.IService
 	log              logger.ILogger
-	progressReporter *ProgressReporter
-	projectFilter    ProjectFilter
+	progressReporter IProgressReporter
+	projectFilter    IProjectFilter
+	mu               sync.RWMutex
 	isRunning        bool
 	cancelFunc       context.CancelFunc
 }
 
-func NewSyncManager(fetcher fetcher.IService, log logger.ILogger, progressReporter *ProgressReporter, projectFilter ProjectFilter) *SyncManager {
+func NewSyncManager(fetcher fetcher.IService, log logger.ILogger, progressReporter IProgressReporter, projectFilter IProjectFilter) *SyncManager {
 	return &SyncManager{
 		fetcher:          fetcher,
 		log:              log,
@@ -30,10 +32,15 @@ func NewSyncManager(fetcher fetcher.IService, log logger.ILogger, progressReport
 }
 
 func (sm *SyncManager) IsRunning() bool {
+	sm.mu.RLock()
+	defer sm.mu.RUnlock()
 	return sm.isRunning
 }
 
 func (sm *SyncManager) StartSync(ctx context.Context) error {
+	sm.mu.Lock()
+	defer sm.mu.Unlock()
+
 	if sm.isRunning {
 		return errSyncAlreadyInProgress
 	}
@@ -47,6 +54,9 @@ func (sm *SyncManager) StartSync(ctx context.Context) error {
 }
 
 func (sm *SyncManager) CancelSync() error {
+	sm.mu.Lock()
+	defer sm.mu.Unlock()
+
 	if !sm.isRunning || sm.cancelFunc == nil {
 		return errNoSyncOperationInProgress
 	}
@@ -57,13 +67,15 @@ func (sm *SyncManager) CancelSync() error {
 
 func (sm *SyncManager) performSync(ctx context.Context) {
 	defer func() {
+		sm.mu.Lock()
 		sm.isRunning = false
 		sm.cancelFunc = nil
+		sm.mu.Unlock()
 	}()
 
 	projectList, err := sm.fetchProjectList(ctx)
 	if err != nil {
-		sm.progressReporter.ReportError(err.Error())
+		sm.progressReporter.ReportError(ctx, sm.log, err.Error())
 		return
 	}
 
@@ -99,17 +111,17 @@ func (sm *SyncManager) processSyncProjects(ctx context.Context, projects []htmlp
 
 		select {
 		case <-ctx.Done():
-			sm.progressReporter.ReportCancellation(project.Name, i, totalProjects)
+			sm.progressReporter.ReportCancellation(ctx, sm.log, project.Name, i, totalProjects)
 			return
 		default:
 			if err := sm.processProject(ctx, project, i, totalProjects); err != nil {
-				sm.progressReporter.ReportError(err.Error())
+				sm.progressReporter.ReportError(ctx, sm.log, err.Error())
 				return
 			}
 		}
 	}
 
-	sm.progressReporter.ReportCompletion(totalProjects)
+	sm.progressReporter.ReportCompletion(ctx, sm.log, totalProjects)
 }
 
 func (sm *SyncManager) processProject(ctx context.Context, project htmlparser.ProjectSummary, currentIndex, totalProjects int) error {
@@ -128,6 +140,6 @@ func (sm *SyncManager) processProject(ctx context.Context, project htmlparser.Pr
 	}
 
 	progress := (currentIndex * 100) / totalProjects
-	sm.progressReporter.ReportProgress(project.Name, currentIndex, progress, totalProjects)
+	sm.progressReporter.ReportProgress(ctx, sm.log, project.Name, currentIndex, progress, totalProjects)
 	return nil
 }

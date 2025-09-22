@@ -7,19 +7,13 @@ import (
 	"github.com/web4ux/src/logger"
 )
 
-type ProgressReporter struct {
-	ctx context.Context
-	log logger.ILogger
+type ProgressReporter struct{}
+
+func NewProgressReporter() *ProgressReporter {
+	return &ProgressReporter{}
 }
 
-func NewProgressReporter(ctx context.Context, log logger.ILogger) *ProgressReporter {
-	return &ProgressReporter{
-		ctx: ctx,
-		log: log,
-	}
-}
-
-func (pr *ProgressReporter) ReportProgress(projectName string, currentIndex, progress, totalProjects int) {
+func (pr *ProgressReporter) ReportProgress(ctx context.Context, log logger.ILogger, projectName string, currentIndex, progress, totalProjects int) {
 	syncProgress := SyncProgress{
 		CurrentProject: projectName,
 		CurrentIndex:   currentIndex,
@@ -28,10 +22,10 @@ func (pr *ProgressReporter) ReportProgress(projectName string, currentIndex, pro
 		IsCompleted:    false,
 		IsCancelled:    false,
 	}
-	pr.emitProgress(syncProgress)
+	pr.emitProgress(ctx, log, syncProgress)
 }
 
-func (pr *ProgressReporter) ReportCompletion(totalProjects int) {
+func (pr *ProgressReporter) ReportCompletion(ctx context.Context, log logger.ILogger, totalProjects int) {
 	syncProgress := SyncProgress{
 		CurrentProject: "All projects completed",
 		Progress:       100,
@@ -40,10 +34,10 @@ func (pr *ProgressReporter) ReportCompletion(totalProjects int) {
 		IsCompleted:    true,
 		IsCancelled:    false,
 	}
-	pr.emitProgress(syncProgress)
+	pr.emitProgress(ctx, log, syncProgress)
 }
 
-func (pr *ProgressReporter) ReportCancellation(projectName string, currentIndex, totalProjects int) {
+func (pr *ProgressReporter) ReportCancellation(ctx context.Context, log logger.ILogger, projectName string, currentIndex, totalProjects int) {
 	progress := (currentIndex * 100) / totalProjects
 	syncProgress := SyncProgress{
 		CurrentProject: projectName,
@@ -53,10 +47,10 @@ func (pr *ProgressReporter) ReportCancellation(projectName string, currentIndex,
 		IsCompleted:    false,
 		IsCancelled:    true,
 	}
-	pr.emitProgress(syncProgress)
+	pr.emitProgress(ctx, log, syncProgress)
 }
 
-func (pr *ProgressReporter) ReportError(errorMessage string) {
+func (pr *ProgressReporter) ReportError(ctx context.Context, log logger.ILogger, errorMessage string) {
 	syncProgress := SyncProgress{
 		CurrentProject: errorMessage,
 		Progress:       100,
@@ -64,10 +58,10 @@ func (pr *ProgressReporter) ReportError(errorMessage string) {
 		IsCompleted:    false,
 		IsCancelled:    true,
 	}
-	pr.emitProgress(syncProgress)
+	pr.emitProgress(ctx, log, syncProgress)
 }
 
-func (pr *ProgressReporter) emitProgress(progress SyncProgress) {
-	runtime.EventsEmit(pr.ctx, "sync:progress", progress)
-	pr.log.Infof("Sync Progress: %+v\n", progress)
+func (pr *ProgressReporter) emitProgress(ctx context.Context, log logger.ILogger, progress SyncProgress) {
+	runtime.EventsEmit(ctx, "sync:progress", progress)
+	log.Infof("Sync Progress: %+v\n", progress)
 }
