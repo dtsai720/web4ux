@@ -56,6 +56,9 @@ type BatchProcessor[T any] struct {
 }
 
 func NewBatchProcessor[T any](batchSize int, processor func(ctx context.Context, tx *sql.Tx, items []T) error) *BatchProcessor[T] {
+	if batchSize <= 0 {
+		batchSize = 1 // Default to batch size of 1 for invalid values
+	}
 	return &BatchProcessor[T]{
 		batchSize: batchSize,
 		processor: processor,

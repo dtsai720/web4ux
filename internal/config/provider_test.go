@@ -13,64 +13,150 @@ import (
 )
 
 func TestNewFileConfigProvider(t *testing.T) {
-	provider := config.NewFileConfigProvider("test.json")
+	t.Parallel()
 
-	assert.NotNil(t, provider)
-	assert.Implements(t, (*config.ConfigProvider)(nil), provider)
+	tests := []struct {
+		name     string
+		filename string
+	}{
+		{
+			name:     "creates valid file config provider",
+			filename: "test.json",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			provider := config.NewFileConfigProvider(tt.filename)
+
+			assert.NotNil(t, provider)
+			assert.Implements(t, (*config.ConfigProvider)(nil), provider)
+		})
+	}
 }
 
 func TestFileConfigProvider_LoadNonExistentFile(t *testing.T) {
-	provider := config.NewFileConfigProvider("nonexistent.json")
+	t.Parallel()
 
-	err := provider.Load()
+	tests := []struct {
+		name     string
+		filename string
+		hasError bool
+	}{
+		{
+			name:     "nonexistent file should not error",
+			filename: "nonexistent.json",
+			hasError: false,
+		},
+	}
 
-	assert.NoError(t, err) // Should not error on missing file
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			provider := config.NewFileConfigProvider(tt.filename)
+			err := provider.Load()
+
+			assert.Equal(t, tt.hasError, err != nil)
+		})
+	}
 }
 
 func TestFileConfigProvider_LoadValidFile(t *testing.T) {
-	// Create temporary file
-	tmpDir := t.TempDir()
-	configFile := filepath.Join(tmpDir, "config.json")
+	t.Parallel()
 
-	testData := map[string]interface{}{
-		"string_key":   "test_value",
-		"int_key":      42,
-		"bool_key":     true,
-		"duration_key": "5s",
+	tests := []struct {
+		name      string
+		testData  map[string]interface{}
+		hasError  bool
+		validate  func(*testing.T, config.ConfigProvider)
+	}{
+		{
+			name: "valid config file with various types",
+			testData: map[string]interface{}{
+				"string_key":   "test_value",
+				"int_key":      42,
+				"bool_key":     true,
+				"duration_key": "5s",
+			},
+			hasError: false,
+			validate: func(t *testing.T, provider config.ConfigProvider) {
+				assert.Equal(t, "test_value", provider.GetString("string_key"))
+				assert.Equal(t, 42, provider.GetInt("int_key"))
+				assert.True(t, provider.GetBool("bool_key"))
+				assert.Equal(t, 5*time.Second, provider.GetDuration("duration_key"))
+			},
+		},
 	}
 
-	data, err := json.Marshal(testData)
-	require.NoError(t, err)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 
-	err = os.WriteFile(configFile, data, 0644)
-	require.NoError(t, err)
+			tmpDir := t.TempDir()
+			configFile := filepath.Join(tmpDir, "config.json")
 
-	provider := config.NewFileConfigProvider(configFile)
+			data, err := json.Marshal(tt.testData)
+			require.NoError(t, err)
 
-	err = provider.Load()
-	assert.NoError(t, err)
+			err = os.WriteFile(configFile, data, 0644)
+			require.NoError(t, err)
 
-	// Test retrieving values
-	assert.Equal(t, "test_value", provider.GetString("string_key"))
-	assert.Equal(t, 42, provider.GetInt("int_key"))
-	assert.True(t, provider.GetBool("bool_key"))
-	assert.Equal(t, 5*time.Second, provider.GetDuration("duration_key"))
+			provider := config.NewFileConfigProvider(configFile)
+			err = provider.Load()
+
+			assert.Equal(t, tt.hasError, err != nil)
+			if !tt.hasError {
+				tt.validate(t, provider)
+			}
+		})
+	}
 }
 
 func TestFileConfigProvider_LoadInvalidJSON(t *testing.T) {
-	// Create temporary file with invalid JSON
-	tmpDir := t.TempDir()
-	configFile := filepath.Join(tmpDir, "invalid.json")
+	t.Parallel()
 
-	invalidJSON := `{"invalid": json}`
-	err := os.WriteFile(configFile, []byte(invalidJSON), 0644)
-	require.NoError(t, err)
+	tests := []struct {
+		name        string
+		invalidJSON string
+		hasError    bool
+		errorMsg    string
+	}{
+		{
+			name:        "invalid JSON syntax",
+			invalidJSON: `{"invalid": json}`,
+			hasError:    true,
+			errorMsg:    "failed to parse config file",
+		},
+		{
+			name:        "incomplete JSON object",
+			invalidJSON: `{"key": "value"`,
+			hasError:    true,
+			errorMsg:    "failed to parse config file",
+		},
+	}
 
-	provider := config.NewFileConfigProvider(configFile)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 
-	err = provider.Load()
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "failed to parse config file")
+			tmpDir := t.TempDir()
+			configFile := filepath.Join(tmpDir, "invalid.json")
+
+			err := os.WriteFile(configFile, []byte(tt.invalidJSON), 0644)
+			require.NoError(t, err)
+
+			provider := config.NewFileConfigProvider(configFile)
+			err = provider.Load()
+
+			assert.Equal(t, tt.hasError, err != nil)
+			if tt.hasError {
+				assert.Contains(t, err.Error(), tt.errorMsg)
+			}
+		})
+	}
 }
 
 func TestFileConfigProvider_LoadUnreadableFile(t *testing.T) {
@@ -190,17 +276,55 @@ func TestFileConfigProvider_Reload(t *testing.T) {
 }
 
 func TestNewEnvConfigProvider(t *testing.T) {
-	provider := config.NewEnvConfigProvider("TEST_")
+	t.Parallel()
 
-	assert.NotNil(t, provider)
-	assert.Implements(t, (*config.ConfigProvider)(nil), provider)
+	tests := []struct {
+		name   string
+		prefix string
+	}{
+		{
+			name:   "creates valid env config provider",
+			prefix: "TEST_",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			provider := config.NewEnvConfigProvider(tt.prefix)
+
+			assert.NotNil(t, provider)
+			assert.Implements(t, (*config.ConfigProvider)(nil), provider)
+		})
+	}
 }
 
 func TestEnvConfigProvider_Load(t *testing.T) {
-	provider := config.NewEnvConfigProvider("TEST_")
+	t.Parallel()
 
-	err := provider.Load()
-	assert.NoError(t, err) // Should always succeed
+	tests := []struct {
+		name     string
+		prefix   string
+		hasError bool
+	}{
+		{
+			name:     "env provider load should always succeed",
+			prefix:   "TEST_",
+			hasError: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			provider := config.NewEnvConfigProvider(tt.prefix)
+			err := provider.Load()
+
+			assert.Equal(t, tt.hasError, err != nil)
+		})
+	}
 }
 
 func TestEnvConfigProvider_GetMethods(t *testing.T) {
@@ -444,7 +568,7 @@ func TestFileConfigProvider_ConcurrentAccess(t *testing.T) {
 
 	// Writer goroutine
 	go func() {
-		for i := 0; i < 100; i++ {
+		for i := range 100 {
 			provider.Set("key", i)
 		}
 		done <- true
@@ -452,7 +576,7 @@ func TestFileConfigProvider_ConcurrentAccess(t *testing.T) {
 
 	// Reader goroutine
 	go func() {
-		for i := 0; i < 100; i++ {
+		for range 100 {
 			_ = provider.GetInt("key")
 			_ = provider.IsSet("key")
 		}

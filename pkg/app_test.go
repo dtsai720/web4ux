@@ -17,6 +17,8 @@ import (
 )
 
 func TestNew(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name     string
 		options  []common.OptionalFn[pkg.App]
@@ -81,6 +83,8 @@ func TestNew(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got := pkg.New(tt.options...)
 			require.NotNil(t, got)
 			tt.validate(t, got)
@@ -89,6 +93,8 @@ func TestNew(t *testing.T) {
 }
 
 func TestWithFetcherService(t *testing.T) {
+	t.Parallel()
+
 	ctrl := gomock.NewController(t)
 	t.Cleanup(ctrl.Finish)
 
@@ -102,6 +108,8 @@ func TestWithFetcherService(t *testing.T) {
 }
 
 func TestWithAnalyzerService(t *testing.T) {
+	t.Parallel()
+
 	ctrl := gomock.NewController(t)
 	t.Cleanup(ctrl.Finish)
 
@@ -115,6 +123,8 @@ func TestWithAnalyzerService(t *testing.T) {
 }
 
 func TestWithLogger(t *testing.T) {
+	t.Parallel()
+
 	log := logger.NewTestLogger()
 	app := &pkg.App{}
 
@@ -125,6 +135,8 @@ func TestWithLogger(t *testing.T) {
 }
 
 func TestApp_Startup(t *testing.T) {
+	t.Parallel()
+
 	ctrl := gomock.NewController(t)
 	t.Cleanup(ctrl.Finish)
 
@@ -158,6 +170,8 @@ func TestApp_Startup(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			mockFetcher := mock_internal_service_fetcher.NewMockIService(ctrl)
 			log := logger.NewTestLogger()
 

@@ -26,3 +26,7 @@ type IProgressReporter interface {
 type IProjectFilter interface {
 	ShouldProcess(project htmlparser.ProjectSummary) bool
 }
+
+type ProjectFilter interface {
+	ShouldProcess(project htmlparser.ProjectSummary) bool
+}

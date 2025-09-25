@@ -7,9 +7,6 @@ import (
 )
 
 // ProjectTypeDetector defines the interface for detecting project types
-type ProjectTypeDetector interface {
-	IsWinfittsProject(project htmlparser.ProjectSummary) bool
-}
 
 // DefaultProjectTypeDetector provides the default implementation
 type DefaultProjectTypeDetector struct{}

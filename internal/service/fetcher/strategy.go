@@ -1,18 +1,8 @@
 package fetcher
 
 import (
-	"context"
-
 	"github.com/web4ux/src/htmlparser"
-	"github.com/web4ux/src/logger"
 )
-
-// ProjectProcessor defines the strategy interface for processing different project types
-type ProjectProcessor interface {
-	CanProcess(project htmlparser.ProjectSummary) bool
-	Process(ctx context.Context, log logger.ILogger, project htmlparser.ProjectSummary) error
-	Name() string
-}
 
 // ProjectProcessorRegistry manages multiple project processors
 type ProjectProcessorRegistry struct {
