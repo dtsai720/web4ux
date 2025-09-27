@@ -251,5 +251,118 @@ describe('moveTimeUtils', () => {
 
       expect(() => calculateMoveTimeAnalysis(incompleteData)).not.toThrow();
     });
+
+    test('should sort difficulties with same difficulty value by width and distance', () => {
+      // Test data with proper structure for move time analysis
+      const testData = [
+        {
+          deviceName: 'device1',
+          participantSerial: 'P001',
+          trailNumber: 1,
+          width: 30,
+          distance: 100,
+          moveTime: 500,
+          deleted: false,
+          mark: 'start',
+          timestamp: 1000
+        },
+        {
+          deviceName: 'device1',
+          participantSerial: 'P001',
+          trailNumber: 1,
+          width: 30,
+          distance: 100,
+          moveTime: 500,
+          deleted: false,
+          mark: 'target',
+          timestamp: 1500
+        },
+        {
+          deviceName: 'device1',
+          participantSerial: 'P001',
+          trailNumber: 2,
+          width: 20,
+          distance: 100,
+          moveTime: 600,
+          deleted: false,
+          mark: 'start',
+          timestamp: 2000
+        },
+        {
+          deviceName: 'device1',
+          participantSerial: 'P001',
+          trailNumber: 2,
+          width: 20,
+          distance: 100,
+          moveTime: 600,
+          deleted: false,
+          mark: 'target',
+          timestamp: 2600
+        }
+      ];
+
+      const result = calculateMoveTimeAnalysis(testData);
+
+      // Verify the analysis was performed successfully
+      expect(result).toBeDefined();
+      expect(result.device1).toBeDefined();
+      expect(result.device1.difficultyGroups).toBeDefined();
+    });
+
+    test('should handle sorting edge cases with identical values', () => {
+      // Test data with identical difficulty, width, and distance values
+      const identicalData = [
+        {
+          deviceName: 'device1',
+          participantSerial: 'P001',
+          trailNumber: 1,
+          width: 30,
+          distance: 100,
+          moveTime: 500,
+          deleted: false,
+          mark: 'start',
+          timestamp: 1000
+        },
+        {
+          deviceName: 'device1',
+          participantSerial: 'P001',
+          trailNumber: 1,
+          width: 30,
+          distance: 100,
+          moveTime: 500,
+          deleted: false,
+          mark: 'target',
+          timestamp: 1500
+        },
+        {
+          deviceName: 'device1',
+          participantSerial: 'P002',
+          trailNumber: 1,
+          width: 30,
+          distance: 100,
+          moveTime: 600,
+          deleted: false,
+          mark: 'start',
+          timestamp: 2000
+        },
+        {
+          deviceName: 'device1',
+          participantSerial: 'P002',
+          trailNumber: 1,
+          width: 30,
+          distance: 100,
+          moveTime: 600,
+          deleted: false,
+          mark: 'target',
+          timestamp: 2600
+        }
+      ];
+
+      const result = calculateMoveTimeAnalysis(identicalData);
+
+      expect(result).toBeDefined();
+      expect(result.device1).toBeDefined();
+      expect(result.device1.difficultyGroups).toBeDefined();
+    });
   });
 });

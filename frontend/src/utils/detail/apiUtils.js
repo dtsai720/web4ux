@@ -4,7 +4,7 @@
 import { GetProjectDetailByID, DeleteOrRestore } from '../../../wailsjs/go/pkg/App';
 import { handleError } from '../common';
 
-const removeDuplicates = (data) => {
+export const removeDuplicates = (data) => {
   const unique = data.filter((item, index, self) =>
     index === self.findIndex(obj => obj.projectId === item.projectId && obj.informationId === item.informationId)
   );

@@ -405,4 +405,5 @@ describe('statsUtils', () => {
       expect(typeof StatsAggregator).toBe('function');
     });
   });
+
 });
