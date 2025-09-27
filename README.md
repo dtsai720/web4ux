@@ -4,7 +4,7 @@
 [![Frontend CI](https://github.com/dtsai720/web4ux/actions/workflows/frontend-ci.yml/badge.svg?branch=main)](https://github.com/dtsai720/web4ux/actions/workflows/frontend-ci.yml)
 
 [![Go Coverage](https://img.shields.io/badge/Go%20Coverage-90.1%25-brightgreen)](./coverage.html)
-[![Frontend Coverage](https://img.shields.io/badge/Frontend%20Coverage-34.37%25-green)](./frontend/coverage/)
+[![Frontend Coverage](https://img.shields.io/badge/Frontend%20Coverage-35.36%25-red)](./frontend/coverage/)
 
 ## About
 
