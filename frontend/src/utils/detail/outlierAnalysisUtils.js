@@ -2,7 +2,7 @@
  * Outlier analysis utilities for detail page
  */
 import { calculateDoubleClickStats } from '../outlier/outlierUtils';
-import { OUTLIER_DETECTION, DATA_ANALYSIS } from '../common';
+import { OUTLIER_DETECTION, DATA_ANALYSIS } from '../common/constants';
 
 /**
  * Calculates participant error data

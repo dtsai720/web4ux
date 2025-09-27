@@ -1,3 +1,5 @@
+import React from 'react';
+
 const LoadingIndicator = () => (
   <div className="text-center mb-4">
     <div className="spinner-border text-primary" role="status">

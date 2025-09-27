@@ -19,6 +19,7 @@ export default defineConfig({
         '**/*.config.js',
         '**/*.config.ts',
         'dist/',
+        'wailsjs/',
       ],
     },
   },

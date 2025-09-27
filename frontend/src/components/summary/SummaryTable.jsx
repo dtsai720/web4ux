@@ -1,3 +1,4 @@
+import React from 'react';
 import { getSortIcon, formatDate } from '../../utils/summary';
 
 const SortableHeader = ({ field, label, orderBy, orderDirection, onSort }) => (

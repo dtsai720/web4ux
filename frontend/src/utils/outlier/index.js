@@ -1,7 +1,17 @@
-import { formatDateTime, isOutlier, getOutlierSummary } from './outlierUtils';
+import {
+  formatDateTime,
+  isOutlier,
+  detectDoubleClicks,
+  calculateDoubleClickStats,
+  trailHasDoubleClick,
+  getOutlierSummary
+} from './outlierUtils';
 
 export {
   formatDateTime,
   isOutlier,
+  detectDoubleClicks,
+  calculateDoubleClickStats,
+  trailHasDoubleClick,
   getOutlierSummary
 };
