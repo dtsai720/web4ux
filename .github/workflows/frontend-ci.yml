@@ -2,21 +2,27 @@ name: Frontend CI
 
 on:
   push:
-    branches: [ main, setup_ci ]
+    branches: [ main, setup_ci, feature/coverage-enhancement ]
     paths:
       - 'frontend/**'
+      - 'pkg/**'
+      - 'internal/**'
       - '.github/workflows/frontend-ci.yml'
       - 'README.md'
       - '.github/workflows/update-readme-coverage.yml'
       - 'scripts/update-coverage-badges.js'
+      - 'wails.json'
   pull_request:
     branches: [ main ]
     paths:
       - 'frontend/**'
+      - 'pkg/**'
+      - 'internal/**'
       - '.github/workflows/frontend-ci.yml'
       - 'README.md'
       - '.github/workflows/update-readme-coverage.yml'
       - 'scripts/update-coverage-badges.js'
+      - 'wails.json'
 
 permissions:
   contents: read
@@ -33,12 +39,23 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.25.1'
+
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
         cache: 'npm'
         cache-dependency-path: frontend/package-lock.json
+
+    - name: Install Wails CLI
+      run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+    - name: Generate Wails bindings
+      run: wails generate module
 
     - name: Install React dependencies
       run: cd frontend && npm ci
