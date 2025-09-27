@@ -193,3 +193,41 @@ func (mr *MockIProjectFilterMockRecorder) ShouldProcess(project any) *gomock.Cal
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ShouldProcess", reflect.TypeOf((*MockIProjectFilter)(nil).ShouldProcess), project)
 }
+
+// MockProjectFilter is a mock of ProjectFilter interface.
+type MockProjectFilter struct {
+	ctrl     *gomock.Controller
+	recorder *MockProjectFilterMockRecorder
+	isgomock struct{}
+}
+
+// MockProjectFilterMockRecorder is the mock recorder for MockProjectFilter.
+type MockProjectFilterMockRecorder struct {
+	mock *MockProjectFilter
+}
+
+// NewMockProjectFilter creates a new mock instance.
+func NewMockProjectFilter(ctrl *gomock.Controller) *MockProjectFilter {
+	mock := &MockProjectFilter{ctrl: ctrl}
+	mock.recorder = &MockProjectFilterMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockProjectFilter) EXPECT() *MockProjectFilterMockRecorder {
+	return m.recorder
+}
+
+// ShouldProcess mocks base method.
+func (m *MockProjectFilter) ShouldProcess(project htmlparser.ProjectSummary) bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ShouldProcess", project)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// ShouldProcess indicates an expected call of ShouldProcess.
+func (mr *MockProjectFilterMockRecorder) ShouldProcess(project any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ShouldProcess", reflect.TypeOf((*MockProjectFilter)(nil).ShouldProcess), project)
+}

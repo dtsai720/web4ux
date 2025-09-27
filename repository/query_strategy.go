@@ -15,10 +15,6 @@ const (
 	SortFieldTime     = "time"
 )
 
-type QueryStrategy interface {
-	Execute(ctx context.Context, req models.ListProjectRequest) ([]sqlc.Project, error)
-}
-
 type ProjectQueryParams struct {
 	Name    string
 	Creator string

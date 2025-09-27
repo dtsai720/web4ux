@@ -17,6 +17,9 @@ on:
       - 'go.sum'
       - 'Makefile'
       - '.github/workflows/backend-ci.yml'
+      - 'README.md'
+      - '.github/workflows/update-readme-coverage.yml'
+      - 'scripts/update-coverage-badges.js'
 
 permissions:
   contents: read

@@ -14,6 +14,8 @@ import (
 )
 
 func TestSyncProgress_Struct(t *testing.T) {
+	t.Parallel()
+
 	progress := pkg.SyncProgress{
 		CurrentProject: "test-project",
 		CurrentIndex:   5,
@@ -32,6 +34,8 @@ func TestSyncProgress_Struct(t *testing.T) {
 }
 
 func TestLoginResponse_Struct(t *testing.T) {
+	t.Parallel()
+
 	response := pkg.LoginResponse{
 		Success: true,
 		Message: "Login successful",
@@ -42,6 +46,8 @@ func TestLoginResponse_Struct(t *testing.T) {
 }
 
 func TestApp_LoginAndSync(t *testing.T) {
+	t.Parallel()
+
 	ctrl := gomock.NewController(t)
 	t.Cleanup(ctrl.Finish)
 
@@ -111,6 +117,8 @@ func TestApp_LoginAndSync(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			mockFetcher := mock_internal_service_fetcher.NewMockIService(ctrl)
 			mockSyncManager := mock_pkg.NewMockISyncManager(ctrl)
 			log := logger.NewTestLogger()
@@ -138,6 +146,8 @@ func TestApp_LoginAndSync(t *testing.T) {
 }
 
 func TestApp_StartSync(t *testing.T) {
+	t.Parallel()
+
 	ctrl := gomock.NewController(t)
 	t.Cleanup(ctrl.Finish)
 
@@ -160,6 +170,8 @@ func TestApp_StartSync(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			mockSyncManager := mock_pkg.NewMockISyncManager(ctrl)
 			log := logger.NewTestLogger()
 
@@ -180,6 +192,8 @@ func TestApp_StartSync(t *testing.T) {
 }
 
 func TestApp_CancelSync(t *testing.T) {
+	t.Parallel()
+
 	ctrl := gomock.NewController(t)
 	t.Cleanup(ctrl.Finish)
 
@@ -202,6 +216,8 @@ func TestApp_CancelSync(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			mockSyncManager := mock_pkg.NewMockISyncManager(ctrl)
 			log := logger.NewTestLogger()
 
@@ -222,6 +238,8 @@ func TestApp_CancelSync(t *testing.T) {
 }
 
 func TestApp_GetSyncStatus(t *testing.T) {
+	t.Parallel()
+
 	ctrl := gomock.NewController(t)
 	t.Cleanup(ctrl.Finish)
 
@@ -248,6 +266,8 @@ func TestApp_GetSyncStatus(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			mockSyncManager := mock_pkg.NewMockISyncManager(ctrl)
 			log := logger.NewTestLogger()
 

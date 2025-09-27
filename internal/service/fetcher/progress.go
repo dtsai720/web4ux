@@ -16,10 +16,6 @@ type ProgressEvent struct {
 	Error       error
 }
 
-type ProgressObserver interface {
-	OnProgress(event ProgressEvent)
-}
-
 type ProgressNotifier struct {
 	observers []ProgressObserver
 }

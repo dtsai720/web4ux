@@ -5,10 +5,6 @@ import (
 	"github.com/web4ux/src/htmlparser"
 )
 
-type ProjectFilter interface {
-	ShouldProcess(project htmlparser.ProjectSummary) bool
-}
-
 type ProcessorBasedFilter struct {
 	processorRegistry *fetcher.ProjectProcessorRegistry
 }

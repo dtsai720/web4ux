@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	errTestResult = errors.New("test error")
-	errNetworkResult = errors.New("network connection failed")
+	errTestResult       = errors.New("test error")
+	errNetworkResult    = errors.New("network connection failed")
 	errProcessingResult = errors.New("processing failed")
 )
 
@@ -31,12 +31,40 @@ func TestProcessStatus_Constants(t *testing.T) {
 func TestNewSuccessResult(t *testing.T) {
 	t.Parallel()
 
-	result := fetcher.NewSuccessResult()
+	tests := []struct {
+		name     string
+		expected struct {
+			status fetcher.ProcessStatus
+			hasError bool
+			reason string
+		}
+	}{
+		{
+			name: "creates success result with expected fields",
+			expected: struct {
+				status fetcher.ProcessStatus
+				hasError bool
+				reason string
+			}{
+				status: fetcher.ProcessStatusSuccess,
+				hasError: false,
+				reason: "",
+			},
+		},
+	}
 
-	assert.NotNil(t, result)
-	assert.Equal(t, fetcher.ProcessStatusSuccess, result.Status)
-	assert.NoError(t, result.Error)
-	assert.Empty(t, result.Reason)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			result := fetcher.NewSuccessResult()
+
+			assert.NotNil(t, result)
+			assert.Equal(t, tt.expected.status, result.Status)
+			assert.Equal(t, tt.expected.hasError, result.Error != nil)
+			assert.Equal(t, tt.expected.reason, result.Reason)
+		})
+	}
 }
 
 func TestNewSkippedResult(t *testing.T) {
@@ -86,41 +114,55 @@ func TestNewErrorResult(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name          string
-		err           error
-		expectedError error
+		name     string
+		err      error
+		expected struct {
+			status fetcher.ProcessStatus
+			hasError bool
+			reason string
+		}
 	}{
 		{
-			name:          "error result with standard error",
-			err:           errTestResult,
-			expectedError: errTestResult,
+			name: "error result with standard error",
+			err:  errTestResult,
+			expected: struct {
+				status fetcher.ProcessStatus
+				hasError bool
+				reason string
+			}{
+				status: fetcher.ProcessStatusError,
+				hasError: true,
+				reason: "",
+			},
 		},
 		{
-			name:          "error result with network error",
-			err:           errNetworkResult,
-			expectedError: errNetworkResult,
-		},
-		{
-			name:          "error result with processing error",
-			err:           errProcessingResult,
-			expectedError: errProcessingResult,
-		},
-		{
-			name:          "error result with nil error",
-			err:           nil,
-			expectedError: nil,
+			name: "error result with nil error",
+			err:  nil,
+			expected: struct {
+				status fetcher.ProcessStatus
+				hasError bool
+				reason string
+			}{
+				status: fetcher.ProcessStatusError,
+				hasError: false,
+				reason: "",
+			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			result := fetcher.NewErrorResult(tt.err)
 
 			assert.NotNil(t, result)
-			assert.Equal(t, fetcher.ProcessStatusError, result.Status)
-			assert.Equal(t, tt.expectedError, result.Error)
-			assert.Empty(t, result.Reason)
+			assert.Equal(t, tt.expected.status, result.Status)
+			assert.Equal(t, tt.expected.hasError, result.Error != nil)
+			if tt.err != nil {
+				assert.Equal(t, tt.err, result.Error)
+			}
+			assert.Equal(t, tt.expected.reason, result.Reason)
 		})
 	}
 }
@@ -511,7 +553,7 @@ func TestProcessResult_Consistency(t *testing.T) {
 		result := fetcher.NewSuccessResult()
 
 		// Multiple calls should return consistent results
-		for i := 0; i < 10; i++ {
+		for range 10 {
 			assert.True(t, result.IsSuccess(), "IsSuccess should consistently return true")
 			assert.False(t, result.IsSkipped(), "IsSkipped should consistently return false")
 			assert.False(t, result.IsError(), "IsError should consistently return false")

@@ -63,3 +63,9 @@ mockgen:
 	@echo "Generating mocks..."
 	@./scripts/genmock.sh
 	@echo "Mocks generated successfully."
+
+.PHONY: update-coverage-badges
+update-coverage-badges:
+	@echo "Updating coverage badges in README.md..."
+	@node scripts/update-coverage-badges.js
+	@echo "Coverage badges updated successfully."

@@ -1,0 +1,144 @@
+name: Update README Coverage
+
+on:
+  push:
+    branches: [ main ]
+  workflow_run:
+    workflows: ["Backend CI", "Frontend CI"]
+    types:
+      - completed
+    branches: [ main ]
+
+permissions:
+  contents: write
+
+jobs:
+  update-readme:
+    name: Update README with Coverage
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.25.1'
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        go mod download
+        cd frontend && npm ci
+
+    - name: Create fake frontend dist for go:embed
+      run: mkdir -p frontend/dist && echo '{}' > frontend/dist/index.html
+
+    - name: Run backend tests with coverage
+      run: make test-coverage
+
+    - name: Run frontend tests with coverage
+      run: make test-frontend-coverage
+
+    - name: Calculate backend coverage
+      id: backend-coverage
+      run: |
+        BACKEND_COVERAGE=$(go tool cover -func=coverage_filtered.out | grep total | awk '{print $3}')
+        echo "coverage=$BACKEND_COVERAGE" >> $GITHUB_OUTPUT
+        echo "Backend Coverage: $BACKEND_COVERAGE"
+
+    - name: Calculate frontend coverage
+      id: frontend-coverage
+      run: |
+        FRONTEND_COVERAGE=$(cd frontend && node -e "
+          const fs = require('fs');
+          try {
+            const coverage = JSON.parse(fs.readFileSync('coverage/coverage-summary.json', 'utf8'));
+            const totalPct = coverage.total.lines.pct;
+            console.log(totalPct + '%');
+          } catch (e) {
+            console.log('0%');
+          }
+        ")
+        echo "coverage=$FRONTEND_COVERAGE" >> $GITHUB_OUTPUT
+        echo "Frontend Coverage: $FRONTEND_COVERAGE"
+
+    - name: Update README badges
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+
+          const backendCoverage = '${{ steps.backend-coverage.outputs.coverage }}';
+          const frontendCoverage = '${{ steps.frontend-coverage.outputs.coverage }}';
+
+          // Function to determine badge color based on coverage
+          function getBadgeColor(coverage) {
+            const num = parseFloat(coverage.replace('%', ''));
+            if (num >= 80) return 'brightgreen';
+            if (num >= 60) return 'yellow';
+            return 'red';
+          }
+
+          const backendColor = getBadgeColor(backendCoverage);
+          const frontendColor = getBadgeColor(frontendCoverage);
+
+          // Read README.md
+          const readmePath = path.join(process.cwd(), 'README.md');
+          let readmeContent = fs.readFileSync(readmePath, 'utf8');
+
+          // URL encode the percentages for shields.io
+          const backendEncoded = encodeURIComponent(backendCoverage);
+          const frontendEncoded = encodeURIComponent(frontendCoverage);
+
+          // Update backend coverage badge
+          readmeContent = readmeContent.replace(
+            /Go%20Coverage-[^-]+-[^)]+/g,
+            `Go%20Coverage-${backendEncoded}-${backendColor}`
+          );
+
+          // Update frontend coverage badge
+          readmeContent = readmeContent.replace(
+            /Frontend%20Coverage-[^-]+-[^)]+/g,
+            `Frontend%20Coverage-${frontendEncoded}-${frontendColor}`
+          );
+
+          // Write back to file
+          fs.writeFileSync(readmePath, readmeContent);
+
+          console.log(`Updated README.md with:`);
+          console.log(`  Backend Coverage: ${backendCoverage} (${backendColor})`);
+          console.log(`  Frontend Coverage: ${frontendCoverage} (${frontendColor})`);
+
+    - name: Check for changes
+      id: verify-changed-files
+      run: |
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "changed=true" >> $GITHUB_OUTPUT
+        else
+          echo "changed=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Commit and push changes
+      if: steps.verify-changed-files.outputs.changed == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add README.md
+        git commit -m "🤖 Update coverage badges
+
+        Backend: ${{ steps.backend-coverage.outputs.coverage }}
+        Frontend: ${{ steps.frontend-coverage.outputs.coverage }}
+
+        Auto-updated by GitHub Actions"
+        git push

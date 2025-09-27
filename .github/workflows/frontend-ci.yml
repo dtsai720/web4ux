@@ -6,11 +6,17 @@ on:
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-ci.yml'
+      - 'README.md'
+      - '.github/workflows/update-readme-coverage.yml'
+      - 'scripts/update-coverage-badges.js'
   pull_request:
     branches: [ main ]
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-ci.yml'
+      - 'README.md'
+      - '.github/workflows/update-readme-coverage.yml'
+      - 'scripts/update-coverage-badges.js'
 
 permissions:
   contents: read

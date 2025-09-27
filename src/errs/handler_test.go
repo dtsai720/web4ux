@@ -12,6 +12,8 @@ import (
 )
 
 func TestErrorType_String(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name     string
 		errType  errs.ErrorType
@@ -56,6 +58,8 @@ func TestErrorType_String(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			result := tt.errType.String()
 			assert.Equal(t, tt.expected, result)
 		})
@@ -63,18 +67,54 @@ func TestErrorType_String(t *testing.T) {
 }
 
 func TestNewAppError(t *testing.T) {
-	cause := errors.New("underlying error")
+	t.Parallel()
 
-	appErr := errs.NewAppError(errs.ValidationError, "test message", cause)
+	tests := []struct {
+		name     string
+		errType  errs.ErrorType
+		message  string
+		cause    error
+		expected struct {
+			errType errs.ErrorType
+			message string
+			cause   error
+		}
+	}{
+		{
+			name:    "creates app error with all fields",
+			errType: errs.ValidationError,
+			message: "test message",
+			cause:   errors.New("underlying error"),
+			expected: struct {
+				errType errs.ErrorType
+				message string
+				cause   error
+			}{
+				errType: errs.ValidationError,
+				message: "test message",
+				cause:   errors.New("underlying error"),
+			},
+		},
+	}
 
-	assert.Equal(t, errs.ValidationError, appErr.Type)
-	assert.Equal(t, "test message", appErr.Message)
-	assert.Equal(t, cause, appErr.Cause)
-	assert.NotNil(t, appErr.Context)
-	assert.Empty(t, appErr.Context)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			appErr := errs.NewAppError(tt.errType, tt.message, tt.cause)
+
+			assert.Equal(t, tt.expected.errType, appErr.Type)
+			assert.Equal(t, tt.expected.message, appErr.Message)
+			assert.Equal(t, tt.expected.cause.Error(), appErr.Cause.Error())
+			assert.NotNil(t, appErr.Context)
+			assert.Empty(t, appErr.Context)
+		})
+	}
 }
 
 func TestAppError_Error(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name     string
 		appErr   *errs.AppError
@@ -102,6 +142,8 @@ func TestAppError_Error(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			result := tt.appErr.Error()
 			assert.Equal(t, tt.expected, result)
 		})
@@ -109,6 +151,8 @@ func TestAppError_Error(t *testing.T) {
 }
 
 func TestAppError_WithContext(t *testing.T) {
+	t.Parallel()
+
 	appErr := errs.NewAppError(errs.ValidationError, "test", nil)
 
 	result := appErr.WithContext("key1", "value1")
@@ -125,6 +169,8 @@ func TestAppError_WithContext(t *testing.T) {
 }
 
 func TestAppError_Unwrap(t *testing.T) {
+	t.Parallel()
+
 	cause := errors.New("underlying error")
 	appErr := errs.NewAppError(errs.ValidationError, "test", cause)
 
@@ -138,6 +184,8 @@ func TestAppError_Unwrap(t *testing.T) {
 }
 
 func TestAppError_Is(t *testing.T) {
+	t.Parallel()
+
 	appErr1 := errs.NewAppError(errs.ValidationError, "test1", nil)
 	appErr2 := errs.NewAppError(errs.ValidationError, "test2", nil)
 	appErr3 := errs.NewAppError(errs.DatabaseError, "test3", nil)
@@ -154,6 +202,8 @@ func TestAppError_Is(t *testing.T) {
 }
 
 func TestNewStandardErrorHandler(t *testing.T) {
+	t.Parallel()
+
 	log := logger.NewTestLogger()
 	classifier := errs.NewDefaultErrorClassifier()
 	reporter := errs.NewLoggingErrorReporter(log)
@@ -165,6 +215,8 @@ func TestNewStandardErrorHandler(t *testing.T) {
 }
 
 func TestNewBasicErrorHandler(t *testing.T) {
+	t.Parallel()
+
 	log := logger.NewTestLogger()
 
 	handler := errs.NewBasicErrorHandler(log)
@@ -174,6 +226,8 @@ func TestNewBasicErrorHandler(t *testing.T) {
 }
 
 func TestStandardErrorHandler_Handle(t *testing.T) {
+	t.Parallel()
+
 	log := logger.NewTestLogger()
 	handler := errs.NewBasicErrorHandler(log)
 	ctx := context.Background()
@@ -198,6 +252,8 @@ func TestStandardErrorHandler_Handle(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			// Should not panic
 			handler.Handle(ctx, tt.err)
 		})
@@ -205,6 +261,8 @@ func TestStandardErrorHandler_Handle(t *testing.T) {
 }
 
 func TestStandardErrorHandler_WrapperMethods(t *testing.T) {
+	t.Parallel()
+
 	log := logger.NewTestLogger()
 	handler := errs.NewBasicErrorHandler(log)
 	cause := errors.New("underlying error")
@@ -243,6 +301,8 @@ func TestStandardErrorHandler_WrapperMethods(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			result := tt.wrapFn()
 			assert.Equal(t, tt.expected, result.Type)
 			assert.Equal(t, cause, result.Cause)
@@ -251,6 +311,8 @@ func TestStandardErrorHandler_WrapperMethods(t *testing.T) {
 }
 
 func TestStandardErrorHandler_WrapError(t *testing.T) {
+	t.Parallel()
+
 	log := logger.NewTestLogger()
 	handler := errs.NewBasicErrorHandler(log)
 	cause := errors.New("underlying error")
@@ -263,6 +325,8 @@ func TestStandardErrorHandler_WrapError(t *testing.T) {
 }
 
 func TestStandardErrorHandler_WrapWithContext(t *testing.T) {
+	t.Parallel()
+
 	log := logger.NewTestLogger()
 	handler := errs.NewBasicErrorHandler(log)
 	cause := errors.New("underlying error")
@@ -281,6 +345,8 @@ func TestStandardErrorHandler_WrapWithContext(t *testing.T) {
 }
 
 func TestStandardErrorHandler_Execute(t *testing.T) {
+	t.Parallel()
+
 	log := logger.NewTestLogger()
 	handler := errs.NewBasicErrorHandler(log)
 	ctx := context.Background()
@@ -308,6 +374,8 @@ func TestStandardErrorHandler_Execute(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			err := handler.Execute(ctx, tt.fn)
 			assert.Equal(t, tt.hasError, err != nil)
 		})
@@ -315,6 +383,8 @@ func TestStandardErrorHandler_Execute(t *testing.T) {
 }
 
 func TestStandardErrorHandler_ExecuteWithResult(t *testing.T) {
+	t.Parallel()
+
 	log := logger.NewTestLogger()
 	handler := errs.NewBasicErrorHandler(log)
 	ctx := context.Background()
@@ -345,6 +415,8 @@ func TestStandardErrorHandler_ExecuteWithResult(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			result, err := handler.ExecuteWithResult(ctx, tt.fn)
 			assert.Equal(t, tt.expectedResult, result)
 			assert.Equal(t, tt.hasError, err != nil)
@@ -353,6 +425,8 @@ func TestStandardErrorHandler_ExecuteWithResult(t *testing.T) {
 }
 
 func TestStandardErrorHandler_ExecuteWithRecovery(t *testing.T) {
+	t.Parallel()
+
 	log := logger.NewTestLogger()
 	handler := errs.NewBasicErrorHandler(log)
 	ctx := context.Background()
@@ -391,6 +465,8 @@ func TestStandardErrorHandler_ExecuteWithRecovery(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			err := handler.ExecuteWithRecovery(ctx, tt.fn)
 			assert.Equal(t, tt.hasError, err != nil)
 
@@ -405,6 +481,8 @@ func TestStandardErrorHandler_ExecuteWithRecovery(t *testing.T) {
 }
 
 func TestNewErrorHandlerDecorator(t *testing.T) {
+	t.Parallel()
+
 	log := logger.NewTestLogger()
 
 	decorator := errs.NewErrorHandlerDecorator[string](log)
@@ -413,6 +491,8 @@ func TestNewErrorHandlerDecorator(t *testing.T) {
 }
 
 func TestErrorHandlerDecorator_Execute(t *testing.T) {
+	t.Parallel()
+
 	log := logger.NewTestLogger()
 	decorator := errs.NewErrorHandlerDecorator[string](log)
 	ctx := context.Background()
@@ -443,6 +523,8 @@ func TestErrorHandlerDecorator_Execute(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			result, err := decorator.Execute(ctx, tt.fn)
 			assert.Equal(t, tt.expectedResult, result)
 			assert.Equal(t, tt.hasError, err != nil)
@@ -451,6 +533,8 @@ func TestErrorHandlerDecorator_Execute(t *testing.T) {
 }
 
 func TestErrorHandlerDecorator_ExecuteWithRecovery(t *testing.T) {
+	t.Parallel()
+
 	log := logger.NewTestLogger()
 	decorator := errs.NewErrorHandlerDecorator[int](log)
 	ctx := context.Background()
@@ -493,6 +577,8 @@ func TestErrorHandlerDecorator_ExecuteWithRecovery(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			result, err := decorator.ExecuteWithRecovery(ctx, tt.fn)
 			assert.Equal(t, tt.expectedResult, result)
 			assert.Equal(t, tt.hasError, err != nil)
