@@ -181,7 +181,7 @@ func TestParseContentForWinfittsDetails_EdgeCases(t *testing.T) {
 			name: "very long content",
 			htmlContent: func() string {
 				content := "<div class=\"data1-pack\">\n"
-				for i := 0; i < 1000; i++ {
+				for i := range 1000 {
 					content += "<p>line " + string(rune('0'+i%10)) + "</p>\n"
 				}
 				content += "</div>"
@@ -189,7 +189,7 @@ func TestParseContentForWinfittsDetails_EdgeCases(t *testing.T) {
 			}(),
 			expectedResult: func() [][]string {
 				expected := []string{"<div class=\"data1-pack\">"}
-				for i := 0; i < 1000; i++ {
+				for i := range 1000 {
 					expected = append(expected, "<p>line "+string(rune('0'+i%10))+"</p>")
 				}
 				expected = append(expected, "</div>")
