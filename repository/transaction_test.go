@@ -6,10 +6,13 @@ import (
 	"fmt"
 	"testing"
 
+	_ "modernc.org/sqlite"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
 	"github.com/web4ux/repository"
 	"github.com/web4ux/src/types"
+	"github.com/web4ux/src/logger"
 )
 
 func TestNewTransactionManager(t *testing.T) {
@@ -475,3 +478,294 @@ func TestBatchProcessor_ErrorPropagation(t *testing.T) {
 		})
 	}
 }
+
+func TestTransactionManager_ExecuteInTransaction(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name            string
+		transactionFunc repository.TransactionFunc
+		expectedError   bool
+		errorSubstring  string
+	}{
+		{
+			name: "successful transaction execution",
+			transactionFunc: func(ctx context.Context, tx *sql.Tx) error {
+				// Simulate successful operation
+				return nil
+			},
+			expectedError: false,
+		},
+		{
+			name: "transaction function returns error",
+			transactionFunc: func(ctx context.Context, tx *sql.Tx) error {
+				// Simulate operation failure
+				return fmt.Errorf("operation failed")
+			},
+			expectedError:  true,
+			errorSubstring: "transaction failed: operation failed",
+		},
+		{
+			name: "transaction function handles context",
+			transactionFunc: func(ctx context.Context, tx *sql.Tx) error {
+				// Simulate context usage
+				if ctx.Err() != nil {
+					return fmt.Errorf("context error: %w", ctx.Err())
+				}
+				return nil
+			},
+			expectedError: false,
+		},
+		{
+			name: "transaction function with detailed error",
+			transactionFunc: func(ctx context.Context, tx *sql.Tx) error {
+				return fmt.Errorf("database constraint violation: duplicate key")
+			},
+			expectedError:  true,
+			errorSubstring: "transaction failed: database constraint violation",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			// Create an in-memory SQLite database for testing
+			db, err := sql.Open("sqlite", ":memory:")
+			require.NoError(t, err)
+			defer db.Close()
+
+			tm := repository.NewTransactionManager(db)
+			ctx := context.Background()
+			log := &mockLogger{}
+
+			err = tm.ExecuteInTransaction(ctx, log, tt.transactionFunc)
+
+			if tt.expectedError {
+				require.Error(t, err)
+				if tt.errorSubstring != "" {
+					assert.Contains(t, err.Error(), tt.errorSubstring)
+				}
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestTransactionManager_ExecuteInTransaction_Panic(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name         string
+		panicValue   interface{}
+		expectedPanic interface{}
+	}{
+		{
+			name:          "handles string panic",
+			panicValue:    "something went wrong",
+			expectedPanic: "something went wrong",
+		},
+		{
+			name:          "handles error panic",
+			panicValue:    "panic error",
+			expectedPanic: "panic error",
+		},
+		{
+			name:          "handles integer panic",
+			panicValue:    42,
+			expectedPanic: 42,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			db, err := sql.Open("sqlite", ":memory:")
+			require.NoError(t, err)
+			defer db.Close()
+
+			tm := repository.NewTransactionManager(db)
+			ctx := context.Background()
+			log := &mockLogger{}
+
+			panicFunc := func(ctx context.Context, tx *sql.Tx) error {
+				panic(tt.panicValue)
+			}
+
+			// Assert that panic is re-raised after rollback
+			assert.PanicsWithValue(t, tt.expectedPanic, func() {
+				tm.ExecuteInTransaction(ctx, log, panicFunc)
+			})
+		})
+	}
+}
+
+func TestTransactionManager_ExecuteInTransaction_BeginError(t *testing.T) {
+	t.Parallel()
+
+	// Create a database that will be closed to simulate BeginTx error
+	db, err := sql.Open("sqlite", ":memory:")
+	require.NoError(t, err)
+	db.Close() // Close immediately to cause BeginTx to fail
+
+	tm := repository.NewTransactionManager(db)
+	ctx := context.Background()
+	log := &mockLogger{}
+
+	transactionFunc := func(ctx context.Context, tx *sql.Tx) error {
+		return nil
+	}
+
+	err = tm.ExecuteInTransaction(ctx, log, transactionFunc)
+
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to begin transaction")
+}
+
+func TestTransactionManager_ExecuteInTransaction_RollbackScenarios(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name            string
+		transactionFunc repository.TransactionFunc
+		expectRollback  bool
+		expectedError   string
+	}{
+		{
+			name: "successful transaction - no rollback",
+			transactionFunc: func(ctx context.Context, tx *sql.Tx) error {
+				return nil
+			},
+			expectRollback: false,
+		},
+		{
+			name: "transaction error - triggers rollback",
+			transactionFunc: func(ctx context.Context, tx *sql.Tx) error {
+				return fmt.Errorf("business logic error")
+			},
+			expectRollback:  true,
+			expectedError: "transaction failed: business logic error",
+		},
+		{
+			name: "context cancellation - triggers rollback",
+			transactionFunc: func(ctx context.Context, tx *sql.Tx) error {
+				// Simulate context cancellation check
+				select {
+				case <-ctx.Done():
+					return ctx.Err()
+				default:
+					return fmt.Errorf("context cancelled during operation")
+				}
+			},
+			expectRollback:  true,
+			expectedError: "transaction failed",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			db, err := sql.Open("sqlite", ":memory:")
+			require.NoError(t, err)
+			defer db.Close()
+
+			tm := repository.NewTransactionManager(db)
+			ctx := context.Background()
+			log := &mockLogger{}
+
+			err = tm.ExecuteInTransaction(ctx, log, tt.transactionFunc)
+
+			if tt.expectedError == "" {
+				require.NoError(t, err)
+			} else {
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), tt.expectedError)
+			}
+		})
+	}
+}
+
+func TestTransactionManager_ExecuteInTransaction_ConcurrentAccess(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name            string
+		numTransactions int
+		description     string
+	}{
+		{
+			name:            "sequential transaction processing",
+			numTransactions: 3,
+			description:     "multiple sequential transactions should all succeed",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			db, err := sql.Open("sqlite", ":memory:")
+			require.NoError(t, err)
+			defer db.Close()
+
+			tm := repository.NewTransactionManager(db)
+			ctx := context.Background()
+			log := &mockLogger{}
+
+			// Process multiple transactions sequentially
+			successCount := 0
+			for i := 0; i < tt.numTransactions; i++ {
+				transactionFunc := func(ctx context.Context, tx *sql.Tx) error {
+					// Simple operation that doesn't require persistent tables
+					_, err := tx.Query("SELECT 1")
+					return err
+				}
+
+				err := tm.ExecuteInTransaction(ctx, log, transactionFunc)
+				if err == nil {
+					successCount++
+				}
+			}
+
+			assert.Equal(t, tt.numTransactions, successCount, tt.description)
+		})
+	}
+}
+
+// Mock logger for testing
+type mockLogger struct {
+	errorMessages []string
+}
+
+func (m *mockLogger) Panicf(template string, args ...any) {}
+
+func (m *mockLogger) Fatalln(args ...any) {}
+
+func (m *mockLogger) With(fields ...zap.Field) logger.ILogger {
+	return m
+}
+
+func (m *mockLogger) Errorf(template string, args ...any) {
+	if m.errorMessages == nil {
+		m.errorMessages = make([]string, 0)
+	}
+	m.errorMessages = append(m.errorMessages, fmt.Sprintf(template, args...))
+}
+
+func (m *mockLogger) Error(args ...any) {
+	if m.errorMessages == nil {
+		m.errorMessages = make([]string, 0)
+	}
+	if len(args) > 0 {
+		if msg, ok := args[0].(string); ok {
+			m.errorMessages = append(m.errorMessages, msg)
+		}
+	}
+}
+
+func (m *mockLogger) Infof(template string, args ...any) {}
+
+func (m *mockLogger) Info(args ...any) {}

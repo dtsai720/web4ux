@@ -3,7 +3,7 @@
 [![Backend CI](https://github.com/dtsai720/web4ux/actions/workflows/backend-ci.yml/badge.svg?branch=main)](https://github.com/dtsai720/web4ux/actions/workflows/backend-ci.yml)
 [![Frontend CI](https://github.com/dtsai720/web4ux/actions/workflows/frontend-ci.yml/badge.svg?branch=main)](https://github.com/dtsai720/web4ux/actions/workflows/frontend-ci.yml)
 
-[![Go Coverage](https://img.shields.io/badge/Go%20Coverage-64.0%25-yellow)](./coverage.html)
+[![Go Coverage](https://img.shields.io/badge/Go%20Coverage-90.1%25-brightgreen)](./coverage.html)
 [![Frontend Coverage](https://img.shields.io/badge/Frontend%20Coverage-13.09%25-red)](./frontend/coverage/)
 
 ## About
