@@ -52,11 +52,18 @@ func TestLogin(t *testing.T) {
 			expectError: true,
 		},
 		{
-			name:        "login with empty credentials",
+			name:        "login with empty email",
 			email:       "",
+			password:    "password123",
+			actual:      common.Item[[]byte]{Count: 0}, // No call expected due to validation
+			expectError: true,
+		},
+		{
+			name:        "login with empty password",
+			email:       "test@example.com",
 			password:    "",
-			actual:      common.Item[[]byte]{Result: []byte("login failed"), Count: 1},
-			expectError: false,
+			actual:      common.Item[[]byte]{Count: 0}, // No call expected due to validation
+			expectError: true,
 		},
 	}
 

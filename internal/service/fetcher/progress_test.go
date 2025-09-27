@@ -166,7 +166,7 @@ func TestProgressNotifier_NotifyProgress(t *testing.T) {
 			notifier := fetcher.NewProgressNotifier()
 
 			// Add observers
-			for i := 0; i < tt.observerCount; i++ {
+			for range tt.observerCount {
 				mockObserver := mock_internal_service_fetcher.NewMockProgressObserver(ctrl)
 				mockObserver.EXPECT().OnProgress(tt.event).Times(1)
 				notifier.AddObserver(mockObserver)

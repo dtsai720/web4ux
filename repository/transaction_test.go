@@ -717,7 +717,7 @@ func TestTransactionManager_ExecuteInTransaction_ConcurrentAccess(t *testing.T) 
 
 			// Process multiple transactions sequentially
 			successCount := 0
-			for i := 0; i < tt.numTransactions; i++ {
+			for range tt.numTransactions {
 				transactionFunc := func(ctx context.Context, tx *sql.Tx) error {
 					// Simple operation that doesn't require persistent tables
 					_, err := tx.Query("SELECT 1")

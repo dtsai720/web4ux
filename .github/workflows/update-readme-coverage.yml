@@ -147,4 +147,24 @@ jobs:
         Frontend: ${{ steps.frontend-coverage.outputs.coverage }}
 
         Auto-updated by GitHub Actions"
-        git push
+
+        # Pull latest changes and rebase our commit on top
+        git fetch origin main
+        git rebase origin/main
+
+        # Push with retry logic
+        for i in {1..3}; do
+          if git push origin main; then
+            echo "Successfully pushed on attempt $i"
+            break
+          else
+            echo "Push failed on attempt $i, retrying..."
+            git fetch origin main
+            git rebase origin/main
+            if [ $i -eq 3 ]; then
+              echo "Failed to push after 3 attempts"
+              exit 1
+            fi
+            sleep 2
+          fi
+        done
