@@ -1,4 +1,6 @@
 
+import React from 'react';
+
 const PageButton = ({ page, isActive, onClick, disabled, children }) => (
   <li className={`page-item ${isActive ? 'active' : ''} ${disabled ? 'disabled' : ''}`}>
     <button

@@ -1,3 +1,5 @@
+import React from 'react';
+
 const BackToHomeButton = ({ setCurrentPage }) => (
   <div className="text-center mt-4">
     <button

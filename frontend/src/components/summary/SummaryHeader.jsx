@@ -1,3 +1,5 @@
+import React from 'react';
+
 const SummaryHeader = () => (
   <div className="row mb-4">
     <div className="col-12">
