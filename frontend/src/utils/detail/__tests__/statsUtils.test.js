@@ -159,14 +159,7 @@ describe('statsUtils', () => {
         { mark: 'target', timestamp: 2000 } // Max timestamp and only target
       ];
 
-      // Remove the first target to simulate calculable case
-      const recordsWithoutFirstTarget = [
-        { mark: 'start', timestamp: 1000 },
-        { mark: 'else', timestamp: 1500 },
-        { mark: 'target', timestamp: 2000 }
-      ];
-
-      const result = calculateSingleTrailStats(recordsWithoutFirstTarget);
+      const result = calculateSingleTrailStats(records);
 
       // Should be available since there is a default target
       expect(result.availableStatus).toBe(1);

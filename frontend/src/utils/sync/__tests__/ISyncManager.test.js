@@ -1,4 +1,4 @@
-import { describe, test, expect, vi } from 'vitest';
+import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { ISyncManager, createSyncManager } from '../ISyncManager.js';
 
 describe('ISyncManager', () => {
@@ -59,7 +59,6 @@ describe('ISyncManager', () => {
   describe('createSyncManager factory', () => {
     test('should create default sync manager', async () => {
       // Mock the dynamic import
-      const mockSyncManager = { type: 'SyncManager' };
       vi.doMock('../SyncManager.js', () => ({
         SyncManager: class MockSyncManager {
           constructor(options) {
