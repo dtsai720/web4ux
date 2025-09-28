@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Import page components
@@ -8,22 +8,24 @@ import GuidePage from './pages/Guide/GuidePage';
 import SummaryPage from './pages/Summary/SummaryPage';
 import DetailPage from './pages/Detail/DetailPage';
 
-const App = () => {
-  const [currentPage, setCurrentPage] = useState('home');
-  const [selectedSummaryId, setSelectedSummaryId] = useState(null);
+// Import navigation context
+import { NavigationProvider, useNavigation } from './contexts/NavigationContext';
+
+const AppContent = () => {
+  const { currentPage } = useNavigation();
 
   const renderCurrentPage = () => {
     switch (currentPage) {
       case 'sync':
-        return <SyncPage setCurrentPage={setCurrentPage} />;
+        return <SyncPage />;
       case 'summary':
-        return <SummaryPage setCurrentPage={setCurrentPage} setSelectedSummaryId={setSelectedSummaryId} />;
+        return <SummaryPage />;
       case 'guide':
-        return <GuidePage setCurrentPage={setCurrentPage} />;
+        return <GuidePage />;
       case 'detail':
-        return <DetailPage setCurrentPage={setCurrentPage} selectedSummaryId={selectedSummaryId} />;
+        return <DetailPage />;
       default:
-        return <HomePage setCurrentPage={setCurrentPage} />;
+        return <HomePage />;
     }
   };
 
@@ -31,6 +33,14 @@ const App = () => {
     <div className="App">
       {renderCurrentPage()}
     </div>
+  );
+};
+
+const App = () => {
+  return (
+    <NavigationProvider>
+      <AppContent />
+    </NavigationProvider>
   );
 };
 

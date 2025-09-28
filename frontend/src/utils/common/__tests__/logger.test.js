@@ -3,7 +3,7 @@ import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 describe('logger', () => {
   let originalNodeEnv;
   let consoleSpy;
-  let logger, handleError;
+  let logger;
 
   beforeEach(() => {
     originalNodeEnv = process.env.NODE_ENV;
@@ -27,7 +27,6 @@ describe('logger', () => {
       vi.resetModules();
       const loggerModule = await import('../logger.js');
       logger = loggerModule.logger;
-      handleError = loggerModule.handleError;
     });
 
     test('logger.error should call console.error', () => {
@@ -86,7 +85,6 @@ describe('logger', () => {
       vi.resetModules();
       const loggerModule = await import('../logger.js');
       logger = loggerModule.logger;
-      handleError = loggerModule.handleError;
     });
 
     test('logger.error should not call console.error', () => {
@@ -128,7 +126,6 @@ describe('logger', () => {
       vi.resetModules();
       const loggerModule = await import('../logger.js');
       logger = loggerModule.logger;
-      handleError = loggerModule.handleError;
     });
 
     test('logger methods should not call console methods', () => {
