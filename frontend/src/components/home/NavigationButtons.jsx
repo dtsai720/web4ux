@@ -1,7 +1,10 @@
 import React from 'react';
 import NavigationButton from './NavigationButton';
+import { useNavigation } from '../../contexts/NavigationContext';
 
-const NavigationButtons = ({ setCurrentPage }) => {
+const NavigationButtons = () => {
+  const { navigateTo } = useNavigation();
+
   const buttons = [
     {
       icon: 'arrow-repeat',
@@ -31,7 +34,7 @@ const NavigationButtons = ({ setCurrentPage }) => {
           icon={button.icon}
           label={button.label}
           color={button.color}
-          onClick={() => setCurrentPage(button.page)}
+          onClick={() => navigateTo(button.page)}
         />
       ))}
     </div>

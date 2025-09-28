@@ -125,9 +125,14 @@ describe('summaryUtils', () => {
 
       expect(mockSetters.setLoading).toHaveBeenCalledWith(true);
       expect(mockSetters.setError).toHaveBeenCalledWith('');
-      expect(mockListSummaries).toHaveBeenCalledWith(
-        'test', 'creator', 'name', 'asc', 10, 10
-      );
+      expect(mockListSummaries).toHaveBeenCalledWith({
+        name: 'test',
+        creator: 'creator',
+        orderBy: 'name',
+        direction: 'asc',
+        offset: 10,
+        limit: 10
+      });
       expect(mockSetters.setSummaries).toHaveBeenCalledWith(mockData);
       expect(mockSetters.setTotalItems).toHaveBeenCalledWith(25);
       expect(mockSetters.setLoading).toHaveBeenCalledWith(false);
@@ -151,9 +156,14 @@ describe('summaryUtils', () => {
       await loadSummaries(params);
 
       // Page 3 with 15 items per page = offset 30
-      expect(mockListSummaries).toHaveBeenCalledWith(
-        '', '', 'createdAt', 'desc', 30, 15
-      );
+      expect(mockListSummaries).toHaveBeenCalledWith({
+        name: '',
+        creator: '',
+        orderBy: 'createdAt',
+        direction: 'desc',
+        offset: 30,
+        limit: 15
+      });
     });
 
     test('should handle API error gracefully', async () => {

@@ -11,8 +11,10 @@ import {
   SummaryHeader,
   SummaryTable
 } from '../../components/summary';
+import { useNavigation } from '../../contexts/NavigationContext';
 
-const SummaryPage = ({ setCurrentPage, setSelectedSummaryId }) => {
+const SummaryPage = () => {
+  const { navigateToDetail } = useNavigation();
   const [summaries, setSummaries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -72,8 +74,7 @@ const SummaryPage = ({ setCurrentPage, setSelectedSummaryId }) => {
 
   // Handle item click
   const handleItemClick = (summaryId) => {
-    setSelectedSummaryId(summaryId);
-    setCurrentPage('detail');
+    navigateToDetail(summaryId);
   };
 
   return (
@@ -119,7 +120,7 @@ const SummaryPage = ({ setCurrentPage, setSelectedSummaryId }) => {
         )}
 
         {/* Back button */}
-        <BackToHomeButton setCurrentPage={setCurrentPage} />
+        <BackToHomeButton />
       </div>
     </div>
   );

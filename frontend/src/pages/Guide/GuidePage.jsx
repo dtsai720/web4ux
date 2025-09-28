@@ -3,10 +3,8 @@ import { GuideAccordion, BackToHomeButton } from '../../components/guide';
 
 /**
  * GuidePage component that displays user guide information
- * @param {Object} props - Component props
- * @param {Function} props.setCurrentPage - Function to set the current page
  */
-const GuidePage = ({ setCurrentPage }) => {
+const GuidePage = () => {
   return (
     <div className="container mt-5">
       <div className="row">
@@ -15,7 +13,7 @@ const GuidePage = ({ setCurrentPage }) => {
           <GuideAccordion />
         </div>
       </div>
-      <BackToHomeButton setCurrentPage={setCurrentPage} />
+      <BackToHomeButton />
     </div>
   );
 };

@@ -22,8 +22,10 @@ import { handleError } from '../../utils/common';
 // Import UI components
 import SummaryInfoCard from '../../components/detail/SummaryInfoCard';
 import DetailPageHeader from '../../components/detail/DetailPageHeader';
+import { useNavigation } from '../../contexts/NavigationContext';
 
-const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
+const DetailPage = () => {
+  const { selectedSummaryId } = useNavigation();
   // State management
   const [data, setData] = useState(DEFAULT_STATE.data);
   const [summaryInfo, setSummaryInfo] = useState(DEFAULT_STATE.summaryInfo);
@@ -178,7 +180,6 @@ const DetailPage = ({ setCurrentPage, selectedSummaryId }) => {
       <div className="row">
         <div className="col-12">
           <DetailPageHeader
-            setCurrentPage={setCurrentPage}
             modeState={{
               deleteMode,
               outlierMode,

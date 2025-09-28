@@ -82,11 +82,20 @@ export const loadSummaries = async ({
     const limit = itemsPerPage;
     const offset = (currentPageNum - 1) * limit;
 
-    const result = await ListSummaries(searchName, searchCreator, orderBy, orderDirection, offset, limit);
+    const request = {
+      name: searchName,
+      creator: searchCreator,
+      orderBy: orderBy,
+      direction: orderDirection,
+      offset: offset,
+      limit: limit
+    };
+    const result = await ListSummaries(request);
     setSummaries(result.data || []);
     setTotalItems(result.total || 0);
   } catch (err) {
-    setError('Failed to load summaries: ' + err.message);
+    const errorMessage = err?.message || err?.toString() || 'Unknown error';
+    setError('Failed to load summaries: ' + errorMessage);
     setSummaries([]);
     setTotalItems(0);
   } finally {
